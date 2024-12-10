@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <DockerDefaultTargetOS>Windows</DockerDefaultTargetOS>
+        <LangVersion>10</LangVersion>
+        <RootNamespace>Game.Client</RootNamespace>
+        <OutputType>Exe</OutputType>
+        <TargetFrameworks>net6.0-windows;netstandard2.1</TargetFrameworks>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Content Include="..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Google.FlatBuffers" Version="24.3.25" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Flatbuffers.Messages\Flatbuffers.Messages.csproj" />
+      <ProjectReference Include="..\src\BeetleX\BeetleX.csproj" />
+    </ItemGroup>
+
+</Project>
