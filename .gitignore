@@ -2,3 +2,6 @@
 Flatbuffers.Messages/obj
 Flatbuffers.Server/obj
 src/BeetleX/obj
+Flatbuffers.Messages/bin
+Flatbuffers.Server/bin
+src/BeetleX/bin

@@ -2,24 +2,36 @@
 using BeetleX.EventArgs;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Flatbuffers.Messages.Packets.Server;
+using Flatbuffers.Server.Logic.network;
 
 namespace Flatbuffers.Server
 {
     public class Program : ServerHandlerBase
     {
-        private static IServer mServer;
+        private static IServer? mServerSocket;
         
         public static void Main(string[] args)
         {
             ServerOptions options = new ServerOptions();
             options.LogLevel = LogType.Info;
-            mServer = SocketFactory.CreateTcpServer<Program, ServerPacket>(options);
+            mServerSocket = SocketFactory.CreateTcpServer<Program, ServerPacket>(options);
 
-            
-            
-            mServer.Open();    
+            if (mServerSocket.Handler is Program program)
+            {
+                program.Start();
+            }
+            mServerSocket.Log(LogType.Warring,null,"----- 서버 시작 ------");
             Console.Read();
+        }
+
+        //------------------------------------------------------------------------------------------------------
+        //        
+        public void Start()
+        {
+            GameClient.SendPacketClassMethods.Register();
+            mServerSocket?.Open();
         }
         
         //------------------------------------------------------------------------------------------------------
