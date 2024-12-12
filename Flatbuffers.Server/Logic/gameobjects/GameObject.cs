@@ -1,4 +1,5 @@
-﻿using Game.Logic.World;
+﻿using Game.Logic.Geometry;
+using Game.Logic.World;
 
 namespace Game.Logic
 {
@@ -11,11 +12,17 @@ namespace Game.Logic
             Deleted
         }
         
+        // =============================================================================================
+        #region 변수들
         protected eRealm m_Realm;
         protected int m_ObjectID;
         protected volatile eObjectState m_ObjectState;
-        
-        // GET / SET ========================================================================
+        protected Region mCurrentRegion;
+        protected string mName;
+        #endregion
+
+        // =============================================================================================
+        #region GET / SET
         public virtual eRealm Realm
         {
             get => m_Realm;
@@ -41,5 +48,17 @@ namespace Game.Logic
             }
         }
         
+        public Position Position { get; set; }
+        public Coordinate Coordinate => Position.Coordinate;
+
+        public string Name
+        {
+            get => mName;
+            set
+            {
+                mName = value;
+            }
+        }
+        #endregion        
     }
 }

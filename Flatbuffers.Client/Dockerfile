@@ -3,16 +3,16 @@ WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
-COPY ["ConsoleApp1/ConsoleApp1.csproj", "ConsoleApp1/"]
-RUN dotnet restore "ConsoleApp1/ConsoleApp1.csproj"
+COPY ["Flatbuffers.Client/Flatbuffers.Client.csproj", "Flatbuffers.Client/"]
+RUN dotnet restore "Flatbuffers.Client/Flatbuffers.Client.csproj"
 COPY . .
-WORKDIR "/src/ConsoleApp1"
-RUN dotnet build "ConsoleApp1.csproj" -c Release -o /app/build
+WORKDIR "/src/Flatbuffers.Client"
+RUN dotnet build "Flatbuffers.Client.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "ConsoleApp1.csproj" -c Release -o /app/publish
+RUN dotnet publish "Flatbuffers.Client.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "ConsoleApp1.dll"]
+ENTRYPOINT ["dotnet", "Flatbuffers.Client.dll"]
