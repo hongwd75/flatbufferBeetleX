@@ -3,6 +3,7 @@ using BeetleX;
 using BeetleX.EventArgs;
 using Flatbuffers.Messages.Packets.Server;
 using Flatbuffers.Server.Logic.network;
+using Game.Logic.World;
 using log4net;
 using log4net.Config;
 using Logic.database;
@@ -17,6 +18,9 @@ public class GameServer
     
     protected IObjectDatabase m_database;
     public IObjectDatabase IDatabase => m_database;
+
+    protected eGameServerStatus mStatus = eGameServerStatus.GSS_Unknown;
+    public eGameServerStatus ServerStatus => mStatus;
     
     public static GameServer Instance { get; private set; } = null;
     public BaseServerConfiguration Configuration;
@@ -66,6 +70,10 @@ public class GameServer
     // 서버 시작
     public void Start()
     {
+        mStatus = eGameServerStatus.GSS_Closed;
+        // GC 설정
+        GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
+        
         // 소켓 설정
         ServerOptions options = new ServerOptions();
         options.LogLevel = LogType.Info;
@@ -75,7 +83,8 @@ public class GameServer
         // 서버 소켓 시작
         mServerSocket = SocketFactory.CreateTcpServer<ServerNetworkHandler, ServerPacket>(options);        
         GameClient.SendPacketClassMethods.Register();
-        mServerSocket.Open();        
+        mServerSocket.Open();
+        mStatus = eGameServerStatus.GSS_Open;
     }
 
     public void Stop()

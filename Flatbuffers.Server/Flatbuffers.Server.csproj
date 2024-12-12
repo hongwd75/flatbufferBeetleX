@@ -31,4 +31,9 @@
       <Folder Include="Logic\managers\playermanager" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="resource\logconfig.xml" />
+      <EmbeddedResource Include="resource\logconfig.xml" />
+    </ItemGroup>
+
 </Project>
