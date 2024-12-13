@@ -48,7 +48,7 @@ namespace Flatbuffers.Messages.Packets.Client
     
     public class ClientPacket : FixeHeaderClientPacket
     {
-        public IMessageTypeHeader TypeHeader { get; set; } = new ClientTypeHandler(PacketMessageAttribute.PacketType.ClientReciveType);
+        public IMessageTypeHeader TypeHeader { get; set; } = new ClientTypeHandler(PacketMessageAttribute.PacketType.ClientReceiveType);
 
         public override IClientPacket Clone()
         {

@@ -29,6 +29,7 @@
 
     <ItemGroup>
       <Folder Include="Logic\managers\playermanager" />
+      <Folder Include="Logic\network\ReceivePacket" />
     </ItemGroup>
 
     <ItemGroup>

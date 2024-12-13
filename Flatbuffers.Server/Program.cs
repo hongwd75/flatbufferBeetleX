@@ -11,7 +11,7 @@ namespace System.Runtime.CompilerServices
 }
 #endif
 
-namespace Flatbuffers.Server
+namespace Game.Logic
 {
     public class Program 
     {

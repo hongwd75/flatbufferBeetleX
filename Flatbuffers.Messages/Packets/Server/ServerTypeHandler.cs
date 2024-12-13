@@ -50,7 +50,7 @@ namespace Flatbuffers.Messages.Packets.Server
     {
         public ServerPacket()
         {
-            TypeHeader = new ServerTypeHandler(PacketMessageAttribute.PacketType.ServerReciveType);
+            TypeHeader = new ServerTypeHandler(PacketMessageAttribute.PacketType.ServerReceiveType);
         }
 
         private PacketDecodeCompletedEventArgs mCompletedEventArgs = new PacketDecodeCompletedEventArgs();

@@ -10,7 +10,7 @@
 		/// <summary>
 		/// The parent element of this element.
 		/// </summary>
-		private readonly ConfigElement _parent;
+		private readonly ConfigElement? _parent = null;
 
 		/// <summary>
 		/// The value of this element.

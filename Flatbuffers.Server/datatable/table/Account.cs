@@ -17,7 +17,7 @@ namespace Logic.database.table
         {
             get => m_name;
             set => SetProperty(ref m_name, value); 
-        }
+        } 
 
         [DataElement(AllowDbNull = false)]
         public string Password

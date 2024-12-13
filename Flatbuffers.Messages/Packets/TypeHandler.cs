@@ -19,8 +19,8 @@ namespace Flatbuffers.Messages
     }
     
     // 타입 핸들러
-    public abstract class TypeHandler<Recive,Send> : BeetleX.Packets.IMessageTypeHeader  
-        where Recive : Enum
+    public abstract class TypeHandler<Receive,Send> : BeetleX.Packets.IMessageTypeHeader  
+        where Receive : Enum
         where Send : Enum
     {
         
@@ -31,7 +31,7 @@ namespace Flatbuffers.Messages
             packetType = ptype;
         }
 
-        protected abstract Type GetReadType(Recive id);
+        protected abstract Type GetReadType(Receive id);
         public Type ReadType(PipeStream reader)
         {
             return typeof(PacketData);

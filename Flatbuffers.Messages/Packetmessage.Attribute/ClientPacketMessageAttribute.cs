@@ -10,7 +10,7 @@ namespace Flatbuffers.Messages
             get => (ushort)ID;
         }
         public readonly ClientPackets ID;
-        public ClientPacketMessageAttribute(ClientPackets id) : base(PacketType.ServerReciveType)
+        public ClientPacketMessageAttribute(ClientPackets id) : base(PacketType.ServerReceiveType)
         {
             ID = id;
         }

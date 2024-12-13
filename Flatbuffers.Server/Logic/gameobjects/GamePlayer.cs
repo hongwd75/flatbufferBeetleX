@@ -1,11 +1,12 @@
-﻿using Flatbuffers.Server.Logic.network;
+﻿using Game.Logic.network;
+using Logic.database.table;
 
 namespace Game.Logic
 {
     public class GamePlayer : GameLiving
     {
-        private UInt64 mAccountIndex;
-        private GameClient mNetwork;
+        private GameClient mNetwork = null;
+        private string mAccountName = null;
 
         public GameClient Network
         {

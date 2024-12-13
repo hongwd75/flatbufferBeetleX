@@ -4,16 +4,16 @@ namespace Flatbuffers.Messages
     public class PacketMessageAttribute : Attribute
     {
         public enum PacketType {
-            ServerReciveType = 0,
-            ClientReciveType,
+            ServerReceiveType = 0,
+            ClientReceiveType,
         }
 
-        public readonly PacketType reciveType;
+        public readonly PacketType receiveType;
         public virtual ushort codeid { get; }
 
         public PacketMessageAttribute(PacketType pt)
         {
-            reciveType = pt;
+            receiveType = pt;
         }
     }
 }

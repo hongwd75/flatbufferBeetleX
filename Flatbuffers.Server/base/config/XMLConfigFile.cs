@@ -9,7 +9,7 @@ public class XMLConfigFile : ConfigElement
 		/// Constructs a new XML config file.
 		/// </summary>
 		public XMLConfigFile()
-			: base(null)
+			: base(null!)
 		{
 		}
 
