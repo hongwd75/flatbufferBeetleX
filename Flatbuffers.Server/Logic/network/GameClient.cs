@@ -1,11 +1,12 @@
-﻿using BeetleX;
+﻿using System.Net.Sockets;
+using BeetleX;
 using Flatbuffers.Messages.Packets.Client;
 using Game.Logic;
 using Logic.database.table;
 
 namespace Game.Logic.network
 {
-    public class GameClient
+    public class GameClient : ISessionSocketProcessHandler
     {
         #region eClientState enum
 
@@ -91,6 +92,16 @@ namespace Game.Logic.network
 
         public void Send<T>(ClientPacket id, T message)
         {
+        }
+
+        public void ReceiveCompleted(ISession session, SocketAsyncEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SendCompleted(ISession session, SocketAsyncEventArgs e)
+        {
+            throw new NotImplementedException();
         }
     }
 }

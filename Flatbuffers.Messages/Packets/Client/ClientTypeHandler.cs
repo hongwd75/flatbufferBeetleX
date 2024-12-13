@@ -4,7 +4,7 @@ using BeetleX.Buffers;
 using BeetleX.Clients;
 using BeetleX.Packets;
 using Google.FlatBuffers;
-using Network.Protocol;
+using Network.Protocol.IPacketMessage;
 using NetworkMessage;
 
 namespace Flatbuffers.Messages.Packets.Client
@@ -36,7 +36,7 @@ namespace Flatbuffers.Messages.Packets.Client
                         true);
                 if (packetattributes.Length > 0)
                 {
-                    var handle = (IPacketMessage)Activator.CreateInstance(type);
+                    var handle = (IClientPacketMessage)Activator.CreateInstance(type);
                     _packetMessages.TryAdd((ServerPackets)(object)packetattributes[0].codeid,
                         async (data) => { await handle.Packet(data); });
                 }

@@ -27,6 +27,7 @@ namespace Game.Logic
             if (args.Length == 0)
             {
                 args = new string[] { "--start", };
+                //args = new string[] { "--makepackethandle", };
             }
 
             string actionName;
@@ -150,6 +151,7 @@ namespace Game.Logic
         {
             //Start server in console mode
             RegisterAction(new ConsoleStart());
+            RegisterAction(new ConsoleMakeClientPacketHandle());
         }        
         
     }

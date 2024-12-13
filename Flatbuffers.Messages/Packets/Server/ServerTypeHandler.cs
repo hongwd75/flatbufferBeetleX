@@ -5,7 +5,7 @@ using BeetleX.Buffers;
 using BeetleX.EventArgs;
 using BeetleX.Packets;
 using Google.FlatBuffers;
-using Network.Protocol;
+using Network.Protocol.IPacketMessage;
 using NetworkMessage;
 
 namespace Flatbuffers.Messages.Packets.Server

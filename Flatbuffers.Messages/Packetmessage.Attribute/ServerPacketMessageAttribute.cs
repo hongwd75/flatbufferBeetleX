@@ -1,7 +1,6 @@
 using NetworkMessage;
 
-namespace Flatbuffers.Messages
-
+namespace Network.Protocol.IPacketMessage
 {
     [AttributeUsage(AttributeTargets.Class,AllowMultiple = false)]
     public class ServerPacketMessageAttribute : PacketMessageAttribute

@@ -1,13 +1,8 @@
-﻿using System.Collections.Concurrent;
-using System.Reflection;
-using BeetleX;
+﻿using System.Reflection;
 using BeetleX.Buffers;
-using BeetleX.Clients;
-using BeetleX.EventArgs;
 using BeetleX.Packets;
 using Google.FlatBuffers;
-using Network.Protocol;
-using NetworkMessage;
+using Network.Protocol.IPacketMessage;
 
 namespace Flatbuffers.Messages
 {
@@ -19,7 +14,7 @@ namespace Flatbuffers.Messages
     }
     
     // 타입 핸들러
-    public abstract class TypeHandler<Receive,Send> : BeetleX.Packets.IMessageTypeHeader  
+    public abstract class TypeHandler<Receive,Send> : IMessageTypeHeader  
         where Receive : Enum
         where Send : Enum
     {

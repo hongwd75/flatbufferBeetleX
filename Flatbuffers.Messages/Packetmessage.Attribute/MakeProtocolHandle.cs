@@ -1,4 +1,5 @@
 using Flatbuffers.Messages;
+using Network.Protocol.IPacketMessage;
 
 namespace NetworkMessage;
 
