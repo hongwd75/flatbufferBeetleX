@@ -4,6 +4,7 @@ using BeetleX.EventArgs;
 using Flatbuffers.Messages.Packets.Server;
 using Game.Logic.managers;
 using Game.Logic.network;
+using Game.Logic.ServerProperties;
 using Game.Logic.World;
 using log4net;
 using log4net.Config;
@@ -15,6 +16,7 @@ namespace Game.Logic
 {
     public class GameServer
     {
+        protected const int MINUTE_CONV = 60000;
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         #region ========= DB ===========================================================================================
@@ -27,20 +29,35 @@ namespace Game.Logic
 
         #region ========= STATUS =======================================================================================
         protected eGameServerStatus mStatus = eGameServerStatus.GSS_Unknown;
-        public eGameServerStatus ServerStatus => mStatus;
+        public eGameServerStatus ServerStatus { get => mStatus; }
+
+        protected long mStartTick;
+        protected Timer mTimer;
+        public long TickCount { get => Environment.TickCount64 - mStartTick; }
+        public int SaveInterval
+        {
+            get { return Configuration.SaveInterval; }
+            set
+            {
+                Configuration.SaveInterval = value;
+                if (mTimer != null)
+                    mTimer.Change(value*MINUTE_CONV, Timeout.Infinite);
+            }
+        }        
         #endregion
-
-
-        protected GameClientManager mClientManager;
-        public static GameServer Instance { get; private set; } = null;
-        public BaseServerConfiguration Configuration;
 
         #region ========= NETWORK ======================================================================================        
         private IServer mServerSocket;
         public IServer ServerSocket { get => mServerSocket; }
         public ServerNetworkHandler NetworkHandler { get =>(ServerNetworkHandler)mServerSocket.Handler; }
-        #endregion
         
+        public static PacketMethodsManager SendPacketClassMethods = new PacketMethodsManager();
+        #endregion
+
+        protected GameClientManager mClientManager;
+        public GameClientManager Clients => mClientManager;
+        public static GameServer Instance { get; private set; } = null;
+        public BaseServerConfiguration Configuration;        
         public GameServer() : this(new BaseServerConfiguration())
         {
         }
@@ -48,18 +65,7 @@ namespace Game.Logic
         protected GameServer(BaseServerConfiguration config)
         {
             Configuration = config;
-
             Directory.SetCurrentDirectory(Configuration.RootDirectory);
-
-            // DB 초기화
-            try
-            {
-                CheckAndInitDB();
-            }
-            catch (Exception e)
-            {
-                throw;
-            }
         }
 
         public static void CreateInstance(BaseServerConfiguration config)
@@ -85,38 +91,126 @@ namespace Game.Logic
 
         //----------------------------------------------------------------------------------------------------
         // 서버 시작
-        public void Start()
+        public bool Start()
         {
+            // 서버 상태 초기화
             mStatus = eGameServerStatus.GSS_Closed;
-
-            // 클라이언트 메니저 설정
-            mClientManager = new GameClientManager(Configuration.MaxClientCount);
-
+            
+            // 시간 틱 설정
+            mStartTick = Environment.TickCount64;
+            
             // GC 설정
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
+            
+            //--------------------------------------------------------------------------------------
+            if ( InitComponent(CheckAndInitDB, "DB 초기화") == false )
+            {
+                return false;
+            }
 
-            // 소켓 설정
-            ServerOptions options = new ServerOptions();
-            options.LogLevel = LogType.Info;
-            options.DefaultListen.Host = Configuration.IP.ToString();
-            options.DefaultListen.Port = Configuration.Port;
+            //--------------------------------------------------------------------------------------
+            if ( InitComponent(Properties.InitProperties, "서버 설정값 DB 확인") == false )
+            {
+                return false;
+            }
 
-            // 서버 소켓 시작
-            mServerSocket = SocketFactory.CreateTcpServer<ServerNetworkHandler, ServerPacket>(options);
-            GameClient.SendPacketClassMethods.Register();
-            mServerSocket.Open();
+            if (InitComponent(() =>
+                {
+                    if (mTimer != null)
+                    {
+                        mTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                        mTimer.Dispose();
+                    }
+                    mTimer = new Timer(SaveTimerProc, null, SaveInterval*MINUTE_CONV, Timeout.Infinite);                    
+                }, "월드 타이머 등록") == false)
+            {
+                return false;
+            }
+            //--------------------------------------------------------------------------------------
+            if ( InitComponent(() =>
+                {
+                    // 클라이언트 메니저 설정
+                    mClientManager = new GameClientManager(Configuration.MaxClientCount);
 
-            mStatus = eGameServerStatus.GSS_Open;
+                    // 소켓 설정
+                    ServerOptions options = new ServerOptions();
+                    options.LogLevel = LogType.Info;
+                    options.DefaultListen.Host = Configuration.IP.ToString();
+                    options.DefaultListen.Port = Configuration.Port;
+
+                    // 서버 소켓 시작
+                    mServerSocket = SocketFactory.CreateTcpServer<ServerNetworkHandler, ServerPacket>(options);
+                    SendPacketClassMethods.Register();
+                    mServerSocket.Open();        
+                }, "네트워크 설정") == false )
+            {
+                return false;
+            }
+            return true;
         }
 
+        public void Open()
+        {
+            mStatus = eGameServerStatus.GSS_Open;
+        }
+        
         public void Stop()
         {
+            mStatus = eGameServerStatus.GSS_Closed;
             mServerSocket.Dispose();
         }
 
+        #region InitComponent ==========================================================================================
+        protected bool InitComponent(bool componentInitState, string text)
+        {
+            if (log.IsDebugEnabled)
+                log.DebugFormat("Start Memory {0}: {1}MB", text, GC.GetTotalMemory(false)/1024/1024);
+			
+            if (log.IsInfoEnabled)
+                log.InfoFormat("{0}: {1}", text, componentInitState);
+			
+            if (!componentInitState)
+                Stop();
+			
+            if (log.IsDebugEnabled)
+                log.DebugFormat("Finish Memory {0}: {1}MB", text, GC.GetTotalMemory(false)/1024/1024);
+			
+            return componentInitState;
+        }
+
+        protected bool InitComponent(Action componentInitMethod, string text)
+        {
+            if (log.IsDebugEnabled)
+                log.DebugFormat("Start Memory {0}: {1}MB", text, GC.GetTotalMemory(false)/1024/1024);
+			
+            bool componentInitState = false;
+            try
+            {
+                componentInitMethod();
+                componentInitState = true;
+            }
+            catch (Exception ex)
+            {
+                if (log.IsErrorEnabled)
+                    log.ErrorFormat("{0}: Error While Initialization\n{1}", text, ex);
+            }
+
+            if (log.IsInfoEnabled)
+                log.InfoFormat("{0}: {1}", text, componentInitState);
+
+            if (!componentInitState)
+                Stop();
+			
+            if (log.IsDebugEnabled)
+                log.DebugFormat("Finish Memory {0}: {1}MB", text, GC.GetTotalMemory(false)/1024/1024);
+			
+            return componentInitState;
+        }
+        
+
+        #endregion
 
         #region DB 초기화 ==============================================================================================
-
         protected virtual void CheckAndInitDB()
         {
             if (!InitDB() || m_database == null)
@@ -173,6 +267,57 @@ namespace Game.Logic
                 log.Info("Database Initialization: true");
             return true;
         }
+
+        #endregion
+
+        #region Save Timer Fuction
+        protected void SaveTimerProc(object sender)
+        {
+            try
+            {
+                long startTick = Environment.TickCount64;
+                if (log.IsInfoEnabled)
+                    log.Info("Saving database...");
+                if (log.IsDebugEnabled)
+                    log.Debug("Save ThreadId=" + Thread.CurrentThread.ManagedThreadId);
+                int saveCount = 0;
+                if (m_database != null)
+                {
+                    ThreadPriority oldprio = Thread.CurrentThread.Priority;
+                    Thread.CurrentThread.Priority = ThreadPriority.Lowest;
+
+                    // //Only save the players, NOT any other object!
+                    // saveCount = WorldMgr.SavePlayers();
+                    //
+                    // //The following line goes through EACH region and EACH object
+                    // //is tested for savability. A real waste of time, so it is commented out
+                    // //WorldMgr.SaveToDatabase();
+                    //
+                    // GuildMgr.SaveAllGuilds();
+                    // BoatMgr.SaveAllBoats();
+                    //
+                    // FactionMgr.SaveAllAggroToFaction();
+
+                    Thread.CurrentThread.Priority = oldprio;
+                }
+                if (log.IsInfoEnabled)
+                    log.Info("Saving database complete!");
+                startTick = Environment.TickCount64 - startTick;
+                if (log.IsInfoEnabled)
+                    log.Info("Saved all databases and " + saveCount + " players in " + startTick + "ms");
+            }
+            catch (Exception e1)
+            {
+                if (log.IsErrorEnabled)
+                    log.Error("SaveTimerProc", e1);
+            }
+            finally
+            {
+                if (mTimer != null)
+                    mTimer.Change(SaveInterval*MINUTE_CONV, Timeout.Infinite);
+            }
+        }
+        
 
         #endregion
     }

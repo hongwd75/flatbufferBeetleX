@@ -25,4 +25,8 @@
       <ProjectReference Include="..\src\BeetleX\BeetleX.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Logic\network\ReceivePacket" />
+    </ItemGroup>
+
 </Project>

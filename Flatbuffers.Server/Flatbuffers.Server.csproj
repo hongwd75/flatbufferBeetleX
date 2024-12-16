@@ -6,7 +6,7 @@
         <Nullable>enable</Nullable>
         <DockerDefaultTargetOS>Windows</DockerDefaultTargetOS>
         <LangVersion>10</LangVersion>
-        <TargetFrameworks>net6.0-windows;netstandard2.1</TargetFrameworks>
+        <TargetFramework>net6.0-windows</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>

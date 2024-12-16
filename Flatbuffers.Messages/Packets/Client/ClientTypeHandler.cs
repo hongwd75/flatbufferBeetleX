@@ -14,6 +14,11 @@ namespace Flatbuffers.Messages.Packets.Client
     {
         private ConcurrentDictionary<ServerPackets, Func<ByteBuffer, Task>> _packetMessages = new();
 
+        public ConcurrentDictionary<ServerPackets, Func<ByteBuffer, Task>> PacketMsg
+        {
+            get => _packetMessages;
+        }
+        
         public ClientTypeHandler(PacketMessageAttribute.PacketType ptype) : base(ptype)
         {
         }
@@ -99,6 +104,15 @@ namespace Flatbuffers.Messages.Packets.Client
             else
             {
                 throw new ArgumentException("데이터는 CombinedData 타입이어야 합니다.");
+            }
+        }
+
+        public void OnRecieveData(ServerPackets msg, ByteBuffer buffer)
+        {
+            ClientTypeHandler handler = (ClientTypeHandler)TypeHeader;
+            if (handler.PacketMsg.TryGetValue(msg, out var fnc) == true)
+            {
+                fnc.Invoke(buffer);
             }
         }
     }      

@@ -1,4 +1,6 @@
-﻿using Game.Logic.network;
+﻿using BeetleX;
+using Game.Logic.network;
+using Logic.database.table;
 
 namespace Game.Logic.managers;
 
@@ -28,7 +30,48 @@ public class GameClientManager
         {
             return mClients.Where(c => c != null).ToList();
         }
-    }    
+    }
+    
+    public GameClient GetClientByAccountName(string accountName, bool exactMatch)
+    {
+        accountName = accountName.ToLower();
+        lock (mClients.SyncRoot)
+        {
+            foreach (GameClient client in mClients)
+            {
+                if (client != null)
+                {
+                    if ((exactMatch && client.Account.Name.ToLower() == accountName)
+                        || (!exactMatch && client.Account.Name.ToLower().StartsWith(accountName)))
+                    {
+                        return client;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public GameClient CreateAccount(Account account,ISession session)
+    {
+        lock (mClients.SyncRoot)
+        {
+            for (int i = 0; i < mClients.Length; i++)
+            {
+                if (mClients[i] == null)
+                {
+                    GameClient obj = new GameClient(session);
+                    obj.Account = account;
+                    obj.PlayerArrayID = i;
+                    mClients[i] = obj;
+                    return obj;
+                }
+            }
+        }
+        return null;
+    }
+    
+    
     private void PingCheck(object sender)
     {
         try

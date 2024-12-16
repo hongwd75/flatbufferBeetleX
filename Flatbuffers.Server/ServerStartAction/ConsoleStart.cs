@@ -14,8 +14,7 @@ public class ConsoleStart : IAction
 
     private bool StartServer()
     {
-        GameServer.Instance.Start();
-        return true;
+        return GameServer.Instance.Start();
     }
     
     public void OnAction(Hashtable parameters)
@@ -55,26 +54,29 @@ public class ConsoleStart : IAction
         }
         
         GameServer.CreateInstance(config);
-        StartServer();
-        
-        bool run = true;
-        while (run)
+        if (StartServer() == true)
         {
-            Console.Write("> ");
-            string line = Console.ReadLine();
-
-            switch (line.ToLower())
+            GameServer.Instance.Open();
+            
+            bool run = true;
+            while (run)
             {
-                case "exit":
-                    run = false;
-                    break;
-                case "stacktrace":
-                    break;
-                case "clear":
-                    Console.Clear();
-                    break;
-                default:
-                    break;
+                Console.Write("> ");
+                string line = Console.ReadLine();
+
+                switch (line.ToLower())
+                {
+                    case "exit":
+                        run = false;
+                        break;
+                    case "stacktrace":
+                        break;
+                    case "clear":
+                        Console.Clear();
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 

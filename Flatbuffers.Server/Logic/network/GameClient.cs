@@ -6,7 +6,7 @@ using Logic.database.table;
 
 namespace Game.Logic.network
 {
-    public class GameClient : ISessionSocketProcessHandler
+    public class GameClient 
     {
         #region eClientState enum
 
@@ -20,7 +20,6 @@ namespace Game.Logic.network
             Linkdead = 0x05,
             Disconnected = 0x06,
         };
-
         #endregion
 
         protected ISession mSession;
@@ -30,10 +29,20 @@ namespace Game.Logic.network
         
         protected long m_pingTime = DateTime.Now.Ticks;
         protected volatile eClientState m_clientState = eClientState.NotConnected;
-        public static ClientPacketMethodsManager SendPacketClassMethods = new ClientPacketMethodsManager();
 
         #region GET / SET
 
+        public OutPacket Out
+        {
+            get
+            {
+                if (mSession != null && mSession.IsDisposed == false)
+                {
+                    return (OutPacket)mSession.SocketProcessHandler;
+                }
+                return null;
+            }
+        }
         public GamePlayer Player
         {
             get => mPlayer;
@@ -92,16 +101,6 @@ namespace Game.Logic.network
 
         public void Send<T>(ClientPacket id, T message)
         {
-        }
-
-        public void ReceiveCompleted(ISession session, SocketAsyncEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SendCompleted(ISession session, SocketAsyncEventArgs e)
-        {
-            throw new NotImplementedException();
         }
     }
 }
