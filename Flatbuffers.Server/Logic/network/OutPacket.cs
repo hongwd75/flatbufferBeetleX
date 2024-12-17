@@ -30,12 +30,7 @@ namespace Game.Logic.network
 
         protected void Send(ServerPackets sc, byte[] buffer)
         {
-            PacketData obj = new PacketData()
-            {
-                ID = (ushort)sc,
-                Data = buffer
-            };
-            Session.Send(obj);
+            Session.Send((sc,buffer));
         }
         
         // 생성 패킷

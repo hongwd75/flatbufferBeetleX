@@ -13,20 +13,13 @@ namespace Flatbuffers.Messages.Packets.Client
     public class ClientTypeHandler : TypeHandler<ServerPackets, ClientPackets>
     {
         private ConcurrentDictionary<ServerPackets, Func<ByteBuffer, Task>> _packetMessages = new();
-
         public ConcurrentDictionary<ServerPackets, Func<ByteBuffer, Task>> PacketMsg
         {
             get => _packetMessages;
         }
         
-        public ClientTypeHandler(PacketMessageAttribute.PacketType ptype) : base(ptype)
-        {
-        }
-        
-        protected override Type GetReadType(ServerPackets id)
-        {
-            return typeof(PacketData);
-        }
+        public ClientTypeHandler(PacketMessageAttribute.PacketType ptype) : base(ptype) { }
+        protected override Type GetReadType(ServerPackets id) => typeof((ushort ID, ByteBuffer buffer));
 
         public override void Register(params Assembly[] assemblies)
         {
@@ -69,33 +62,33 @@ namespace Flatbuffers.Messages.Packets.Client
         
         protected override object OnRead(IClient client, PipeStream reader)
         {
-            // ushort 값 읽기
-            ushort ushortValue = reader.ReadUInt16();
-            int size = (int)reader.Length;
-            PacketData data = new PacketData
-            {
-                ID = ushortValue,
-                Data = new byte[size]
-            };
-            reader.Read(data.Data, 0, size);
+            // ushort ID 읽기
+            ushort id = reader.ReadUInt16();
 
-            return data;
+            // 남은 데이터의 크기 확인
+            int size = (int)reader.Length;
+
+            // 바이트 배열 생성 및 데이터 읽기
+            byte[] buffer = new byte[size];
+            reader.Read(buffer, 0, size);
+
+            // FlatBuffers의 ByteBuffer 생성
+            var byteBuffer = new ByteBuffer(buffer);
+
+            return (ID: id, Buffer: byteBuffer);
         }
 
         protected override void OnWrite(object data, IClient client, PipeStream writer)
         {
-            // ToDo. ## 메모리 사용에 대한 최적화 필요성 있음 ##
-            if (data is PacketData writedata)
+            if (data is (ushort ID, byte[] Buffer))
             {
-                // ushort 값 쓰기
-                writer.Write((ushort)writedata.ID);
-
-                // ByteBuffer 데이터 쓰기
-                writer.Write(writedata.Data, 0, writedata.Data.Length);
+                // ID 쓰기
+                writer.Write(ID);
+                writer.Write(Buffer, 0, Buffer.Length);
             }
             else
             {
-                throw new ArgumentException("데이터는 CombinedData 타입이어야 합니다.");
+                throw new ArgumentException("데이터는 (ushort, ByteBuffer) 형태여야 합니다.");
             }
         }
 

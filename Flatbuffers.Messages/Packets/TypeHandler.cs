@@ -6,13 +6,6 @@ using Network.Protocol.IPacketMessage;
 
 namespace Flatbuffers.Messages
 {
-    // 데이터 기본 형태
-    public class PacketData
-    {
-        public ushort ID;
-        public byte[] Data;
-    }
-    
     // 타입 핸들러
     public abstract class TypeHandler<Receive,Send> : IMessageTypeHeader  
         where Receive : Enum
@@ -25,13 +18,12 @@ namespace Flatbuffers.Messages
         {
             packetType = ptype;
         }
-
         protected abstract Type GetReadType(Receive id);
         public Type ReadType(PipeStream reader)
         {
-            return typeof(PacketData);
+            return typeof((ushort ID, ByteBuffer buffer));
         }
-
+        
         public void WriteType(object data, PipeStream stream)
         {
 

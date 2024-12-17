@@ -1,4 +1,5 @@
-﻿using BeetleX;
+﻿using System.Runtime.Serialization.Formatters.Binary;
+using BeetleX;
 using BeetleX.Clients;
 using Flatbuffers.Messages;
 using Flatbuffers.Messages.Packets.Client;
@@ -30,12 +31,8 @@ public class ClientNetworkLogic
     
     public void Send(ClientPackets sc, byte[] buffer)
     {
-        PacketData obj = new PacketData()
-        {
-            ID = (ushort)sc,
-            Data = buffer
-        };
-        client.SendMessage(obj);
+
+        client.SendMessage((sc,buffer));
     }
     
     public void SendLoginReq(string id, string pwd)
@@ -52,7 +49,9 @@ public class ClientNetworkLogic
     
     private void OnPacket(IClient client, object message)
     {
-        PacketData data = (PacketData)message;
-        Packet.OnRecieveData((ServerPackets)data.ID,new ByteBuffer(data.Data));
+        if (message is (ushort ID, ByteBuffer buffer))
+        {
+            Packet.OnRecieveData((ServerPackets)ID,buffer);    
+        }
     }
 }

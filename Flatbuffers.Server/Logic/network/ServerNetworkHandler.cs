@@ -11,12 +11,11 @@ namespace Game.Logic.network
         //------------------------------------------------------------------------------------------------------
         public override void SessionPacketDecodeCompleted(IServer server, PacketDecodeCompletedEventArgs e)
         {
-            if (e.Message is PacketData packetdata)
+            if (e.Message is (ushort ID, ByteBuffer buffer))
             {
                 try
                 {
-                    GameServer.SendPacketClassMethods.OnReceivePacket(e.Session,
-                        (ClientPackets)packetdata.ID,new ByteBuffer(packetdata.Data));
+                    GameServer.SendPacketClassMethods.OnReceivePacket(e.Session, (ClientPackets)ID, buffer);
                 }
                 catch (Exception exception)
                 {
