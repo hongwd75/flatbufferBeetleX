@@ -27,7 +27,7 @@ public class ConsoleMakeClientPacketHandle : IAction
         {
             if (type.IsClass == false) continue;
 
-            if (type.GetInterface("Network.Protocol.IPacketMessage") == null) continue;
+            if (type.GetInterface("Network.Protocol.IPacketMessage.IServerPacketMessage") == null) continue;
 
             var packetattribute =
                 (ClientPacketMessageAttribute[])type.GetCustomAttributes(typeof(ClientPacketMessageAttribute), true);

@@ -28,7 +28,7 @@ namespace Game.Logic.network
             Session = session;
         }
 
-        protected void Send(ServerPackets sc, ByteBuffer buffer)
+        protected void Send(ServerPackets sc, byte[] buffer)
         {
             PacketData obj = new PacketData()
             {
@@ -49,7 +49,7 @@ namespace Game.Logic.network
                 req.Errorcode = (int)error;
                 var packedOffset = GameServer.SendPacketClassMethods.GetServerPacketType(ServerPackets.SC_LoginAns, req);
                 sendBuilder.Finish((int)packedOffset.GetType().GetField("Value").GetValue(packedOffset));
-                Send(ServerPackets.SC_LoginAns, sendBuilder.DataBuffer);
+                Send(ServerPackets.SC_LoginAns, sendBuilder.SizedByteArray());
             }
         }
 
@@ -64,7 +64,7 @@ namespace Game.Logic.network
                 req.Sessionid = Client.PlayerArrayID;
                 var packedOffset = GameServer.SendPacketClassMethods.GetServerPacketType(ServerPackets.SC_LoginAns, req);
                 sendBuilder.Finish((int)packedOffset.GetType().GetField("Value").GetValue(packedOffset));
-                Send(ServerPackets.SC_LoginAns, sendBuilder.DataBuffer);
+                Send(ServerPackets.SC_LoginAns, sendBuilder.SizedByteArray());
             }
         }
 

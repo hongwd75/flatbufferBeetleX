@@ -1,6 +1,7 @@
 ﻿using BeetleX;
 using BeetleX.EventArgs;
 using Flatbuffers.Messages;
+using Google.FlatBuffers;
 using NetworkMessage;
 
 namespace Game.Logic.network
@@ -15,7 +16,7 @@ namespace Game.Logic.network
                 try
                 {
                     GameServer.SendPacketClassMethods.OnReceivePacket(e.Session,
-                        (ClientPackets)packetdata.ID,packetdata.Data);
+                        (ClientPackets)packetdata.ID,new ByteBuffer(packetdata.Data));
                 }
                 catch (Exception exception)
                 {

@@ -13,7 +13,8 @@ public class ClientPacketMethodsManager
     
     public void Register()
     {
-        Assembly assembly = Assembly.GetExecutingAssembly();
+        Assembly assembly = Assembly.LoadFrom("Flatbuffers.Messages.dll");
+        //Assembly assembly = Assembly.GetExecutingAssembly();
         sendPacketRegister(assembly);
     }
 
@@ -32,7 +33,7 @@ public class ClientPacketMethodsManager
 
         fbsClasses.ForEach(name =>
         {
-            Type? type = Type.GetType(name);
+            Type? type = assembly.GetType($"NetworkMessage.{name}");
             if (type != null)
             {
                 var packMethod = type.GetMethod("Pack", BindingFlags.Public | BindingFlags.Static);

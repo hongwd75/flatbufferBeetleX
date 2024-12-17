@@ -28,7 +28,7 @@ public class ClientNetworkLogic
     }
 
     
-    public void Send(ClientPackets sc, ByteBuffer buffer)
+    public void Send(ClientPackets sc, byte[] buffer)
     {
         PacketData obj = new PacketData()
         {
@@ -44,15 +44,15 @@ public class ClientNetworkLogic
         req.Id = id;
         req.Pwd = pwd;
         FlatBufferBuilder sendBuilder = new FlatBufferBuilder(1024);
-        var packedOffset = sendPacketMethods.GetClientPacketType(ClientPackets.CS_LoginReq, req);
+        var packfunc = sendPacketMethods.GetClientPacketType(ClientPackets.CS_LoginReq, req);
+        object packedOffset = packfunc.method.Invoke(packfunc.obj, new object[] { sendBuilder, req });
         sendBuilder.Finish((int)packedOffset.GetType().GetField("Value").GetValue(packedOffset));
-        
-        Send(ClientPackets.CS_LoginReq,sendBuilder.DataBuffer);
+        Send(ClientPackets.CS_LoginReq,sendBuilder.SizedByteArray());
     }
     
     private void OnPacket(IClient client, object message)
     {
         PacketData data = (PacketData)message;
-        Packet.OnRecieveData((ServerPackets)data.ID,data.Data);
+        Packet.OnRecieveData((ServerPackets)data.ID,new ByteBuffer(data.Data));
     }
 }

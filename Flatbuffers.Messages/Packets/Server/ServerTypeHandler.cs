@@ -30,7 +30,7 @@ namespace Flatbuffers.Messages.Packets.Server
             foreach (Type type in assembly.GetTypes())
             {
                 if (type.IsClass == false) continue;
-                if (type.GetInterface("Network.Protocol.IPacketMessage") == null) continue;
+                if (type.GetInterface("Network.Protocol.IPacketMessage.IServerPacketMessage") == null) continue;
 
                 var packetattributes =
                     (ClientPacketMessageAttribute[])type.GetCustomAttributes(typeof(ClientPacketMessageAttribute),
@@ -73,21 +73,15 @@ namespace Flatbuffers.Messages.Packets.Server
         {
             // ushort 값 읽기
             ushort ushortValue = reader.ReadUInt16();
-
-            // 남은 데이터를 ByteBuffer로 읽기
-            
-            // int remainingLength = (int)(reader.Length - reader.Position);
-            // byte[] buffer = new byte[remainingLength];
-            // reader.Read(buffer, 0, remainingLength);
-            ByteBuffer byteBuffer = new ByteBuffer(reader.GetReadBuffers().Data);
-
+            int size = (int)reader.Length;
             // CombinedData 객체 생성 및 반환
             PacketData data = new PacketData
             {
                 ID = ushortValue,
-                Data = byteBuffer
+                Data = new byte[size]
             };
-
+            
+            reader.Read(data.Data, 0, size);
             return data;
         }
 
@@ -98,10 +92,8 @@ namespace Flatbuffers.Messages.Packets.Server
             {
                 // ushort 값 쓰기
                 writer.Write(writedata.ID);
-
                 // ByteBuffer 데이터 쓰기
-                byte[] buffer = writedata.Data.ToFullArray();
-                writer.Write(buffer, 0, buffer.Length);
+                writer.Write(writedata.Data, 0, writedata.Data.Length);
             }
             else
             {

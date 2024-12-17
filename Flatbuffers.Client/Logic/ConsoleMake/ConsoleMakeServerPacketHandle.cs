@@ -23,7 +23,7 @@ public class ConsoleMakeServerPacketHandle
         {
             if (type.IsClass == false) continue;
 
-            if (type.GetInterface("Network.Protocol.IPacketMessage") == null) continue;
+            if (type.GetInterface("Network.Protocol.IPacketMessage.IClientPacketMessage") == null) continue;
 
             var packetattribute =
                 (ServerPacketMessageAttribute[])type.GetCustomAttributes(typeof(ServerPacketMessageAttribute), true);

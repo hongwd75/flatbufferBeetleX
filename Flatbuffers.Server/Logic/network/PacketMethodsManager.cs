@@ -15,9 +15,8 @@ namespace Game.Logic.network
         //----------------------------------------------------------------------------------------------------------
         public void Register()
         {
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            sendPacketRegister(assembly);
-            receivePacketRegister(assembly);
+            sendPacketRegister(Assembly.LoadFrom("Flatbuffers.Messages.dll"));
+            receivePacketRegister(Assembly.GetExecutingAssembly());
         }
 
         private void receivePacketRegister(Assembly assembly)
@@ -25,7 +24,7 @@ namespace Game.Logic.network
             foreach (Type type in assembly.GetTypes())
             {
                 if(type.IsClass == false) continue;
-                if (type.GetInterface("Network.Protocol.IPacketMessage") == null) continue;
+                if (type.GetInterface("Network.Protocol.IPacketMessage.IServerPacketMessage") == null) continue;
 
                 var packetattributes = (ClientPacketMessageAttribute[])type.GetCustomAttributes(typeof(ClientPacketMessageAttribute), true);
                 if (packetattributes.Length > 0)
@@ -51,7 +50,7 @@ namespace Game.Logic.network
 
             fbsClasses.ForEach(name =>
             {
-                Type? type = Type.GetType(name);
+                Type? type = assembly.GetType($"NetworkMessage.{name}");
                 if (type != null)
                 {
                     var packMethod = type.GetMethod("Pack", BindingFlags.Public | BindingFlags.Static);

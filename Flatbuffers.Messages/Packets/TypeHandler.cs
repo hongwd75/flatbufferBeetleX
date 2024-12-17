@@ -10,7 +10,7 @@ namespace Flatbuffers.Messages
     public class PacketData
     {
         public ushort ID;
-        public ByteBuffer Data;
+        public byte[] Data;
     }
     
     // 타입 핸들러
