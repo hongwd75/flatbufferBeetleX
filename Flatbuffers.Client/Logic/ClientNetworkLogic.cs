@@ -32,7 +32,7 @@ public class ClientNetworkLogic
     public void Send(ClientPackets sc, byte[] buffer)
     {
 
-        client.SendMessage((sc,buffer));
+        client.SendMessage(((ushort)sc,buffer));
     }
     
     public void SendLoginReq(string id, string pwd)

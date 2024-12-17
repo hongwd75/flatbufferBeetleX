@@ -12,7 +12,7 @@ namespace Game.Logic.network
         private ISession Session = null;
         private GameClient mGameClient = null;
         
-        FlatBufferBuilder sendBuilder = new FlatBufferBuilder(1024);
+        
 
         public GameClient Client
         {
@@ -30,16 +30,15 @@ namespace Game.Logic.network
 
         protected void Send(ServerPackets sc, byte[] buffer)
         {
-            Session.Send((sc,buffer));
+            Session.Send(((ushort)sc,buffer));
         }
         
         // 생성 패킷
         public void SendLoginDenied(eLoginError error)
         {
-            lock (sendBuilder)
+            //lock (sendBuilder)
             {
-                sendBuilder.Clear();
-
+                FlatBufferBuilder sendBuilder = new FlatBufferBuilder(1024);
                 SC_LoginAns_FBS req = new SC_LoginAns_FBS();
                 req.Errorcode = (int)error;
                 var packedOffset = GameServer.SendPacketClassMethods.GetServerPacketType(ServerPackets.SC_LoginAns, req);
@@ -50,9 +49,9 @@ namespace Game.Logic.network
 
         public void SendLoginInfo()
         {
-            lock (sendBuilder)
+            //lock (sendBuilder)
             {
-                sendBuilder.Clear();
+                FlatBufferBuilder sendBuilder = new FlatBufferBuilder(1024);
                 SC_LoginAns_FBS req = new SC_LoginAns_FBS();
                 req.Errorcode = 0;
                 req.Nickname = Client.Account.Name;

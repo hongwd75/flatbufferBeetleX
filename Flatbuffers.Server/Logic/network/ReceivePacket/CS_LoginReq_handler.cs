@@ -130,6 +130,10 @@ namespace Network.Protocol
 							GameServer.Instance.NetworkHandler.Disconnect(session);
 							return;
 						}
+						else
+						{
+							output.Client = client;
+						}
 					}
 					else
 					{
