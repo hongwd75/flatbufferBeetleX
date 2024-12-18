@@ -43,7 +43,7 @@
         public static bool operator !=(Coordinate a, Coordinate b)
             => !a.Equals(b);
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is Coordinate loc)
             {

@@ -77,7 +77,7 @@ namespace Game.Logic.Geometry
         public static bool operator !=(Position a, Position b)
             => !a.Equals(b);
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is Position otherPos)
             {

@@ -531,9 +531,6 @@ namespace Logic.database
 		#region Select Implementation
 		protected virtual void ExecuteSelectImpl(string SQLCommand, IEnumerable<IEnumerable<QueryParameter>> parameters, Action<IDataReader> Reader)
 		{
-			if (log.IsDebugEnabled)
-				log.DebugFormat("ExecuteSelectImpl: {0}", SQLCommand);
-
 			bool repeat;
 			var current = 0;
 			do
@@ -576,10 +573,11 @@ namespace Logic.database
 								current++;
 							}
 
-							if (log.IsDebugEnabled)
-								log.DebugFormat("ExecuteSelectImpl: SQL Select exec time {0}ms", ((DateTime.UtcNow.Ticks / 10000) - start));
-							else if (log.IsWarnEnabled && (DateTime.UtcNow.Ticks / 10000) - start > 500)
-								log.WarnFormat("ExecuteSelectImpl: SQL Select took {0}ms!\n{1}", ((DateTime.UtcNow.Ticks / 10000) - start), SQLCommand);
+							if (log.IsWarnEnabled && (DateTime.UtcNow.Ticks / 10000) - start > 500)
+							{
+								log.WarnFormat("ExecuteSelectImpl: SQL Select took {0}ms!\n{1}",
+									((DateTime.UtcNow.Ticks / 10000) - start), SQLCommand);
+							}
 
 						}
 						catch (Exception e)
@@ -606,9 +604,6 @@ namespace Logic.database
 		protected virtual void ExecuteSelectImpl(string selectFromExpression, IEnumerable<WhereClause> whereClauseBatch, Action<IDataReader> Reader)
 		{
 			if (!whereClauseBatch.Any()) throw new ArgumentException("No parameter list was given.");
-
-			if (log.IsDebugEnabled)
-				log.DebugFormat("ExecuteSelectImpl: {0}", selectFromExpression);
 
 			bool repeat;
 			var current = 0;
@@ -649,10 +644,11 @@ namespace Logic.database
 								current++;
 							}
 
-							if (log.IsDebugEnabled)
-								log.DebugFormat("ExecuteSelectImpl: SQL Select exec time {0}ms", ((DateTime.UtcNow.Ticks / 10000) - start));
-							else if (log.IsWarnEnabled && (DateTime.UtcNow.Ticks / 10000) - start > 500)
-								log.WarnFormat("ExecuteSelectImpl: SQL Select took {0}ms!\n{1}", ((DateTime.UtcNow.Ticks / 10000) - start), selectFromExpression);
+							if (log.IsWarnEnabled && (DateTime.UtcNow.Ticks / 10000) - start > 500)
+							{
+								log.WarnFormat("ExecuteSelectImpl: SQL Select took {0}ms!\n{1}",
+									((DateTime.UtcNow.Ticks / 10000) - start), selectFromExpression);
+							}
 
 						}
 						catch (Exception e)

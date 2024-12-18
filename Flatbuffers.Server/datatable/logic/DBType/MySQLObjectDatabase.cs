@@ -179,11 +179,7 @@ namespace Logic.database
 							var allowNull = reader.GetString(2).ToLower() == "yes";
 							var primary = reader.GetString(3).ToLower() == "pri";
 							currentTableColumns.Add(new TableRowBindind(column, colType, allowNull, primary));
-							if (log.IsDebugEnabled)
-								log.DebugFormat("CheckOrCreateTable: Found Column {0} in existing table {1}", column, table.TableName);
 						}
-						if (log.IsDebugEnabled)
-							log.DebugFormat("CheckOrCreateTable: {0} columns existing in table {1}", currentTableColumns.Count, table.TableName);
 					});
 			}
 			catch (Exception e)
@@ -279,11 +275,7 @@ namespace Logic.database
 							var indexname = reader.GetString(2);
 							var column = reader.GetString(4);
 							indexes.Add(new Tuple<bool, string, string>(unique, indexname, column));
-							if (log.IsDebugEnabled)
-								log.DebugFormat("AlterTable: Found Index `{0}` (Unique:{1}) on `{2}` in existing table {3}", indexname, unique, column, table.TableName);
 						}
-						if (log.IsDebugEnabled)
-							log.DebugFormat("AlterTable: {0} Indexes existing in table {1}", indexes.Count, table.TableName);
 					});
 			}
 			catch (Exception e)

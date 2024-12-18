@@ -30,7 +30,7 @@
         public ushort InDegrees => (ushort)(steps / DEGREE_TO_STEPS);
         public ushort InHeading => (ushort)(steps / HEADING_TO_STEPS);
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is Angle angle) return angle.steps == steps;
             return false;

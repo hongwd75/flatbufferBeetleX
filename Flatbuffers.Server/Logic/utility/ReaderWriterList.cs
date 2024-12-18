@@ -209,7 +209,7 @@ namespace Game.Logic.utility
 		{
 			get
 			{
-				T ret = default(T);
+				T ret = default!;
 				m_rwLock.EnterReadLock();
 				try
 				{

@@ -73,7 +73,7 @@
 
         public static readonly WhereClause Empty = new WhereClause("", new object[] { });
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if(obj is WhereClause clause)
             {
@@ -114,7 +114,7 @@
 
         public bool IsEmpty => string.IsNullOrEmpty(QueryText);
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if(obj is ParameterizedExpression paramQuery)
             {

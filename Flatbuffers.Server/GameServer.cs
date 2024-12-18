@@ -245,11 +245,6 @@ namespace Game.Logic
                             var attrib = type.GetCustomAttributes<DataTable>(false);
                             if (attrib.Any())
                             {
-                                if (log.IsInfoEnabled)
-                                {
-                                    log.InfoFormat("Registering table: {0}", type.FullName);
-                                }
-
                                 m_database.RegisterDataObject(type);
                             }
                         });

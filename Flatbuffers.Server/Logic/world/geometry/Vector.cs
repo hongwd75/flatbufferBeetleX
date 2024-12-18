@@ -50,7 +50,7 @@
         public override string ToString()
             => $"{X}, {Y}, {Z}";
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if(obj is Vector vector)
             {

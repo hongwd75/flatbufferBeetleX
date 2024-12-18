@@ -2,7 +2,7 @@
 
 namespace Game.Logic.utility
 {
-	public class ReaderWriterDictionary<TKey, TValue> : IDictionary<TKey, TValue>
+	public class ReaderWriterDictionary<TKey, TValue> : IDictionary<TKey, TValue> where TKey : notnull
 	{
 		private readonly IDictionary<TKey, TValue> m_dictionary;
 		private readonly ReaderWriterLockSlim m_rwLock = new ReaderWriterLockSlim();
@@ -295,7 +295,11 @@ namespace Game.Logic.utility
 			{
 				m_rwLock.ExitReadLock();
 			}
-
+			
+			if (!found)
+			{
+				value = default!; // Null 값 할당 경고 무시
+			}
 			return found;
 		}
 

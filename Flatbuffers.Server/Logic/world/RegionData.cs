@@ -52,7 +52,7 @@
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public int CompareTo(object obj)
+        public int CompareTo(object? obj)
         {
             RegionData cmp = obj as RegionData;
             if (cmp == null) return -1;

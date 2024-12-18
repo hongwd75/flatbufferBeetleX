@@ -211,11 +211,7 @@ namespace Logic.database
 							var allowNull = !reader.GetBoolean(3);
 							var primary = reader.GetInt64(5) > 0;
 							currentTableColumns.Add(new TableRowBindind(column, colType, allowNull, primary));
-							if (log.IsDebugEnabled)
-								log.DebugFormat("CheckOrCreateTable: Found Column {0} in existing table {1}", column, table.TableName);
 						}
-						if (log.IsDebugEnabled)
-							log.DebugFormat("CheckOrCreateTable: {0} columns existing in table {1}", currentTableColumns.Count, table.TableName);
 					});
 			}
 			catch (Exception e)
