@@ -13,26 +13,24 @@ public class ClientNetworkLogic
 {
     private ClientPacketMethodsManager sendPacketMethods;
     private ClientPacket Packet;
-    private TcpClient client;
+    private AsyncTcpClient client;
 
     public void Init(string url, int port)
     {
         Packet = new ClientPacket();
         Packet.Register(null);
-        Packet.Completed += OnPacket;
         
         sendPacketMethods = new ClientPacketMethodsManager();
         sendPacketMethods.Register();
 
-        client = SocketFactory.CreateClient<TcpClient>(Packet, url, port);
+        client = SocketFactory.CreateClient<AsyncTcpClient>(Packet, url, port);
+        client.PacketReceive = OnPacket;
         client.Connect();
     }
-
     
     public void Send(ClientPackets sc, byte[] buffer)
     {
-
-        client.SendMessage(((ushort)sc,buffer));
+        client.Send(((ushort)sc,buffer));
     }
     
     public void SendLoginReq(string id, string pwd)
@@ -51,7 +49,11 @@ public class ClientNetworkLogic
     {
         if (message is (ushort ID, ByteBuffer buffer))
         {
-            Packet.OnRecieveData((ServerPackets)ID,buffer);    
+            ClientTypeHandler handler = (ClientTypeHandler)Packet.TypeHeader;
+            if (handler.PacketMsg.TryGetValue((ServerPackets)ID, out var fnc) == true)
+            {
+                fnc.Invoke(buffer);
+            }
         }
     }
 }

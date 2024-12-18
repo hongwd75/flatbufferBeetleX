@@ -30,7 +30,10 @@ namespace Game.Logic.network
 
         protected void Send(ServerPackets sc, byte[] buffer)
         {
-            Session.Send(((ushort)sc,buffer));
+            if (Session != null)
+            {
+                Session.Send(((ushort)sc, buffer));
+            }
         }
         
         // 생성 패킷
@@ -41,7 +44,8 @@ namespace Game.Logic.network
                 FlatBufferBuilder sendBuilder = new FlatBufferBuilder(1024);
                 SC_LoginAns_FBS req = new SC_LoginAns_FBS();
                 req.Errorcode = (int)error;
-                var packedOffset = GameServer.SendPacketClassMethods.GetServerPacketType(ServerPackets.SC_LoginAns, req);
+                var packfunc = GameServer.SendPacketClassMethods.GetServerPacketType(ServerPackets.SC_LoginAns, req);
+                object packedOffset = packfunc.method.Invoke(packfunc.obj, new object[] { sendBuilder, req });
                 sendBuilder.Finish((int)packedOffset.GetType().GetField("Value").GetValue(packedOffset));
                 Send(ServerPackets.SC_LoginAns, sendBuilder.SizedByteArray());
             }
@@ -56,7 +60,8 @@ namespace Game.Logic.network
                 req.Errorcode = 0;
                 req.Nickname = Client.Account.Name;
                 req.Sessionid = Client.PlayerArrayID;
-                var packedOffset = GameServer.SendPacketClassMethods.GetServerPacketType(ServerPackets.SC_LoginAns, req);
+                var packfunc = GameServer.SendPacketClassMethods.GetServerPacketType(ServerPackets.SC_LoginAns, req);
+                object packedOffset = packfunc.method.Invoke(packfunc.obj, new object[] { sendBuilder, req });
                 sendBuilder.Finish((int)packedOffset.GetType().GetField("Value").GetValue(packedOffset));
                 Send(ServerPackets.SC_LoginAns, sendBuilder.SizedByteArray());
             }

@@ -92,13 +92,5 @@ namespace Flatbuffers.Messages.Packets.Client
             }
         }
 
-        public void OnRecieveData(ServerPackets msg, ByteBuffer buffer)
-        {
-            ClientTypeHandler handler = (ClientTypeHandler)TypeHeader;
-            if (handler.PacketMsg.TryGetValue(msg, out var fnc) == true)
-            {
-                fnc.Invoke(buffer);
-            }
-        }
     }      
 }
