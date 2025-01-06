@@ -31,7 +31,7 @@ namespace Network.Protocol
 
 			if (GameServer.Instance.ServerStatus == eGameServerStatus.GSS_Closed)
 			{
-				GameServer.Instance.NetworkHandler.Disconnect(session);
+				GameServer.Instance.NetworkHandler.Disconnect(session,false);
 				return;
 			}
 
@@ -48,17 +48,21 @@ namespace Network.Protocol
 					bool disconnect = false;
 					lock (client)
 					{
-						if (client.Session == null || client.Session.IsDisposed == true)
+						if (client.IsConnected() == false)
 						{
 							if (client.ClientState != GameClient.eClientState.Playing)
 							{
 								// 게임하고 있지 않는 상태면 접속 종료 시키고 새로 접속 시도.
 								client.ClientState = GameClient.eClientState.Connecting;
-								
 							}
 						}
 						else
 						{
+							// 중복 로그인 패킷은 무시
+							if (client.ClientState == GameClient.eClientState.Connecting)
+							{
+								return;
+							} else
 							if (client.ClientState == GameClient.eClientState.Playing)
 							{
 								disconnect = true;
@@ -70,7 +74,7 @@ namespace Network.Protocol
 
 					if (disconnect == true)
 					{
-						GameServer.Instance.NetworkHandler.Disconnect(session);
+						GameServer.Instance.NetworkHandler.Disconnect(session,false);
 						return;
 					}
 				}
@@ -116,7 +120,7 @@ namespace Network.Protocol
 				if (error != eLoginError.none)
 				{
 					output?.SendLoginDenied(error);
-					GameServer.Instance.NetworkHandler.Disconnect(session);
+					GameServer.Instance.NetworkHandler.Disconnect(session,false);
 				}
 				else
 				{
@@ -127,7 +131,7 @@ namespace Network.Protocol
 						if (client == null)
 						{
 							output?.SendLoginDenied(eLoginError.TooManyPlayersLoggedIn);
-							GameServer.Instance.NetworkHandler.Disconnect(session);
+							GameServer.Instance.NetworkHandler.Disconnect(session,false);
 							return;
 						}
 						else
@@ -147,11 +151,11 @@ namespace Network.Protocol
 			}
 			catch (DatabaseException e)
 			{
-				GameServer.Instance.NetworkHandler.Disconnect(session);
+				GameServer.Instance.NetworkHandler.Disconnect(session,true);
 			}			
 			catch (Exception e)
 			{
-				GameServer.Instance.NetworkHandler.Disconnect(session);
+				GameServer.Instance.NetworkHandler.Disconnect(session,true);
 			}
 			finally
 			{

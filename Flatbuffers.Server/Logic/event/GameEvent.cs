@@ -1,4 +1,4 @@
-﻿namespace Game.Logic.Event
+﻿namespace Game.Logic.Events
 {
     public abstract class GameEvent
     {
@@ -30,7 +30,7 @@
         /// <returns></returns>
         public override string ToString()
         {
-            return "DOLEvent("+m_EventName+")";
+            return $"GameEvent("+m_EventName+")";
         }
 
         /// <summary>

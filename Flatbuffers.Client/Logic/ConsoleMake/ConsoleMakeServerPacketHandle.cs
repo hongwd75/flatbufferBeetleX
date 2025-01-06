@@ -3,7 +3,7 @@ using System.Text;
 using Network.Protocol.IPacketMessage;
 using NetworkMessage;
 
-namespace Game.Client.Logic.ConsoleMake;
+namespace Game.Logic.ConsoleMake;
 
 public class ConsoleMakeServerPacketHandle
 {

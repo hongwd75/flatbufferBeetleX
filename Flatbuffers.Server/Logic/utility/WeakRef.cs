@@ -1,4 +1,4 @@
-﻿namespace Game.Logic.utility
+﻿namespace Game.Logic.Utils
 {
     public class WeakRef : WeakReference
     {

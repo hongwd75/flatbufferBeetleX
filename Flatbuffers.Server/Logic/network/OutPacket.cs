@@ -7,12 +7,10 @@ using NetworkMessage;
 
 namespace Game.Logic.network
 {
-    public class OutPacket : ISessionSocketProcessHandler
+    public abstract class OutPacket : ISessionSocketProcessHandler
     {
         private ISession Session = null;
         private GameClient mGameClient = null;
-        
-        
 
         public GameClient Client
         {
@@ -36,37 +34,6 @@ namespace Game.Logic.network
             }
         }
         
-        // 생성 패킷
-        public void SendLoginDenied(eLoginError error)
-        {
-            //lock (sendBuilder)
-            {
-                FlatBufferBuilder sendBuilder = new FlatBufferBuilder(1024);
-                SC_LoginAns_FBS req = new SC_LoginAns_FBS();
-                req.Errorcode = (int)error;
-                var packfunc = GameServer.SendPacketClassMethods.GetServerPacketType(ServerPackets.SC_LoginAns, req);
-                object packedOffset = packfunc.method.Invoke(packfunc.obj, new object[] { sendBuilder, req });
-                sendBuilder.Finish((int)packedOffset.GetType().GetField("Value").GetValue(packedOffset));
-                Send(ServerPackets.SC_LoginAns, sendBuilder.SizedByteArray());
-            }
-        }
-
-        public void SendLoginInfo()
-        {
-            //lock (sendBuilder)
-            {
-                FlatBufferBuilder sendBuilder = new FlatBufferBuilder(1024);
-                SC_LoginAns_FBS req = new SC_LoginAns_FBS();
-                req.Errorcode = 0;
-                req.Nickname = Client.Account.Name;
-                req.Sessionid = Client.PlayerArrayID;
-                var packfunc = GameServer.SendPacketClassMethods.GetServerPacketType(ServerPackets.SC_LoginAns, req);
-                object packedOffset = packfunc.method.Invoke(packfunc.obj, new object[] { sendBuilder, req });
-                sendBuilder.Finish((int)packedOffset.GetType().GetField("Value").GetValue(packedOffset));
-                Send(ServerPackets.SC_LoginAns, sendBuilder.SizedByteArray());
-            }
-        }
-
         public void ReceiveCompleted(ISession session, SocketAsyncEventArgs e)
         {
         }
@@ -74,5 +41,12 @@ namespace Game.Logic.network
         public void SendCompleted(ISession session, SocketAsyncEventArgs e)
         {
         }
+
+        //=======================================================================================================
+        // 생성 패킷
+        public abstract void SendLoginDenied(eLoginError error);
+        public abstract void SendLoginInfo();
+        public abstract void SendTime();
+
     }
 }

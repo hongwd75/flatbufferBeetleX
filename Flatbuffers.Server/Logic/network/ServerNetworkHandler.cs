@@ -25,15 +25,28 @@ namespace Game.Logic.network
             }
         }
 
-        public void Disconnect(GameClient client) => client.Session.Dispose();
-        public void Disconnect(ISession client) => client.Dispose();
+        public void Disconnect(GameClient client,bool removeClientArray)
+        {
+            Disconnect(client?.Session,removeClientArray);
+
+        }
+
+        public void Disconnect(ISession client,bool removeClientArray)
+        {
+            var outproc = (OutPacket)client.SocketProcessHandler;
+            if (removeClientArray == true && outproc.Client != null)
+            {
+                
+            }
+            client.Dispose();   
+        }
         
         //------------------------------------------------------------------------------------------------------
         #region OnConnect / OnDisconnect
         public override void Connected(IServer server, ConnectedEventArgs e)
         {
             base.Connected(server,e);
-            e.Session.SocketProcessHandler = new OutPacket(e.Session);
+            e.Session.SocketProcessHandler = new OutPacketV1(e.Session);
         }
         
         public override void Disconnect(IServer server, SessionEventArgs e)

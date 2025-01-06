@@ -5,7 +5,7 @@ using BeetleX.Clients;
 using Google.FlatBuffers;
 using NetworkMessage;
 
-namespace Game.Client.Network;
+namespace Game.Logic.Network;
 
 public class ClientPacketMethodsManager
 {

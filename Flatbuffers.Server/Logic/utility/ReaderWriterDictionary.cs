@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace Game.Logic.utility
+namespace Game.Logic.Utils
 {
 	public class ReaderWriterDictionary<TKey, TValue> : IDictionary<TKey, TValue> where TKey : notnull
 	{

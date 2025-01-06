@@ -3,11 +3,11 @@ using BeetleX;
 using BeetleX.Clients;
 using Flatbuffers.Messages;
 using Flatbuffers.Messages.Packets.Client;
-using Game.Client.Network;
+using Game.Logic.Network;
 using Google.FlatBuffers;
 using NetworkMessage;
 
-namespace Game.Client.Logic;
+namespace Game.Logic;
 
 public class ClientNetworkLogic
 {

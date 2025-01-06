@@ -4,9 +4,10 @@ using Logic.database.table;
 
 namespace Game.Logic.managers;
 
-public class GameClientManager
+public class GameClientManager : IDisposable
 {
-    public const long PING_TIMEOUT = 360; 
+    public const long PING_TIMEOUT = 360;
+    public const long PING_TIME = 10 * 60 * 10000000L;
     private GameClient[] mClients = Array.Empty<GameClient>();
     private Timer m_pingCheckTimer;
     public GameClientManager(int maxClient)
@@ -31,6 +32,23 @@ public class GameClientManager
             return mClients.Where(c => c != null).ToList();
         }
     }
+    public IList<GameClient> GetAllPlayingClients()
+    {
+        var targetClients = new List<GameClient>();
+
+        lock (mClients.SyncRoot)
+        {
+            foreach (GameClient client in mClients)
+            {
+                if (client != null
+                    && client.IsPlaying
+                    && client.Player != null
+                    && client.Player.ObjectState == GameObject.eObjectState.Active)
+                    targetClients.Add(client);
+            }
+        }
+        return targetClients;
+    }    
     
     public GameClient GetClientByAccountName(string accountName, bool exactMatch)
     {
@@ -81,20 +99,19 @@ public class GameClientManager
                 try
                 {
                     // check ping timeout if we are in charscreen or in playing state
-                    if (client.ClientState == GameClient.eClientState.CharScreen ||
-                        client.ClientState == GameClient.eClientState.Playing)
+                    if (client.ClientState == GameClient.eClientState.Playing)
                     {
-                        if (client.PingTime + PING_TIMEOUT * 1000 * 1000 * 10 < DateTime.Now.Ticks)
+                        if (client.PingTime + PING_TIMEOUT * 1000 * 1000 * 10 < DateTime.Now.Ticks) // 1시간
                         {
-                            GameServer.Instance.NetworkHandler.Disconnect(client);
+                            GameServer.Instance.NetworkHandler.Disconnect(client,false);
                         }
                     }
                     else
                     {
                         // in all other cases client gets 10min to get wether in charscreen or playing state
-                        if (client.PingTime + 10 * 60 * 10000000L < DateTime.Now.Ticks)
+                        if (client.PingTime + PING_TIME < DateTime.Now.Ticks)
                         {
-                            GameServer.Instance.NetworkHandler.Disconnect(client);
+                            GameServer.Instance.NetworkHandler.Disconnect(client,true);
                         }
                     }
                 }

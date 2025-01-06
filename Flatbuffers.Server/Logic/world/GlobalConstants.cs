@@ -5,7 +5,8 @@
         None = 0,
         Albion = 1,
         Midgard = 2,
-        Hibernia = 3
+        Hibernia = 3,
+        _Last = 4,
     };
     
     public enum eGameServerStatus

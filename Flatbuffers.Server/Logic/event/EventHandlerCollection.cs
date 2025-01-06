@@ -1,6 +1,6 @@
-﻿using Game.Logic.utility;
+﻿using Game.Logic.Utils;
 
-namespace Game.Logic.Event
+namespace Game.Logic.Events
 {
 	public delegate void GameEventHandler(GameEvent e, object sender, EventArgs arguments);
 

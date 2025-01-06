@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using log4net;
 
-namespace Game.Logic.Event
+namespace Game.Logic.Events
 {
     public class GameEventManager
 	{

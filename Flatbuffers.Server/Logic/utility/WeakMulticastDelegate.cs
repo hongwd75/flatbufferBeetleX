@@ -2,7 +2,7 @@
 using System.Text;
 using log4net;
 
-namespace Game.Logic.utility
+namespace Game.Logic.Utils
 {
 public class WeakMulticastDelegate
 	{

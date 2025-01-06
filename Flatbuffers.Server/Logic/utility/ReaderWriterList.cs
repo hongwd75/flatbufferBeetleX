@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace Game.Logic.utility
+namespace Game.Logic.Utils
 {
 	public class ReaderWriterList<T> : IList<T>
 	{

@@ -27,11 +27,19 @@ namespace Game.Logic.network
         protected Account mAccount;
         protected int mGamePlayerArrayID;
         
-        protected long m_pingTime = DateTime.Now.Ticks;
+        protected long mPingTime = DateTime.Now.Ticks;
         protected volatile eClientState m_clientState = eClientState.NotConnected;
 
+        protected long mRoomID = 0;      // room 형식의 게임용 room id
+        
         #region GET / SET
 
+        public long RoomID 
+        { 
+            get => mRoomID;
+            set { mRoomID = value; }
+        }
+        
         public OutPacket Out
         {
             get
@@ -84,15 +92,28 @@ namespace Game.Logic.network
                 m_clientState = value;
             }
         }
+
+        public bool IsPlaying
+        {
+            get
+            {
+                return m_clientState == eClientState.Playing;
+            }
+        }
         
         public long PingTime
         {
-            get { return m_pingTime; }
-            set { m_pingTime = value; }
+            get { return mPingTime; }
+            set { mPingTime = value; }
         }
         
         #endregion
 
+        public bool IsConnected()
+        {
+            return Session != null && Session.IsDisposed == false && m_clientState > eClientState.NotConnected;
+        }
+        
         public GameClient(ISession session)
         {
             mSession = session;

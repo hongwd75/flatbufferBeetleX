@@ -4,12 +4,12 @@ using System;
 using System.Collections.Generic;
 using BeetleX.EventArgs;
 using Flatbuffers.Messages.Packets.Client;
-using Game.Client.Logic;
-using Game.Client.Logic.ConsoleMake;
+using Game.Logic.ConsoleMake;
+using Game.Logic;
 using Google.FlatBuffers;
 using NetworkMessage;
 
-namespace Game.Client
+namespace Game.Logic.Client
 {
     class Program
     {

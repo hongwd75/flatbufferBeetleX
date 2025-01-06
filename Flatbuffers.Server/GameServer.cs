@@ -2,9 +2,13 @@
 using BeetleX;
 using BeetleX.EventArgs;
 using Flatbuffers.Messages.Packets.Server;
+using Game.Logic.attribute;
+using Game.Logic.Events;
 using Game.Logic.managers;
 using Game.Logic.network;
 using Game.Logic.ServerProperties;
+using Game.Logic.Skills;
+using Game.Logic.Utils;
 using Game.Logic.World;
 using log4net;
 using log4net.Config;
@@ -96,6 +100,9 @@ namespace Game.Logic
             // 서버 상태 초기화
             mStatus = eGameServerStatus.GSS_Closed;
             
+            Thread.CurrentThread.Priority = ThreadPriority.Normal;
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            
             // 시간 틱 설정
             mStartTick = Environment.TickCount64;
             
@@ -114,6 +121,10 @@ namespace Game.Logic
                 return false;
             }
 
+            //--------------------------------------------------------------------------------------
+            GameEventManager.Notify(ScriptEvent.Loaded);
+            
+            //--------------------------------------------------------------------------------------
             if (InitComponent(() =>
                 {
                     if (mTimer != null)
@@ -126,6 +137,7 @@ namespace Game.Logic
             {
                 return false;
             }
+            
             //--------------------------------------------------------------------------------------
             if ( InitComponent(() =>
                 {
@@ -157,6 +169,15 @@ namespace Game.Logic
         public void Stop()
         {
             mStatus = eGameServerStatus.GSS_Closed;
+            
+            GameEventManager.Notify(ScriptEvent.Unloaded);
+            if (mTimer != null)
+            {
+                mTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                mTimer.Dispose();
+                mTimer = null;
+            }
+            
             mServerSocket.Dispose();
         }
 
@@ -206,8 +227,15 @@ namespace Game.Logic
 			
             return componentInitState;
         }
-        
+        #endregion
 
+        #region 크래시 로그 =============================================================================================
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            log.Fatal("Unhandled exception!\n" + e.ExceptionObject);
+            if (e.IsTerminating)
+                LogManager.Shutdown();
+        }
         #endregion
 
         #region DB 초기화 ==============================================================================================
@@ -265,6 +293,38 @@ namespace Game.Logic
 
         #endregion
 
+        #region 메니저 초기화 ===========================================================================================
+
+        protected bool StartScriptComponents()
+        {
+            try
+            {
+                SkillBase.LoadSkills();
+                if (log.IsInfoEnabled)
+                {
+                    log.Info("스킬 로딩 완료");
+                }
+                
+                foreach (Assembly asm in ScriptMgr.GameServerScripts)
+                {
+                    GameEventManager.RegisterGlobalEvents(asm, typeof (GameServerStartedEventAttribute), GameServerEvent.Started);
+                    GameEventManager.RegisterGlobalEvents(asm, typeof (GameServerStoppedEventAttribute), GameServerEvent.Stopped);
+                    GameEventManager.RegisterGlobalEvents(asm, typeof (ScriptLoadedEventAttribute), ScriptEvent.Loaded);
+                    GameEventManager.RegisterGlobalEvents(asm, typeof (ScriptUnloadedEventAttribute), ScriptEvent.Unloaded);
+                }                
+            }
+            catch (Exception e)
+            {
+                if (log.IsErrorEnabled)
+                    log.Error("StartScriptComponents 함수 내에서 오류 발생", e);                
+                return false;
+            }
+
+            return true;
+        }
+        
+
+        #endregion
         #region Save Timer Fuction
         protected void SaveTimerProc(object sender)
         {
@@ -282,11 +342,11 @@ namespace Game.Logic
                     Thread.CurrentThread.Priority = ThreadPriority.Lowest;
 
                     // //Only save the players, NOT any other object!
-                    // saveCount = WorldMgr.SavePlayers();
+                    // saveCount = WorldManager.SavePlayers();
                     //
                     // //The following line goes through EACH region and EACH object
                     // //is tested for savability. A real waste of time, so it is commented out
-                    // //WorldMgr.SaveToDatabase();
+                    // //WorldManager.SaveToDatabase();
                     //
                     // GuildMgr.SaveAllGuilds();
                     // BoatMgr.SaveAllBoats();
