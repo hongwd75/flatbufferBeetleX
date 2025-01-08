@@ -1,4 +1,5 @@
-﻿using System.Net.Sockets;
+﻿using System.Net;
+using System.Net.Sockets;
 using BeetleX;
 using Flatbuffers.Messages.Packets.Client;
 using Game.Logic;
@@ -106,12 +107,25 @@ namespace Game.Logic.network
             get { return mPingTime; }
             set { mPingTime = value; }
         }
-        
+
+        public bool IsConnectedBan = false;
         #endregion
 
         public bool IsConnected()
         {
             return Session != null && Session.IsDisposed == false && m_clientState > eClientState.NotConnected;
+        }
+        
+        public string TcpEndpointAddress
+        {
+            get
+            {
+                Socket s = Session?.Socket;
+                if (s != null && s.Connected && s.RemoteEndPoint != null)
+                    return ((IPEndPoint) s.RemoteEndPoint).Address.ToString();
+
+                return "not connected";
+            }
         }
         
         public GameClient(ISession session)

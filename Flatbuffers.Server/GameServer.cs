@@ -7,6 +7,7 @@ using Game.Logic.Events;
 using Game.Logic.managers;
 using Game.Logic.network;
 using Game.Logic.ServerProperties;
+using Game.Logic.ServerRules;
 using Game.Logic.Skills;
 using Game.Logic.Utils;
 using Game.Logic.World;
@@ -24,11 +25,9 @@ namespace Game.Logic
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         #region ========= DB ===========================================================================================
-
         protected IObjectDatabase m_database;
         public IObjectDatabase IDatabase => m_database;
         public static IObjectDatabase Database => Instance.IDatabase;
-
         #endregion
 
         #region ========= STATUS =======================================================================================
@@ -54,14 +53,39 @@ namespace Game.Logic
         private IServer mServerSocket;
         public IServer ServerSocket { get => mServerSocket; }
         public ServerNetworkHandler NetworkHandler { get =>(ServerNetworkHandler)mServerSocket.Handler; }
-        
         public static PacketMethodsManager SendPacketClassMethods = new PacketMethodsManager();
         #endregion
 
         protected GameClientManager mClientManager;
         public GameClientManager Clients => mClientManager;
         public static GameServer Instance { get; private set; } = null;
-        public BaseServerConfiguration Configuration;        
+        public BaseServerConfiguration Configuration;
+        
+        public static IServerRules ServerRules => Instance.ServerRulesImpl;
+        protected IServerRules m_serverRules;
+        protected virtual IServerRules ServerRulesImpl
+        {
+            get
+            {
+                if (m_serverRules == null)
+                {
+                    m_serverRules = ScriptMgr.CreateServerRules(Configuration.ServerType);
+                    if (m_serverRules != null)
+                    {
+                        m_serverRules.Initialize();
+                    }
+                    else
+                    {
+                        if (log.IsErrorEnabled)
+                        {
+                            log.Error("ServerRules null on access and failed to create.");
+                        }
+                    }
+                }
+                return m_serverRules;
+            }
+        }
+        
         public GameServer() : this(new BaseServerConfiguration())
         {
         }

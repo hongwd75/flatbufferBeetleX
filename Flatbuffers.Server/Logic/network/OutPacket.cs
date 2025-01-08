@@ -48,5 +48,7 @@ namespace Game.Logic.network
         public abstract void SendLoginInfo();
         public abstract void SendTime();
 
+        public abstract void SendMessage(string message, eChatType type, eChatLoc loc);
+
     }
 }

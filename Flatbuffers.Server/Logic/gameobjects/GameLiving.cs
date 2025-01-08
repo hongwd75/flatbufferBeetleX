@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using Game.Logic.AI.Brain;
+using Game.Logic.Effects;
 using Game.Logic.Events;
 using Game.Logic.Geometry;
 using Game.Logic.PropertyCalc;
@@ -45,11 +46,8 @@ public class GameLiving : GameObject
     {
         return m_PropertyIndexers[(int)type];
     }
-    public IMultiplicativeProperties BuffBonusMultCategory
-    {
-        get { return m_buffMultBonus; }
-    }
-    
+
+    public IMultiplicativeProperties BuffBonusMultCategory => m_buffMultBonus;
     public virtual int GetBaseStat(eStat stat)
     {
         return m_charStat[stat - eStat._First];
@@ -60,26 +58,142 @@ public class GameLiving : GameObject
     }
     
     protected eActiveWeaponSlot m_activeWeaponSlot;
+    public virtual eActiveWeaponSlot ActiveWeaponSlot => m_activeWeaponSlot;
+    protected byte m_visibleActiveWeaponSlots = 0xFF; // none by default
+    public byte VisibleActiveWeaponSlots
+    {
+	    get => m_visibleActiveWeaponSlots;
+	    set { m_visibleActiveWeaponSlots=value; }
+    }
+
+    #region ## Attacker
     protected AttackAction m_attackAction;
     protected readonly List<GameObject> m_attackers;
-    public virtual eActiveWeaponSlot ActiveWeaponSlot
-    {
-	    get { return m_activeWeaponSlot; }
-    }    
-    protected virtual AttackAction CreateAttackAction()
-    {
-	    return m_attackAction ?? new AttackAction(this);
-    }
+    public List<GameObject> Attackers => m_attackers;
+    protected virtual AttackAction CreateAttackAction() => m_attackAction ?? new AttackAction(this);
+	public virtual void AddAttacker(GameObject attacker)
+	{
+		lock (Attackers)
+		{
+			if (attacker == this) return;
+			if (m_attackers.Contains(attacker)) return;
+			m_attackers.Add(attacker);
+		}
+	}
+	public virtual void RemoveAttacker(GameObject attacker)
+	{
+		lock (Attackers)
+		{
+			m_attackers.Remove(attacker);
+        }
+	}
+	/// <summary>
+	/// Called when this living dies
+	/// </summary>
+	public virtual void Die(GameObject killer)
+	{
+		if (this is GameNPC == false && this is GamePlayer == false)
+		{
+			// deal out exp and realm points based on server rules
+			GameServer.ServerRules.OnLivingKilled(this, killer);
+		}
+
+		StopAttack();
+
+		List<GameObject> clone;
+		lock (Attackers)
+		{
+			if (m_attackers.Contains(killer) == false)
+				m_attackers.Add(killer);
+			clone = new List<GameObject>(m_attackers);
+		}
+		List<GamePlayer> playerAttackers = null;
+
+		foreach (GameObject obj in clone)
+		{
+			if (obj is GameLiving)
+			{
+				GamePlayer player = obj as GamePlayer;
+
+				if (obj as GameNPC != null && (obj as GameNPC).Brain is IControlledBrain)
+				{
+					// Ok, we're a pet - if our Player owner isn't in the attacker list, let's make them a 'virtual' attacker
+					player = ((obj as GameNPC).Brain as IControlledBrain).GetPlayerOwner();
+					if (player != null)
+					{
+						if (clone.Contains(player) == false)
+						{
+							if (playerAttackers == null)
+								playerAttackers = new List<GamePlayer>();
+
+							if (playerAttackers.Contains(player) == false)
+								playerAttackers.Add(player);
+						}
+
+						// Pet gets the killed message as well
+						((GameLiving)obj).EnemyKilled(this);
+					}
+				}
+
+				if (player != null)
+				{
+					if (playerAttackers == null)
+						playerAttackers = new List<GamePlayer>();
+
+					if (playerAttackers.Contains(player) == false)
+					{
+						playerAttackers.Add(player);
+					}
+				}
+				else
+				{
+					((GameLiving)obj).EnemyKilled(this);
+				}
+			}
+		}
+
+		if (playerAttackers != null)
+		{
+			foreach (GamePlayer player in playerAttackers)
+			{
+				player.EnemyKilled(this);
+			}
+		}
+
+		m_attackers.Clear();
+
+		// cancel all concentration effects
+		ConcentrationEffects.CancelAll();
+
+		// clear all of our targets
+		RangeAttackTarget = null;
+		TargetObject = null;
+
+		// cancel all left effects
+		EffectList.CancelAll();
+
+		// Stop the regeneration timers
+		StopHealthRegeneration();
+		StopPowerRegeneration();
+		StopEnduranceRegeneration();
+
+		//Reduce health to zero
+		Health = 0;
+
+		// Remove all last attacked times
+		
+		LastAttackedByEnemyTickPvE = 0;
+		LastAttackedByEnemyTickPvP = 0;
+		//Let's send the notification at the end
+		Notify(GameLivingEvent.Dying, this, new DyingEventArgs(killer));
+	}    
+    #endregion
+    
+
     
     protected readonly GameEffectList m_effects;
-    public GameEffectList EffectList
-    {
-	    get { return m_effects; }
-    }
-    protected virtual GameEffectList CreateEffectsList()
-    {
-	    return new GameEffectList(this);
-    }    
+    public GameEffectList EffectList => m_effects;
+    protected virtual GameEffectList CreateEffectsList() => new GameEffectList(this);
     #endregion
     
     public PropertyCollection TempProperties
@@ -94,8 +208,23 @@ public class GameLiving : GameObject
         set { m_race = value; }
     }    
 
-    #region ControlledNpc
+    #region Stealth
+    public virtual bool CanStealth
+    { get; set; }
+    
+    public virtual bool IsStealthed
+    {
+	    get { return false; }
+    }
 
+    public virtual void Stealth(bool goStealth)
+    {
+	    if (goStealth)
+		    log.Warn($"Stealth(): {GetType().FullName} cannot be stealthed.  You probably need to override Stealth() for this class");
+    }
+    #endregion
+    
+    #region ControlledNpc
     private byte m_petCount = 0;
 
     /// <summary>
@@ -350,13 +479,6 @@ public class GameLiving : GameObject
 		//If we are fully healed, we stop the timer
 		if (Health >= MaxHealth)
 		{
-			//We clean all damagedealers if we are fully healed,
-			//no special XP calculations need to be done
-			lock (m_xpGainers.SyncRoot)
-			{
-				m_xpGainers.Clear();
-			}
-
 			return 0;
 		}
 
@@ -375,9 +497,7 @@ public class GameLiving : GameObject
 	/// <param name="selfRegenerationTimer">timer calling this function</param>
 	protected virtual int PowerRegenerationTimerCallback(RegionTimer selfRegenerationTimer)
 	{
-		if (this is GamePlayer &&
-		    (((GamePlayer)this).CharacterClass.ID == (int)eCharacterClass.Vampiir ||
-		     (((GamePlayer)this).CharacterClass.ID > 59 && ((GamePlayer)this).CharacterClass.ID < 63))) // Maulers
+		if (this is GamePlayer )
 		{
 			double MinMana = MaxMana * 0.15;
 			double OnePercMana = Math.Ceiling(MaxMana * 0.01);
@@ -711,7 +831,7 @@ public class GameLiving : GameObject
 				base.Level = value;
 				if (ObjectState == eObjectState.Active)
 				{
-					foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+					foreach (GamePlayer player in GetPlayersInRadius(WorldManager.VISIBILITY_DISTANCE))
 					{
 						if (player == null)
 							continue;

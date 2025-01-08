@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Reflection;
 using Game.Logic.Collections;
+using Game.Logic.datatable;
 using Game.Logic.Events;
 using Game.Logic.Geometry;
 using Game.Logic.Utils;

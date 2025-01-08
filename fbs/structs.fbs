@@ -1,0 +1,15 @@
+namespace NetworkMessage;
+
+struct Vector3 {
+	x: float;
+	y: float;
+	z: float;
+}
+
+table CreatePlayerInfo {
+	sessionid : int;
+	name : string;
+	realm : int;
+	head : int;
+	position : Vector3;
+}

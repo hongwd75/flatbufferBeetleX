@@ -1,4 +1,7 @@
-﻿namespace Game.Logic;
+﻿using Game.Logic.AI.Brain;
+using Game.Logic.Effects;
+
+namespace Game.Logic;
 
 public class AttackAction : RegionAction
 {
@@ -39,14 +42,7 @@ public class AttackAction : RegionAction
 			Stop();
 			return;
 		}
-
-		// Don't attack if gameliving is engaging
-		if (owner.IsEngaging)
-		{
-			Interval = owner.AttackSpeed(owner.AttackWeapon); // while gameliving is engageing it doesn't attack.
-			return;
-		}
-
+		
 		// Store all datas which must not change during the attack
 		// double effectiveness = 1.0;
 		double effectiveness = owner.Effectiveness;
@@ -58,7 +54,7 @@ public class AttackAction : RegionAction
 		InventoryItem leftWeapon = (owner.Inventory == null) ? null : owner.Inventory.GetItem(eInventorySlot.LeftHandWeapon);
 		GameObject attackTarget = null;
 
-		if (owner.ActiveWeaponSlot == eActiveWeaponSlot.Distance)
+		if (owner.ActiveWeaponSlot == GameLiving.eActiveWeaponSlot.Distance)
 		{
 			attackTarget = owner.RangeAttackTarget; // must be do here because RangeAttackTarget is changed in CheckRangeAttackState
 			eCheckRangeAttackStateResult rangeCheckresult = owner.CheckRangeAttackState(attackTarget);
@@ -189,7 +185,7 @@ public class AttackAction : RegionAction
 			ticksToTarget = 1;
 		}
 
-		if (attackTarget != null && !owner.IsWithinRadius(attackTarget, owner.AttackRange) && owner.ActiveWeaponSlot != eActiveWeaponSlot.Distance)
+		if (attackTarget != null && !owner.IsWithinRadius(attackTarget, owner.AttackRange) && owner.ActiveWeaponSlot != GameLiving.eActiveWeaponSlot.Distance)
 		{
 			if (owner is GameNPC && (owner as GameNPC).Brain is StandardMobBrain && ((owner as GameNPC).Brain as StandardMobBrain).AggroTable.Count > 0 && (owner as GameNPC).Brain is IControlledBrain == false)
 			{
@@ -250,19 +246,19 @@ public class AttackAction : RegionAction
 		new WeaponOnTargetAction(owner, attackTarget, attackWeapon, leftWeapon, effectiveness, interruptDuration, combatStyle).Start(ticksToTarget);  // really start the attack
 
 		//Are we inactive?
-		if (owner.ObjectState != eObjectState.Active)
+		if (owner.ObjectState != GameObject.eObjectState.Active)
 		{
 			Stop();
 			return;
 		}
 
 		//switch to melee if range to target is less than 200
-		if (owner is GameNPC && owner.ActiveWeaponSlot == eActiveWeaponSlot.Distance && owner.TargetObject != null && owner.IsWithinRadius( owner.TargetObject, 200 ) )
+		if (owner is GameNPC && owner.ActiveWeaponSlot == GameLiving.eActiveWeaponSlot.Distance && owner.TargetObject != null && owner.IsWithinRadius( owner.TargetObject, 200 ) )
 		{
-			owner.SwitchWeapon(eActiveWeaponSlot.Standard);
+			owner.SwitchWeapon(GameLiving.eActiveWeaponSlot.Standard);
 		}
 
-		if (owner.ActiveWeaponSlot == eActiveWeaponSlot.Distance)
+		if (owner.ActiveWeaponSlot == GameLiving.eActiveWeaponSlot.Distance)
 		{
 			//Mobs always shot and reload
 			if (owner is GameNPC)

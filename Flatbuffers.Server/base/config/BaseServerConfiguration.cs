@@ -213,6 +213,13 @@ public class BaseServerConfiguration
 			set { m_saveInterval = value; }
 		}
 		
+		protected eGameServerType m_serverType;
+		public eGameServerType ServerType
+		{
+			get { return m_serverType; }
+			set { m_serverType = value; }
+		}
+		
 		/// <summary>
 		/// Loads the configuration values from the given configuration element.
 		/// </summary>
@@ -245,6 +252,18 @@ public class BaseServerConfiguration
 					m_dbType = ConnectionType.DATABASE_SQLITE;
 					break;
 			}
+			
+			string serverType = root["Server"]["GameType"].GetString("Normal");
+			switch (serverType.ToLower())
+			{
+				case "normal":
+					m_serverType = eGameServerType.GST_Normal;
+					break;
+				case "casual":
+					m_serverType = eGameServerType.GST_Casual;
+					break;
+			}
+
 			m_dbConnectionString = root["Server"]["DBConnectionString"].GetString(m_dbConnectionString);
 			m_autoSave = root["Server"]["DBAutosave"].GetBoolean(m_autoSave);
 			m_saveInterval = root["Server"]["DBAutosaveInterval"].GetInt(m_saveInterval);

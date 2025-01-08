@@ -2,8 +2,11 @@
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Game.Logic.AI.Brain;
+using Game.Logic.datatable;
 using Game.Logic.Events;
 using Game.Logic.Geometry;
+using Game.Logic.Language;
+using Game.Logic.PropertyCalc;
 using Game.Logic.ServerProperties;
 using Game.Logic.Skills;
 using Game.Logic.Utils;

@@ -3,6 +3,7 @@ using Game.Logic.Utils;
 using Game.Logic.Events;
 using Game.Logic.Geometry;
 using Game.Logic;
+using Game.Logic.datatable;
 using Logic.database.table;
 
 namespace Game.Logic.World;
@@ -99,9 +100,9 @@ public abstract class AbstractArea : IArea, ITranslatableObject
 			set { m_ID = value; }
 		}
 
-        public virtual eTranslationIdentifier TranslationIdentifier
+        public virtual LanguageDataObject.eTranslationIdentifier TranslationIdentifier
         {
-            get { return eTranslationIdentifier.eArea; }
+            get { return LanguageDataObject.eTranslationIdentifier.eArea; }
         }
 
         /// <summary>

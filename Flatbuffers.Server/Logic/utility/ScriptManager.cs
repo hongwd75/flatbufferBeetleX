@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Text;
 using Game.Logic.AI.Brain;
 using Game.Logic.network;
+using Game.Logic.ServerRules;
 using Game.Logic.Skills;
 using Game.Logic.World;
 using log4net;
@@ -480,7 +481,7 @@ public class ScriptMgr
 				foreach (Type type in script.GetTypes())
 				{
 					if (type.IsClass == false) continue;
-					if (type.GetInterface("DOL.GS.ServerRules.IServerRules") == null) continue;
+					if (type.GetInterface("Game.Logic.ServerRules.IServerRules") == null) continue;
 
 					// look for attribute
 					try
@@ -512,7 +513,7 @@ public class ScriptMgr
 				foreach (Type type in Assembly.GetAssembly(typeof(GameServer)).GetTypes())
 				{
 					if (type.IsClass == false) continue;
-					if (type.GetInterface("DOL.GS.ServerRules.IServerRules") == null) continue;
+					if (type.GetInterface("Game.Logic.ServerRules.IServerRules") == null) continue;
 
 					// look for attribute
 					try

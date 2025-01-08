@@ -1,0 +1,70 @@
+include "structs.fbs";
+include "enumPackets.fbs";
+namespace NetworkMessage;
+
+// 로그인 관련 메시지들
+table CS_LoginReq {
+	id 		: string;
+	pwd 	: string;
+}
+
+table CS_WorldJoinReq{
+	gate	: int; // 0이면 로그인시 사용. 0이 아니면 게이트 포털
+}
+
+table CS_UpdatePosition {
+	sessionid : int;
+	head : int;
+	position : Vector3;
+}
+
+/////////////////////////////////////////////////////////
+// 서버 메시지
+table SC_LoginAns {
+	errorcode 	: int;
+	sessionid 	: int;
+	nickname  	: string;
+}
+
+
+table SC_AccountInfo {
+	chartype : int;
+}
+
+table SC_WorldEnterNotify {
+	zoneid : int;
+}
+
+// 플레이어 정보
+table SC_CreatePlayer {
+	player : CreatePlayerInfo;
+}
+
+table SC_CreatePlayers {
+	player : [CreatePlayerInfo];
+}
+
+
+table SC_RemovePlayer {
+	sessionid : int;
+}
+
+table SC_UpdatePosition {
+	sessionid : int;
+	head: int;
+	position : Vector3;
+}
+
+table SC_PlayerUpdate {
+	head   : int;
+	health : int;
+	state  : int;
+}
+
+table SC_StringMessage
+{
+	seesionid : int;
+	chattype  : eChatType;
+	chatloc   : eChatLoc;
+	message   : string;
+}

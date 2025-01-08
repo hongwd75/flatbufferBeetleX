@@ -1,4 +1,5 @@
 ﻿using Game.Logic;
+using Game.Logic.datatable;
 
 namespace Game.Logic.World;
 
@@ -6,5 +7,5 @@ public interface ITranslatableObject
 {
     string TranslationId { get; set; }
 
-    eTranslationIdentifier TranslationIdentifier { get; }
+    LanguageDataObject.eTranslationIdentifier TranslationIdentifier { get; }
 }

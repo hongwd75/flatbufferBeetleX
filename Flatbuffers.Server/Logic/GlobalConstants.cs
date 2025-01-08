@@ -25,16 +25,76 @@ public enum eDamageType : byte
     Falling = 255,
 }
 
-public enum eTranslationIdentifier : byte
+public enum eGender : byte
 {
-    eArea = 0,
-    eDoor = 1,
-    eItem = 2,
-    eNPC = 3,
-    eObject = 4,
-    eSystem = 5,
-    eZone = 6
+    Neutral = 0,
+    Male = 1,
+    Female = 2
 }
+
+public enum eRace : byte
+{
+    Unknown = 0,
+    Briton = 1,
+    Celt = 11,
+    Troll = 21,
+    max = 22
+}
+
+public enum eLivingModel : ushort
+{
+    None = 0,
+    #region AlbionClassModels
+    BritonMale = 1,
+    BritonFemale = 2,
+    #endregion
+    #region MidgardClassModels
+    TrollMale = 3,
+    TrollFemale = 4,
+    #endregion
+    #region HiberniaClassModels
+    CeltMale = 5,
+    CeltFemale = 6,
+    #endregion
+    #region Hastener
+    AlbionHastener = 100,
+    MidgardHastener = 101,
+    HiberniaHastener = 102,
+    #endregion Hastener
+}
+
+public enum eCharacterClass : byte
+{
+    Unknown = 0,
+    //base classes
+    Acolyte = 1,
+    Mage = 2,
+    Fighter = 3,
+    
+    Naturalist = 4,
+    Magician = 5,
+    Guardian = 6,
+
+    Seer = 7,
+    Viking = 8,
+    Mystic = 9,
+    
+    //alb classes
+    Armsman = 10,
+    Cleric = 11,
+    Wizard = 12,
+
+    //mid classes
+    Warrior = 13,
+    Healer = 14,
+    Runemaster = 15,
+
+    //hib classes
+    Hero = 16,
+    Druid = 17,
+    Eldritch = 18,
+}
+
 /////
 public static class GlobalConstants
 {

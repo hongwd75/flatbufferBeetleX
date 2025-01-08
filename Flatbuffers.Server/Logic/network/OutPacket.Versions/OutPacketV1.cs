@@ -17,6 +17,7 @@ namespace Game.Logic.network
             FlatBufferBuilder sendBuilder = new FlatBufferBuilder(1024);
             SC_LoginAns_FBS req = new SC_LoginAns_FBS();
             req.Errorcode = (int)error;
+            
             var packfunc = GameServer.SendPacketClassMethods.GetServerPacketType(ServerPackets.SC_LoginAns, req);
             object packedOffset = packfunc.method.Invoke(packfunc.obj, new object[] { sendBuilder, req });
             sendBuilder.Finish((int)packedOffset.GetType().GetField("Value").GetValue(packedOffset));
@@ -30,6 +31,7 @@ namespace Game.Logic.network
             req.Errorcode = 0;
             req.Nickname = Client.Account.Name;
             req.Sessionid = Client.PlayerArrayID;
+            
             var packfunc = GameServer.SendPacketClassMethods.GetServerPacketType(ServerPackets.SC_LoginAns, req);
             object packedOffset = packfunc.method.Invoke(packfunc.obj, new object[] { sendBuilder, req });
             sendBuilder.Finish((int)packedOffset.GetType().GetField("Value").GetValue(packedOffset));
@@ -39,6 +41,21 @@ namespace Game.Logic.network
         public override void SendTime()
         {
            // 12시가 넘음 ㅇㅇ
+        }
+
+        public override void SendMessage(string message, eChatType type, eChatLoc loc)
+        {
+            FlatBufferBuilder sendBuilder = new FlatBufferBuilder(1024);
+            SC_StringMessage_FBS req = new SC_StringMessage_FBS();
+            req.Seesionid = Client.PlayerArrayID;
+            req.Chatloc = loc;
+            req.Chattype = type;
+            req.Message = message;
+            
+            var packfunc = GameServer.SendPacketClassMethods.GetServerPacketType(ServerPackets.SC_StringMessage, req);
+            object packedOffset = packfunc.method.Invoke(packfunc.obj, new object[] { sendBuilder, req });
+            sendBuilder.Finish((int)packedOffset.GetType().GetField("Value").GetValue(packedOffset));
+            Send(ServerPackets.SC_StringMessage, sendBuilder.SizedByteArray());            
         }
     }
 }

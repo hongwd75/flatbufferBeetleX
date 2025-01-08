@@ -1,4 +1,6 @@
-﻿namespace Game.Logic.Effects;
+﻿using Logic.database.table;
+
+namespace Game.Logic.Effects;
 
 public interface IGameEffect
 {

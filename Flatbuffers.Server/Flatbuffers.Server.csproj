@@ -34,8 +34,10 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="resource\logconfig.xml" />
       <EmbeddedResource Include="resource\logconfig.xml" />
+	  <TranslationFiles Include="resource\language\**\*.txt" />
     </ItemGroup>
-
+    <Target Name="CopyFiles" AfterTargets="AfterBuild">
+	  <Copy SourceFiles="@(TranslationFiles)" DestinationFiles="@(TranslationFiles->'$(MSBuildProjectDirectory)\..\$(Configuration)\languages\%(RecursiveDir)%(Filename)%(Extension)')" />
+	</Target>
 </Project>
