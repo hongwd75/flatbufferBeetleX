@@ -138,7 +138,7 @@ public class NormalServerRules : AbstractServerRules
 		if (source == null) 
 			return false;
 
-		if (ServerProperties.Properties.ALLOW_CROSS_REALM_GUILDS == false && guild.Realm != eRealm.None && source.Realm != guild.Realm)
+		if (guild.Realm != eRealm.None && source.Realm != guild.Realm)
 		{
 			return false;
 		}

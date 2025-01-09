@@ -16,6 +16,10 @@ namespace Game.Logic.ServerProperties
 		public static string DISABLED_EXPANSIONS = "";
 		[ServerProperty("system", "server_language", "기본 언어 설정 (EN, KR)", "EN")]
 		public static string SERV_LANGUAGE;	
+		[ServerProperty("system", "command_spam_delay", "기본 1500ms으로 같은 명령을 또 보내는 경우 무시한다.", 1500)]
+		public static int COMMAND_SPAM_DELAY;		
+		[ServerProperty("system", "hours_uptime_between_shutdown", "예약된 서버 종료 사이의 시간 (-1 = 예약된 재시작 없음)(ms)", -1)]
+		public static int HOURS_UPTIME_BETWEEN_SHUTDOWN;
 		
 		[ServerProperty("server", "use_dblanguage", "언어 데이터를 DB테이블에서 로딩 (테이블이 비어 있으면 파일에서 읽어서 작성)", false)]
 		public static bool USE_DBLANGUAGE;

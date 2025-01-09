@@ -16,4 +16,12 @@ public interface IServerRules
     
     bool IsSameRealm(GameLiving source, GameLiving target, bool quiet);
     string RulesDescription();
+    
+    
+    string GetPlayerTitle(GamePlayer source, GamePlayer target);
+    byte GetLivingRealm(GamePlayer player, GameLiving target);
+    string GetPlayerName(GamePlayer source, GamePlayer target);
+    string GetPlayerLastName(GamePlayer source, GamePlayer target);
+    string GetPlayerGuildName(GamePlayer source, GamePlayer target);
+    string GetPlayerPrefixName(GamePlayer source, GamePlayer target);
 }

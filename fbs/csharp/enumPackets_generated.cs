@@ -13,9 +13,15 @@ public enum eChatType : sbyte
 {
   CT_System = 0,
   CT_Say = 1,
-  CT_Chat = 2,
-  CT_Guild = 3,
-  CT_Help = 4,
+  CT_Send = 2,
+  CT_Chat = 3,
+  CT_Guild = 4,
+  CT_Merchant = 5,
+  CT_Loot = 6,
+  CT_Broadcast = 7,
+  CT_Help = 8,
+  CT_Staff = 9,
+  CT_Important = 10,
 };
 
 public enum eChatLoc : sbyte
@@ -25,11 +31,29 @@ public enum eChatLoc : sbyte
   CL_SystemWindow = 2,
 };
 
+public enum eDialogType : sbyte
+{
+  Ok = 0,
+  Warmap = 1,
+  YesNo = 1,
+};
+
+public enum eDialogCode : sbyte
+{
+  SimpleWarning = 0,
+  GuildInvite = 3,
+  GroupInvite = 5,
+  CustomDialog = 6,
+  GuildLeave = 8,
+};
+
 public enum ServerPackets : ushort
 {
   SC_LoginAns = 1,
   SC_AccountInfo = 2,
   SC_StringMessage = 3,
+  SC_DialogBoxMessage = 4,
+  SC_Quit = 5,
 };
 
 public enum ClientPackets : ushort

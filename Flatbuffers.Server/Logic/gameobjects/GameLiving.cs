@@ -87,9 +87,10 @@ public class GameLiving : GameObject
 			m_attackers.Remove(attacker);
         }
 	}
-	/// <summary>
-	/// Called when this living dies
-	/// </summary>
+	
+	protected long m_lastAttackedTick;
+	public virtual long LastAttackedTick => m_lastAttackedTick;
+	
 	public virtual void Die(GameObject killer)
 	{
 		if (this is GameNPC == false && this is GamePlayer == false)
@@ -162,11 +163,6 @@ public class GameLiving : GameObject
 
 		m_attackers.Clear();
 
-		// cancel all concentration effects
-		ConcentrationEffects.CancelAll();
-
-		// clear all of our targets
-		RangeAttackTarget = null;
 		TargetObject = null;
 
 		// cancel all left effects
@@ -181,15 +177,45 @@ public class GameLiving : GameObject
 		Health = 0;
 
 		// Remove all last attacked times
-		
-		LastAttackedByEnemyTickPvE = 0;
-		LastAttackedByEnemyTickPvP = 0;
+		m_lastAttackedTick = 0;
+
 		//Let's send the notification at the end
 		Notify(GameLivingEvent.Dying, this, new DyingEventArgs(killer));
 	}    
     #endregion
+
+    #region Attack action
+    public virtual void EnemyKilled(GameLiving enemy)
+    {
+	    RemoveAttacker(enemy);
+	    Notify(GameLivingEvent.EnemyKilled, this, new EnemyKilledEventArgs(enemy));
+    }
+    
+    public virtual bool AttackState { get; protected set; } = false;
+    public virtual void OnTargetDeadOrNoTarget()
+    {
+	    StopAttack();
+    }
+
+    /// <summary>
+    /// Stops all attacks this GameLiving is currently making.
+    /// </summary>
+    public virtual void StopAttack()
+    {
+	    StopAttack(true);
+    }
+
+    /// <summary>
+    /// Stop all attackes this GameLiving is currently making
+    /// </summary>
+    /// <param name="forced">Is this a forced stop or is the client suggesting we stop?</param>
+    public virtual void StopAttack(bool forced)
+    {
+	    AttackState = false;
+    }
     
 
+    #endregion
     
     protected readonly GameEffectList m_effects;
     public GameEffectList EffectList => m_effects;
@@ -603,7 +629,7 @@ public class GameLiving : GameObject
 	}	
 	#endregion
     
-#region Mana/Health/Endurance/Concentration/Delete
+	#region Mana/Health/Endurance/Concentration/Delete
 	protected int m_mana;
 	protected int m_endurance;
 	protected int m_maxEndurance;
@@ -663,8 +689,7 @@ public class GameLiving : GameObject
 			int maxmana = MaxMana;
 			m_mana = Math.Min(value, maxmana);
 			m_mana = Math.Max(m_mana, 0);
-			if (IsAlive && (m_mana < maxmana || (this is GamePlayer && ((GamePlayer)this).CharacterClass.ID == (int)eCharacterClass.Vampiir)
-			                || (this is GamePlayer && ((GamePlayer)this).CharacterClass.ID > 59 && ((GamePlayer)this).CharacterClass.ID < 63)))
+			if (IsAlive && (m_mana < maxmana || (this is GamePlayer && ((GamePlayer)this).CharacterClass.ID > 0 && ((GamePlayer)this).CharacterClass.ID < 63)))
 			{
 				StartPowerRegeneration();
 			}
@@ -729,176 +754,175 @@ public class GameLiving : GameObject
 	}
 	#endregion
 		
-#region Speed/Heading/Target/GroundTarget/GuildName/SitState/Level
-		/// <summary>
-		/// The targetobject of this living
-		/// This is a weak reference to a GameObject, which
-		/// means that the gameobject can be cleaned up even
-		/// when this living has a reference on it ...
-		/// </summary>
-		protected readonly WeakReference m_targetObjectWeakReference;
-		/// <summary>
-		/// The current speed of this living
-		/// </summary>
-		protected short m_currentSpeed;
-		/// <summary>
-		/// The base maximum speed of this living
-		/// </summary>
-		protected short m_maxSpeedBase;
+	#region Speed/Heading/Target/GroundTarget/GuildName/SitState/Level
+	/// <summary>
+	/// The targetobject of this living
+	/// This is a weak reference to a GameObject, which
+	/// means that the gameobject can be cleaned up even
+	/// when this living has a reference on it ...
+	/// </summary>
+	protected readonly WeakReference m_targetObjectWeakReference;
+	/// <summary>
+	/// The current speed of this living
+	/// </summary>
+	protected short m_currentSpeed;
+	/// <summary>
+	/// The base maximum speed of this living
+	/// </summary>
+	protected short m_maxSpeedBase;
 
-		private bool m_fixedSpeed = false;
+	private bool m_fixedSpeed = false;
 
-		/// <summary>
-		/// Does this NPC have a fixed speed, unchanged by any modifiers?
-		/// </summary>
-		public virtual bool FixedSpeed
+	/// <summary>
+	/// Does this NPC have a fixed speed, unchanged by any modifiers?
+	/// </summary>
+	public virtual bool FixedSpeed
+	{
+		get { return m_fixedSpeed; }
+		set { m_fixedSpeed = value; }
+	}
+
+    public virtual short CurrentSpeed
+    {
+        get => Motion.Speed;
+        set => Motion = Geometry.Motion.Create(Position, Motion.Destination, value);
+    }
+
+	/// <summary>
+	/// Gets the maxspeed of this living
+	/// </summary>
+	public virtual short MaxSpeed
+	{
+		get
 		{
-			get { return m_fixedSpeed; }
-			set { m_fixedSpeed = value; }
+			if (FixedSpeed)
+				return MaxSpeedBase;
+
+			return (short)GetModified(eProperty.MaxSpeed);
 		}
+	}
 
-        public virtual short CurrentSpeed
-        {
-            get => Motion.Speed;
-            set => Motion = Geometry.Motion.Create(Position, Motion.Destination, value);
-        }
+	/// <summary>
+	/// Gets or sets the base max speed of this living
+	/// </summary>
+	public virtual short MaxSpeedBase
+	{
+		get { return m_maxSpeedBase; }
+		set { m_maxSpeedBase = value; }
+	}
 
-		/// <summary>
-		/// Gets the maxspeed of this living
-		/// </summary>
-		public virtual short MaxSpeed
+	/// <summary>
+	/// Gets or sets the target of this living
+	/// </summary>
+	public virtual GameObject TargetObject
+	{
+		get
 		{
-			get
+			return (m_targetObjectWeakReference.Target as GameObject);
+		}
+		set
+		{
+			m_targetObjectWeakReference.Target = value;
+		}
+	}
+
+    public virtual void TurnTo(Coordinate coordinate, bool sendUpdate = true)
+        => Orientation = Coordinate.GetOrientationTo(coordinate);
+
+	public virtual bool IsSitting
+	{
+		get { return false; }
+		set { }
+	}
+
+    [Obsolete("Use GroundTargetPosition instead!")]
+    public virtual Point3D GroundTarget
+        => GroundTargetPosition.Coordinate.ToPoint3D();
+
+    [Obsolete("Use GroundTargetPosition_set instead!")]
+    public virtual void SetGroundTarget(int groundX, int groundY, int groundZ)
+        => GroundTargetPosition = Position.Create(Position.RegionID, groundX, groundY, groundZ);
+
+    public virtual Position GroundTargetPosition { get; set; } = Position.Nowhere;
+
+	/// <summary>
+	/// Gets or Sets the current level of the Object
+	/// </summary>
+	public override byte Level
+	{
+		get { return base.Level; }
+		set
+		{
+			base.Level = value;
+			if (ObjectState == eObjectState.Active)
 			{
-				if (FixedSpeed)
-					return MaxSpeedBase;
-
-				return (short)GetModified(eProperty.MaxSpeed);
-			}
-		}
-
-		/// <summary>
-		/// Gets or sets the base max speed of this living
-		/// </summary>
-		public virtual short MaxSpeedBase
-		{
-			get { return m_maxSpeedBase; }
-			set { m_maxSpeedBase = value; }
-		}
-
-		/// <summary>
-		/// Gets or sets the target of this living
-		/// </summary>
-		public virtual GameObject TargetObject
-		{
-			get
-			{
-				return (m_targetObjectWeakReference.Target as GameObject);
-			}
-			set
-			{
-				m_targetObjectWeakReference.Target = value;
-			}
-		}
-
-        public virtual void TurnTo(Coordinate coordinate, bool sendUpdate = true)
-            => Orientation = Coordinate.GetOrientationTo(coordinate);
-
-		public virtual bool IsSitting
-		{
-			get { return false; }
-			set { }
-		}
-
-        [Obsolete("Use GroundTargetPosition instead!")]
-        public virtual Point3D GroundTarget
-            => GroundTargetPosition.Coordinate.ToPoint3D();
-
-        [Obsolete("Use GroundTargetPosition_set instead!")]
-        public virtual void SetGroundTarget(int groundX, int groundY, int groundZ)
-            => GroundTargetPosition = Position.Create(Position.RegionID, groundX, groundY, groundZ);
-
-        public virtual Position GroundTargetPosition { get; set; } = Position.Nowhere;
-
-		/// <summary>
-		/// Gets or Sets the current level of the Object
-		/// </summary>
-		public override byte Level
-		{
-			get { return base.Level; }
-			set
-			{
-				base.Level = value;
-				if (ObjectState == eObjectState.Active)
+				foreach (GamePlayer player in GetPlayersInRadius(WorldManager.VISIBILITY_DISTANCE))
 				{
-					foreach (GamePlayer player in GetPlayersInRadius(WorldManager.VISIBILITY_DISTANCE))
-					{
-						if (player == null)
-							continue;
-						player.Out.SendLivingDataUpdate(this, false);
-					}
+					if (player == null)
+						continue;
+					player.Out.SendLivingDataUpdate(this, false);
 				}
 			}
 		}
+	}
 
-		/// <summary>
-		/// What is the base, unmodified level of this living
-		/// </summary>
-		public virtual byte BaseLevel
-		{
-			get { return Level; }
-		}
+	/// <summary>
+	/// What is the base, unmodified level of this living
+	/// </summary>
+	public virtual byte BaseLevel
+	{
+		get { return Level; }
+	}
 
-		/// <summary>
-		/// Calculates the level of a skill on this living.  Generally this is simply the level of the skill.
-		/// </summary>
-		public virtual int CalculateSkillLevel(Skill skill)
-		{
-			return skill.Level;
-		}
-		#endregion
-		
-		#region Movement
-		// public virtual void UpdateHealthManaEndu()
-		// {
-		// 	if (IsAlive)
-		// 	{
-		// 		if (Health < MaxHealth) StartHealthRegeneration();
-		// 		else if (Health > MaxHealth) Health = MaxHealth;
-		//
-		// 		if (Mana < MaxMana) StartPowerRegeneration();
-		// 		else if (Mana > MaxMana) Mana = MaxMana;
-		//
-		// 		if (Endurance < MaxEndurance) StartEnduranceRegeneration();
-		// 		else if (Endurance > MaxEndurance) Endurance = MaxEndurance;
-		// 	}
-		// }
+	/// <summary>
+	/// Calculates the level of a skill on this living.  Generally this is simply the level of the skill.
+	/// </summary>
+	public virtual int CalculateSkillLevel(Skill skill)
+	{
+		return skill.Level;
+	}
+	#endregion
+	
+	#region Movement
+	// public virtual void UpdateHealthManaEndu()
+	// {
+	// 	if (IsAlive)
+	// 	{
+	// 		if (Health < MaxHealth) StartHealthRegeneration();
+	// 		else if (Health > MaxHealth) Health = MaxHealth;
+	//
+	// 		if (Mana < MaxMana) StartPowerRegeneration();
+	// 		else if (Mana > MaxMana) Mana = MaxMana;
+	//
+	// 		if (Endurance < MaxEndurance) StartEnduranceRegeneration();
+	// 		else if (Endurance > MaxEndurance) Endurance = MaxEndurance;
+	// 	}
+	// }
 
-		public int MovementStartTick
-			=> Motion.StartTimeInMilliSeconds;
+	public int MovementStartTick
+		=> Motion.StartTimeInMilliSeconds;
 
-		public virtual bool IsMoving => CurrentSpeed != 0;
+	public virtual bool IsMoving => CurrentSpeed != 0;
 
-		public override Position Position
-		{
-			get => Motion.CurrentPosition;
-			set => Motion = Motion.Create(value, Motion.Destination, Motion.Speed);
-		}
+	public override Position Position
+	{
+		get => Motion.CurrentPosition;
+		set => Motion = Motion.Create(value, Motion.Destination, Motion.Speed);
+	}
 
-		protected virtual Motion Motion { get; set; } = new Motion();
+	protected virtual Motion Motion { get; set; } = new Motion();
 
-		public override Angle Orientation 
-		{
-			get => Position.Orientation;
-			set => Position = Motion.Start.With(orientation: value);
-		}
+	public override Angle Orientation 
+	{
+		get => Position.Orientation;
+		set => Position = Motion.Start.With(orientation: value);
+	}
 
-		public override bool MoveTo(Position position)
-		{
-			if (position.RegionID != CurrentRegionID) CancelAllConcentrationEffects();
-			return base.MoveTo(position);
-		}
-		#endregion		
+	public override bool MoveTo(Position position)
+	{
+		return base.MoveTo(position);
+	}
+	#endregion		
     /// <summary>
     /// 생성 초기화
     /// </summary>
@@ -913,10 +937,14 @@ public class GameLiving : GameObject
         }
         
         m_targetObjectWeakReference = new WeakRef(null);
+        m_activeWeaponSlot = eActiveWeaponSlot.Standard;
+        m_attackers = new List<GameObject>();
+        m_effects = CreateEffectsList();
         
         m_health = 1;
         m_mana = 1;
         m_endurance = 1;
-        m_maxEndurance = 1;        
+        m_maxEndurance = 1;
+        m_lastAttackedTick = 0;
     }
 }

@@ -4,21 +4,44 @@ namespace NetworkMessage;
 enum eChatType : byte {
 	CT_System = 0x00,
 	CT_Say,
+	CT_Send,
 	CT_Chat,
 	CT_Guild,
-	CT_Help
+	CT_Merchant,
+	CT_Loot,
+	CT_Broadcast,
+	CT_Help,
+	CT_Staff,
+	CT_Important
 }
 enum eChatLoc : byte {
 	CL_ChatWindow = 0x0,
 	CL_PopupWindow = 0x1,
 	CL_SystemWindow = 0x2
 }
+
+enum eDialogType : byte {
+	Ok = 0x00,
+	YesNo = 0x01,
+	Warmap = 0x01
+}
+
+enum eDialogCode : byte {
+	SimpleWarning = 0x00,
+	GuildInvite = 0x03,
+	GroupInvite = 0x05,
+	CustomDialog = 0x06,
+	GuildLeave = 0x08
+}
+
 //-------------------------------------------------------	
 
 enum ServerPackets : ushort {
 	SC_LoginAns	= 1,
 	SC_AccountInfo,
-	SC_StringMessage
+	SC_StringMessage,
+	SC_DialogBoxMessage,
+	SC_Quit
 }
 
 enum ClientPackets : ushort {

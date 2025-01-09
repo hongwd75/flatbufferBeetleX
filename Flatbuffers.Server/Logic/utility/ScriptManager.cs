@@ -5,6 +5,7 @@ using Game.Logic.AI.Brain;
 using Game.Logic.network;
 using Game.Logic.ServerRules;
 using Game.Logic.Skills;
+using Game.Logic.Spells;
 using Game.Logic.World;
 using log4net;
 using Server.Config;
@@ -236,7 +237,7 @@ public class ScriptMgr
 				{
 					if (!type.IsClass)
 						continue;
-					if (type.GetInterface("DOL.GS.ISpecActionHandler") == null)
+					if (type.GetInterface("Game.Logic.Skills.ISpecActionHandler") == null)
 						continue;
 					if (type.IsAbstract)
 						continue;
@@ -402,7 +403,7 @@ public class ScriptMgr
 					foreach (Type type in script.GetTypes())
 					{
 						if (type.IsClass != true) continue;
-						if (type.GetInterface("DOL.GS.Spells.ISpellHandler") == null) continue;
+						if (type.GetInterface("Game.Logic.Spells.ISpellHandler") == null) continue;
 
 						// look for attribute
 						try

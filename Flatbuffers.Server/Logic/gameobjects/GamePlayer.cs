@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Game.Logic.CharacterClasses;
 using Game.Logic.Geometry;
 using Game.Logic.network;
 using Game.Logic.World;
@@ -11,7 +12,7 @@ namespace Game.Logic
     public class GamePlayer : GameLiving
     {
         private GameClient mNetwork = null;
-        private string mAccountName = null;
+
         protected DOLCharacters mdbCharacter;
         
         internal DOLCharacters DBCharacter
@@ -32,6 +33,31 @@ namespace Game.Logic
         {
 	        get { return DBCharacter != null ? DBCharacter.ObjectId : InternalID; }
 	        set { if (DBCharacter != null) DBCharacter.ObjectId = value; }
+        }
+        
+        public virtual CharacterClass CharacterClass { get; protected set; }
+
+        public string Salutation => CharacterClass.GetSalutation(Gender);
+      
+        public string AccountName
+        {
+	        get { return DBCharacter != null ? DBCharacter.AccountName : string.Empty; }
+        }
+        
+        public override eGender Gender
+        {
+	        get
+	        {
+		        if (DBCharacter.Gender == 0)
+		        {
+			        return eGender.Male;
+		        }
+
+		        return eGender.Female;
+	        }
+	        set
+	        {
+	        }
         }
         
         public Position BindPosition
@@ -59,20 +85,17 @@ namespace Game.Logic
             Region rgn = WorldManager.GetRegion(BindPosition.RegionID);
             if (rgn == null || rgn.GetZone(BindPosition.Coordinate) == null)
             {
-                // if (log.IsErrorEnabled)
-                //     log.Error("Player: " + Name + " unknown bind point : (R/X/Y) " + BindPosition.RegionID + "/" + BindPosition.X + "/" + BindPosition.Y);
-                //Kick the player, avoid server freeze
-                Client.Out.SendPlayerQuit(true);
+                Network?.Out.SendPlayerQuit(true);
                 SaveIntoDatabase();
                 Quit(true);
-                //now ban him
-                if (ServerProperties.Properties.BAN_HACKERS)
+
+                //if (ServerProperties.Properties.BAN_HACKERS)
                 {
                     DBBannedAccount b = new DBBannedAccount();
                     b.Author = "SERVER";
 
                     b.Ip = Network?.TcpEndpointAddress ?? "";
-                    b.Account = this.mAccountName;
+                    b.Account = AccountName;
                     b.DateBan = DateTime.Now;
                     b.Type = "B";
                     b.Reason = "X/Y/RegionID : " + Position.X + "/" + Position.Y + "/" + Position.RegionID;
@@ -92,29 +115,9 @@ namespace Game.Logic
         }
         
 		#region Invulnerability
-
-		/// <summary>
-		/// The delegate for invulnerability expire callbacks
-		/// </summary>
 		public delegate void InvulnerabilityExpiredCallback(GamePlayer player);
-		/// <summary>
-		/// Holds the invulnerability timer
-		/// </summary>
 		protected InvulnerabilityTimer m_invulnerabilityTimer;
-		/// <summary>
-		/// Holds the invulnerability expiration tick
-		/// </summary>
 		protected long m_invulnerabilityTick;
-
-		/// <summary>
-		/// Starts the Invulnerability Timer
-		/// </summary>
-		/// <param name="duration">The invulnerability duration in milliseconds</param>
-		/// <param name="callback">
-		/// The callback for when invulnerability expires;
-		/// not guaranteed to be called if overwriten by another invulnerability
-		/// </param>
-		/// <returns>true if invulnerability was set (smaller than old invulnerability)</returns>
 		public virtual bool StartInvulnerabilityTimer(int duration, InvulnerabilityExpiredCallback callback)
 		{
 			if (GameServer.Instance.Configuration.ServerType == eGameServerType.GST_PvE)
@@ -183,9 +186,6 @@ namespace Game.Logic
 		{
 			mNetwork = client;
 			mdbCharacter = dbChar;
-			mAccountName = client.Account.Name;
-			
-			m_buffMultBonus
 		}
     }
 }

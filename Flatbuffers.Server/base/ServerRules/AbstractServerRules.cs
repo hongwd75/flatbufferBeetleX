@@ -4,6 +4,7 @@ using Flatbuffers.Messages.Enums;
 using Game.Logic.AI.Brain;
 using Game.Logic.datatable;
 using Game.Logic.Events;
+using Game.Logic.Language;
 using Game.Logic.network;
 using Game.Logic.ServerProperties;
 using Game.Logic.Skills;
@@ -308,5 +309,57 @@ public abstract class AbstractServerRules : IServerRules
 	    if (living is GamePlayer)
 		    ((GamePlayer)living).Network?.Out.SendMessage(message, type, loc);
     }
-    #endregion    
+    #endregion
+
+    #region get Player info
+    public virtual byte GetLivingRealm(GamePlayer player, GameLiving target)
+    {
+	    if (player == null || target == null) return 0;
+
+	    // clients with priv level > 1 are considered friendly by anyone
+	    GamePlayer playerTarget = target as GamePlayer;
+	    if (playerTarget != null && playerTarget.Network.Account.PrivLevel > 1) return (byte)player.Realm;
+
+	    return (byte)target.Realm;
+    }
+    
+    public virtual string GetPlayerName(GamePlayer source, GamePlayer target)
+    {
+	    return target.Name;
+    }
+    
+    public virtual string GetPlayerLastName(GamePlayer source, GamePlayer target)
+    {
+	    return target.LastName;
+    }
+    
+    public virtual string GetPlayerGuildName(GamePlayer source, GamePlayer target)
+    {
+	    return target.GuildName;
+    }
+    
+    public virtual string GetPlayerTitle(GamePlayer source, GamePlayer target)
+    {
+	    return target.CurrentTitle.GetValue(source, target);
+    }
+    
+    public virtual string GetPlayerPrefixName(GamePlayer source, GamePlayer target)
+    {
+	    string language;
+
+	    try
+	    {
+		    language = source.Network.Account.Language;
+	    }
+	    catch
+	    {
+		    language = LanguageMgr.DefaultLanguage;
+	    }
+
+	    if (IsSameRealm(source, target, true) && target.RealmLevel >= 110)
+		    return target.RealmRankTitle(language);
+
+	    return string.Empty;
+    }    
+    #endregion
 }

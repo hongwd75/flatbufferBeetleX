@@ -9,12 +9,14 @@ using Game.Logic.Language;
 using Game.Logic.PropertyCalc;
 using Game.Logic.ServerProperties;
 using Game.Logic.Skills;
+using Game.Logic.Spells;
 using Game.Logic.Utils;
 using Game.Logic.World;
 using Game.Logic.World.Timer;
 using Logic.database;
 using Logic.database.table;
 using Microsoft.VisualBasic;
+using NetworkMessage;
 
 namespace Game.Logic
 {
@@ -1900,7 +1902,6 @@ namespace Game.Logic
 			m_houseNumber = (ushort)dbMob.HouseNumber;
 			m_maxdistance = dbMob.MaxDistance;
 			m_roamingRange = dbMob.RoamingRange;
-			m_isCloakHoodUp = dbMob.IsCloakHoodUp;
 			m_visibleActiveWeaponSlots = dbMob.VisibleWeaponSlots;
 
 			Gender = (eGender)dbMob.Gender;

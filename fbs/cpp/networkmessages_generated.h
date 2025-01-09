@@ -66,6 +66,14 @@ struct SC_StringMessage;
 struct SC_StringMessageBuilder;
 struct SC_StringMessage_FBS;
 
+struct SC_DialogBoxMessage;
+struct SC_DialogBoxMessageBuilder;
+struct SC_DialogBoxMessage_FBS;
+
+struct SC_Quit;
+struct SC_QuitBuilder;
+struct SC_Quit_FBS;
+
 bool operator==(const CS_LoginReq_FBS &lhs, const CS_LoginReq_FBS &rhs);
 bool operator!=(const CS_LoginReq_FBS &lhs, const CS_LoginReq_FBS &rhs);
 bool operator==(const CS_WorldJoinReq_FBS &lhs, const CS_WorldJoinReq_FBS &rhs);
@@ -90,6 +98,10 @@ bool operator==(const SC_PlayerUpdate_FBS &lhs, const SC_PlayerUpdate_FBS &rhs);
 bool operator!=(const SC_PlayerUpdate_FBS &lhs, const SC_PlayerUpdate_FBS &rhs);
 bool operator==(const SC_StringMessage_FBS &lhs, const SC_StringMessage_FBS &rhs);
 bool operator!=(const SC_StringMessage_FBS &lhs, const SC_StringMessage_FBS &rhs);
+bool operator==(const SC_DialogBoxMessage_FBS &lhs, const SC_DialogBoxMessage_FBS &rhs);
+bool operator!=(const SC_DialogBoxMessage_FBS &lhs, const SC_DialogBoxMessage_FBS &rhs);
+bool operator==(const SC_Quit_FBS &lhs, const SC_Quit_FBS &rhs);
+bool operator!=(const SC_Quit_FBS &lhs, const SC_Quit_FBS &rhs);
 
 struct CS_LoginReq_FBS : public ::flatbuffers::NativeTable {
   typedef CS_LoginReq TableType;
@@ -992,6 +1004,234 @@ inline ::flatbuffers::Offset<SC_StringMessage> CreateSC_StringMessageDirect(
 
 ::flatbuffers::Offset<SC_StringMessage> CreateSC_StringMessage(::flatbuffers::FlatBufferBuilder &_fbb, const SC_StringMessage_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct SC_DialogBoxMessage_FBS : public ::flatbuffers::NativeTable {
+  typedef SC_DialogBoxMessage TableType;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_DialogBoxMessage_FBS";
+  }
+  NetworkMessage::eDialogCode code = NetworkMessage::eDialogCode_SimpleWarning;
+  NetworkMessage::eDialogType type = NetworkMessage::eDialogType_Ok;
+  bool autowraptext = false;
+  uint16_t data1 = 0;
+  uint16_t data2 = 0;
+  uint16_t data3 = 0;
+  uint16_t data4 = 0;
+  std::string message{};
+};
+
+struct SC_DialogBoxMessage FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SC_DialogBoxMessage_FBS NativeTableType;
+  typedef SC_DialogBoxMessageBuilder Builder;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_DialogBoxMessage";
+  }
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_CODE = 4,
+    VT_TYPE = 6,
+    VT_AUTOWRAPTEXT = 8,
+    VT_DATA1 = 10,
+    VT_DATA2 = 12,
+    VT_DATA3 = 14,
+    VT_DATA4 = 16,
+    VT_MESSAGE = 18
+  };
+  NetworkMessage::eDialogCode code() const {
+    return static_cast<NetworkMessage::eDialogCode>(GetField<int8_t>(VT_CODE, 0));
+  }
+  NetworkMessage::eDialogType type() const {
+    return static_cast<NetworkMessage::eDialogType>(GetField<int8_t>(VT_TYPE, 0));
+  }
+  bool autowraptext() const {
+    return GetField<uint8_t>(VT_AUTOWRAPTEXT, 0) != 0;
+  }
+  uint16_t data1() const {
+    return GetField<uint16_t>(VT_DATA1, 0);
+  }
+  uint16_t data2() const {
+    return GetField<uint16_t>(VT_DATA2, 0);
+  }
+  uint16_t data3() const {
+    return GetField<uint16_t>(VT_DATA3, 0);
+  }
+  uint16_t data4() const {
+    return GetField<uint16_t>(VT_DATA4, 0);
+  }
+  const ::flatbuffers::String *message() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_MESSAGE);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int8_t>(verifier, VT_CODE, 1) &&
+           VerifyField<int8_t>(verifier, VT_TYPE, 1) &&
+           VerifyField<uint8_t>(verifier, VT_AUTOWRAPTEXT, 1) &&
+           VerifyField<uint16_t>(verifier, VT_DATA1, 2) &&
+           VerifyField<uint16_t>(verifier, VT_DATA2, 2) &&
+           VerifyField<uint16_t>(verifier, VT_DATA3, 2) &&
+           VerifyField<uint16_t>(verifier, VT_DATA4, 2) &&
+           VerifyOffset(verifier, VT_MESSAGE) &&
+           verifier.VerifyString(message()) &&
+           verifier.EndTable();
+  }
+  SC_DialogBoxMessage_FBS *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(SC_DialogBoxMessage_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<SC_DialogBoxMessage> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_DialogBoxMessage_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct SC_DialogBoxMessageBuilder {
+  typedef SC_DialogBoxMessage Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_code(NetworkMessage::eDialogCode code) {
+    fbb_.AddElement<int8_t>(SC_DialogBoxMessage::VT_CODE, static_cast<int8_t>(code), 0);
+  }
+  void add_type(NetworkMessage::eDialogType type) {
+    fbb_.AddElement<int8_t>(SC_DialogBoxMessage::VT_TYPE, static_cast<int8_t>(type), 0);
+  }
+  void add_autowraptext(bool autowraptext) {
+    fbb_.AddElement<uint8_t>(SC_DialogBoxMessage::VT_AUTOWRAPTEXT, static_cast<uint8_t>(autowraptext), 0);
+  }
+  void add_data1(uint16_t data1) {
+    fbb_.AddElement<uint16_t>(SC_DialogBoxMessage::VT_DATA1, data1, 0);
+  }
+  void add_data2(uint16_t data2) {
+    fbb_.AddElement<uint16_t>(SC_DialogBoxMessage::VT_DATA2, data2, 0);
+  }
+  void add_data3(uint16_t data3) {
+    fbb_.AddElement<uint16_t>(SC_DialogBoxMessage::VT_DATA3, data3, 0);
+  }
+  void add_data4(uint16_t data4) {
+    fbb_.AddElement<uint16_t>(SC_DialogBoxMessage::VT_DATA4, data4, 0);
+  }
+  void add_message(::flatbuffers::Offset<::flatbuffers::String> message) {
+    fbb_.AddOffset(SC_DialogBoxMessage::VT_MESSAGE, message);
+  }
+  explicit SC_DialogBoxMessageBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<SC_DialogBoxMessage> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<SC_DialogBoxMessage>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<SC_DialogBoxMessage> CreateSC_DialogBoxMessage(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    NetworkMessage::eDialogCode code = NetworkMessage::eDialogCode_SimpleWarning,
+    NetworkMessage::eDialogType type = NetworkMessage::eDialogType_Ok,
+    bool autowraptext = false,
+    uint16_t data1 = 0,
+    uint16_t data2 = 0,
+    uint16_t data3 = 0,
+    uint16_t data4 = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> message = 0) {
+  SC_DialogBoxMessageBuilder builder_(_fbb);
+  builder_.add_message(message);
+  builder_.add_data4(data4);
+  builder_.add_data3(data3);
+  builder_.add_data2(data2);
+  builder_.add_data1(data1);
+  builder_.add_autowraptext(autowraptext);
+  builder_.add_type(type);
+  builder_.add_code(code);
+  return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<SC_DialogBoxMessage> CreateSC_DialogBoxMessageDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    NetworkMessage::eDialogCode code = NetworkMessage::eDialogCode_SimpleWarning,
+    NetworkMessage::eDialogType type = NetworkMessage::eDialogType_Ok,
+    bool autowraptext = false,
+    uint16_t data1 = 0,
+    uint16_t data2 = 0,
+    uint16_t data3 = 0,
+    uint16_t data4 = 0,
+    const char *message = nullptr) {
+  auto message__ = message ? _fbb.CreateString(message) : 0;
+  return NetworkMessage::CreateSC_DialogBoxMessage(
+      _fbb,
+      code,
+      type,
+      autowraptext,
+      data1,
+      data2,
+      data3,
+      data4,
+      message__);
+}
+
+::flatbuffers::Offset<SC_DialogBoxMessage> CreateSC_DialogBoxMessage(::flatbuffers::FlatBufferBuilder &_fbb, const SC_DialogBoxMessage_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct SC_Quit_FBS : public ::flatbuffers::NativeTable {
+  typedef SC_Quit TableType;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_Quit_FBS";
+  }
+  bool totalout = false;
+  uint8_t level = 0;
+};
+
+struct SC_Quit FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SC_Quit_FBS NativeTableType;
+  typedef SC_QuitBuilder Builder;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_Quit";
+  }
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_TOTALOUT = 4,
+    VT_LEVEL = 6
+  };
+  bool totalout() const {
+    return GetField<uint8_t>(VT_TOTALOUT, 0) != 0;
+  }
+  uint8_t level() const {
+    return GetField<uint8_t>(VT_LEVEL, 0);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint8_t>(verifier, VT_TOTALOUT, 1) &&
+           VerifyField<uint8_t>(verifier, VT_LEVEL, 1) &&
+           verifier.EndTable();
+  }
+  SC_Quit_FBS *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(SC_Quit_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<SC_Quit> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_Quit_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct SC_QuitBuilder {
+  typedef SC_Quit Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_totalout(bool totalout) {
+    fbb_.AddElement<uint8_t>(SC_Quit::VT_TOTALOUT, static_cast<uint8_t>(totalout), 0);
+  }
+  void add_level(uint8_t level) {
+    fbb_.AddElement<uint8_t>(SC_Quit::VT_LEVEL, level, 0);
+  }
+  explicit SC_QuitBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<SC_Quit> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<SC_Quit>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<SC_Quit> CreateSC_Quit(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    bool totalout = false,
+    uint8_t level = 0) {
+  SC_QuitBuilder builder_(_fbb);
+  builder_.add_level(level);
+  builder_.add_totalout(totalout);
+  return builder_.Finish();
+}
+
+::flatbuffers::Offset<SC_Quit> CreateSC_Quit(::flatbuffers::FlatBufferBuilder &_fbb, const SC_Quit_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 
 inline bool operator==(const CS_LoginReq_FBS &lhs, const CS_LoginReq_FBS &rhs) {
   return
@@ -1527,6 +1767,112 @@ inline ::flatbuffers::Offset<SC_StringMessage> CreateSC_StringMessage(::flatbuff
       _chattype,
       _chatloc,
       _message);
+}
+
+
+inline bool operator==(const SC_DialogBoxMessage_FBS &lhs, const SC_DialogBoxMessage_FBS &rhs) {
+  return
+      (lhs.code == rhs.code) &&
+      (lhs.type == rhs.type) &&
+      (lhs.autowraptext == rhs.autowraptext) &&
+      (lhs.data1 == rhs.data1) &&
+      (lhs.data2 == rhs.data2) &&
+      (lhs.data3 == rhs.data3) &&
+      (lhs.data4 == rhs.data4) &&
+      (lhs.message == rhs.message);
+}
+
+inline bool operator!=(const SC_DialogBoxMessage_FBS &lhs, const SC_DialogBoxMessage_FBS &rhs) {
+    return !(lhs == rhs);
+}
+
+
+inline SC_DialogBoxMessage_FBS *SC_DialogBoxMessage::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<SC_DialogBoxMessage_FBS>(new SC_DialogBoxMessage_FBS());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void SC_DialogBoxMessage::UnPackTo(SC_DialogBoxMessage_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = code(); _o->code = _e; }
+  { auto _e = type(); _o->type = _e; }
+  { auto _e = autowraptext(); _o->autowraptext = _e; }
+  { auto _e = data1(); _o->data1 = _e; }
+  { auto _e = data2(); _o->data2 = _e; }
+  { auto _e = data3(); _o->data3 = _e; }
+  { auto _e = data4(); _o->data4 = _e; }
+  { auto _e = message(); if (_e) _o->message = _e->str(); }
+}
+
+inline ::flatbuffers::Offset<SC_DialogBoxMessage> SC_DialogBoxMessage::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_DialogBoxMessage_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateSC_DialogBoxMessage(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<SC_DialogBoxMessage> CreateSC_DialogBoxMessage(::flatbuffers::FlatBufferBuilder &_fbb, const SC_DialogBoxMessage_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const SC_DialogBoxMessage_FBS* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _code = _o->code;
+  auto _type = _o->type;
+  auto _autowraptext = _o->autowraptext;
+  auto _data1 = _o->data1;
+  auto _data2 = _o->data2;
+  auto _data3 = _o->data3;
+  auto _data4 = _o->data4;
+  auto _message = _o->message.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->message);
+  return NetworkMessage::CreateSC_DialogBoxMessage(
+      _fbb,
+      _code,
+      _type,
+      _autowraptext,
+      _data1,
+      _data2,
+      _data3,
+      _data4,
+      _message);
+}
+
+
+inline bool operator==(const SC_Quit_FBS &lhs, const SC_Quit_FBS &rhs) {
+  return
+      (lhs.totalout == rhs.totalout) &&
+      (lhs.level == rhs.level);
+}
+
+inline bool operator!=(const SC_Quit_FBS &lhs, const SC_Quit_FBS &rhs) {
+    return !(lhs == rhs);
+}
+
+
+inline SC_Quit_FBS *SC_Quit::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<SC_Quit_FBS>(new SC_Quit_FBS());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void SC_Quit::UnPackTo(SC_Quit_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = totalout(); _o->totalout = _e; }
+  { auto _e = level(); _o->level = _e; }
+}
+
+inline ::flatbuffers::Offset<SC_Quit> SC_Quit::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_Quit_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateSC_Quit(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<SC_Quit> CreateSC_Quit(::flatbuffers::FlatBufferBuilder &_fbb, const SC_Quit_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const SC_Quit_FBS* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _totalout = _o->totalout;
+  auto _level = _o->level;
+  return NetworkMessage::CreateSC_Quit(
+      _fbb,
+      _totalout,
+      _level);
 }
 
 }  // namespace NetworkMessage

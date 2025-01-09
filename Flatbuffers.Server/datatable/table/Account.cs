@@ -8,6 +8,7 @@ namespace Logic.database.table
         private string m_name;
         private string m_password;
         private string m_language;
+        private string m_guildid;
         private DateTime m_creationDate;
         private DateTime m_lastLogin;
         private int m_realm;
@@ -15,7 +16,8 @@ namespace Logic.database.table
         private int m_state;
         private bool m_isMuted;
         private String m_mail;
-        
+        private String m_nickname;
+        private bool m_isAnonymous;
         public Account()
         {
             m_name = null;
@@ -40,7 +42,24 @@ namespace Logic.database.table
             get => m_password;
             set => SetProperty(ref m_password, value);
         }
-
+        
+        /// <summary>
+        /// ID of the guild this character is in
+        /// </summary>
+        [DataElement(AllowDbNull = true, Index = true)]
+        public string GuildID
+        {
+            get => m_guildid;
+            set { Dirty = true; m_guildid = value.ToUpper(); }            
+        }
+        
+        [DataElement(AllowDbNull = false)]
+        public string Nickname
+        {
+            get => m_nickname;
+            set => SetProperty(ref m_nickname, value);     
+        }
+        
         [DataElement(AllowDbNull = false)]
         public string Language
         {
@@ -48,9 +67,13 @@ namespace Logic.database.table
             set { Dirty = true; m_language = value.ToUpper(); }
         }
         
-        /// <summary>
-        /// The private level of this account (admin=3, GM=2 or player=1)
-        /// </summary>
+        [DataElement(AllowDbNull = false)]
+        public bool IsAnonymous
+        {
+            get => m_isAnonymous;
+            set => SetProperty(ref m_isAnonymous, value);            
+        }
+        
         [DataElement(AllowDbNull = false)]
         public uint PrivLevel
         {

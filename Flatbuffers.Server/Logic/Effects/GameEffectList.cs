@@ -3,6 +3,7 @@ using System.Reflection;
 using Game.Logic.AI.Brain;
 using Game.Logic.datatable;
 using Game.Logic.Skills;
+using Game.Logic.Spells;
 using Game.Logic.Utils;
 using log4net;
 using Logic.database;
@@ -168,7 +169,7 @@ public class GameEffectList : IEnumerable<IGameEffect>
 
 			SpellLine line = null;
 
-			if (!Util.IsEmpty(eff.SpellLine))
+			if (!string.IsNullOrEmpty(eff.SpellLine))
 			{
 				line = SkillBase.GetSpellLine(eff.SpellLine, false);
 				if (line == null)

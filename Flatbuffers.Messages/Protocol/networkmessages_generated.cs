@@ -880,5 +880,204 @@ static public class SC_StringMessageVerify
       && verifier.VerifyTableEnd(tablePos);
   }
 }
+public struct SC_DialogBoxMessage : IFlatbufferObject
+{
+  private Table __p;
+  public ByteBuffer ByteBuffer { get { return __p.bb; } }
+  public static void ValidateVersion() { FlatBufferConstants.FLATBUFFERS_24_3_25(); }
+  public static SC_DialogBoxMessage GetRootAsSC_DialogBoxMessage(ByteBuffer _bb) { return GetRootAsSC_DialogBoxMessage(_bb, new SC_DialogBoxMessage()); }
+  public static SC_DialogBoxMessage GetRootAsSC_DialogBoxMessage(ByteBuffer _bb, SC_DialogBoxMessage obj) { return (obj.__assign(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
+  public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
+  public SC_DialogBoxMessage __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
+
+  public NetworkMessage.eDialogCode Code { get { int o = __p.__offset(4); return o != 0 ? (NetworkMessage.eDialogCode)__p.bb.GetSbyte(o + __p.bb_pos) : NetworkMessage.eDialogCode.SimpleWarning; } }
+  public NetworkMessage.eDialogType Type { get { int o = __p.__offset(6); return o != 0 ? (NetworkMessage.eDialogType)__p.bb.GetSbyte(o + __p.bb_pos) : NetworkMessage.eDialogType.Ok; } }
+  public bool Autowraptext { get { int o = __p.__offset(8); return o != 0 ? 0!=__p.bb.Get(o + __p.bb_pos) : (bool)false; } }
+  public ushort Data1 { get { int o = __p.__offset(10); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public ushort Data2 { get { int o = __p.__offset(12); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public ushort Data3 { get { int o = __p.__offset(14); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public ushort Data4 { get { int o = __p.__offset(16); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public string Message { get { int o = __p.__offset(18); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
+#if ENABLE_SPAN_T
+  public Span<byte> GetMessageBytes() { return __p.__vector_as_span<byte>(18, 1); }
+#else
+  public ArraySegment<byte>? GetMessageBytes() { return __p.__vector_as_arraysegment(18); }
+#endif
+  public byte[] GetMessageArray() { return __p.__vector_as_array<byte>(18); }
+
+  public static Offset<NetworkMessage.SC_DialogBoxMessage> CreateSC_DialogBoxMessage(FlatBufferBuilder builder,
+      NetworkMessage.eDialogCode code = NetworkMessage.eDialogCode.SimpleWarning,
+      NetworkMessage.eDialogType type = NetworkMessage.eDialogType.Ok,
+      bool autowraptext = false,
+      ushort data1 = 0,
+      ushort data2 = 0,
+      ushort data3 = 0,
+      ushort data4 = 0,
+      StringOffset messageOffset = default(StringOffset)) {
+    builder.StartTable(8);
+    SC_DialogBoxMessage.AddMessage(builder, messageOffset);
+    SC_DialogBoxMessage.AddData4(builder, data4);
+    SC_DialogBoxMessage.AddData3(builder, data3);
+    SC_DialogBoxMessage.AddData2(builder, data2);
+    SC_DialogBoxMessage.AddData1(builder, data1);
+    SC_DialogBoxMessage.AddAutowraptext(builder, autowraptext);
+    SC_DialogBoxMessage.AddType(builder, type);
+    SC_DialogBoxMessage.AddCode(builder, code);
+    return SC_DialogBoxMessage.EndSC_DialogBoxMessage(builder);
+  }
+
+  public static void StartSC_DialogBoxMessage(FlatBufferBuilder builder) { builder.StartTable(8); }
+  public static void AddCode(FlatBufferBuilder builder, NetworkMessage.eDialogCode code) { builder.AddSbyte(0, (sbyte)code, 0); }
+  public static void AddType(FlatBufferBuilder builder, NetworkMessage.eDialogType type) { builder.AddSbyte(1, (sbyte)type, 0); }
+  public static void AddAutowraptext(FlatBufferBuilder builder, bool autowraptext) { builder.AddBool(2, autowraptext, false); }
+  public static void AddData1(FlatBufferBuilder builder, ushort data1) { builder.AddUshort(3, data1, 0); }
+  public static void AddData2(FlatBufferBuilder builder, ushort data2) { builder.AddUshort(4, data2, 0); }
+  public static void AddData3(FlatBufferBuilder builder, ushort data3) { builder.AddUshort(5, data3, 0); }
+  public static void AddData4(FlatBufferBuilder builder, ushort data4) { builder.AddUshort(6, data4, 0); }
+  public static void AddMessage(FlatBufferBuilder builder, StringOffset messageOffset) { builder.AddOffset(7, messageOffset.Value, 0); }
+  public static Offset<NetworkMessage.SC_DialogBoxMessage> EndSC_DialogBoxMessage(FlatBufferBuilder builder) {
+    int o = builder.EndTable();
+    return new Offset<NetworkMessage.SC_DialogBoxMessage>(o);
+  }
+  public SC_DialogBoxMessage_FBS UnPack() {
+    var _o = new SC_DialogBoxMessage_FBS();
+    this.UnPackTo(_o);
+    return _o;
+  }
+  public void UnPackTo(SC_DialogBoxMessage_FBS _o) {
+    _o.Code = this.Code;
+    _o.Type = this.Type;
+    _o.Autowraptext = this.Autowraptext;
+    _o.Data1 = this.Data1;
+    _o.Data2 = this.Data2;
+    _o.Data3 = this.Data3;
+    _o.Data4 = this.Data4;
+    _o.Message = this.Message;
+  }
+  public static Offset<NetworkMessage.SC_DialogBoxMessage> Pack(FlatBufferBuilder builder, SC_DialogBoxMessage_FBS _o) {
+    if (_o == null) return default(Offset<NetworkMessage.SC_DialogBoxMessage>);
+    var _message = _o.Message == null ? default(StringOffset) : builder.CreateString(_o.Message);
+    return CreateSC_DialogBoxMessage(
+      builder,
+      _o.Code,
+      _o.Type,
+      _o.Autowraptext,
+      _o.Data1,
+      _o.Data2,
+      _o.Data3,
+      _o.Data4,
+      _message);
+  }
+}
+
+public class SC_DialogBoxMessage_FBS
+{
+  public NetworkMessage.eDialogCode Code { get; set; }
+  public NetworkMessage.eDialogType Type { get; set; }
+  public bool Autowraptext { get; set; }
+  public ushort Data1 { get; set; }
+  public ushort Data2 { get; set; }
+  public ushort Data3 { get; set; }
+  public ushort Data4 { get; set; }
+  public string Message { get; set; }
+
+  public SC_DialogBoxMessage_FBS() {
+    this.Code = NetworkMessage.eDialogCode.SimpleWarning;
+    this.Type = NetworkMessage.eDialogType.Ok;
+    this.Autowraptext = false;
+    this.Data1 = 0;
+    this.Data2 = 0;
+    this.Data3 = 0;
+    this.Data4 = 0;
+    this.Message = null;
+  }
+}
+
+
+static public class SC_DialogBoxMessageVerify
+{
+  static public bool Verify(Google.FlatBuffers.Verifier verifier, uint tablePos)
+  {
+    return verifier.VerifyTableStart(tablePos)
+      && verifier.VerifyField(tablePos, 4 /*Code*/, 1 /*NetworkMessage.eDialogCode*/, 1, false)
+      && verifier.VerifyField(tablePos, 6 /*Type*/, 1 /*NetworkMessage.eDialogType*/, 1, false)
+      && verifier.VerifyField(tablePos, 8 /*Autowraptext*/, 1 /*bool*/, 1, false)
+      && verifier.VerifyField(tablePos, 10 /*Data1*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 12 /*Data2*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 14 /*Data3*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 16 /*Data4*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyString(tablePos, 18 /*Message*/, false)
+      && verifier.VerifyTableEnd(tablePos);
+  }
+}
+public struct SC_Quit : IFlatbufferObject
+{
+  private Table __p;
+  public ByteBuffer ByteBuffer { get { return __p.bb; } }
+  public static void ValidateVersion() { FlatBufferConstants.FLATBUFFERS_24_3_25(); }
+  public static SC_Quit GetRootAsSC_Quit(ByteBuffer _bb) { return GetRootAsSC_Quit(_bb, new SC_Quit()); }
+  public static SC_Quit GetRootAsSC_Quit(ByteBuffer _bb, SC_Quit obj) { return (obj.__assign(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
+  public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
+  public SC_Quit __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
+
+  public bool Totalout { get { int o = __p.__offset(4); return o != 0 ? 0!=__p.bb.Get(o + __p.bb_pos) : (bool)false; } }
+  public byte Level { get { int o = __p.__offset(6); return o != 0 ? __p.bb.Get(o + __p.bb_pos) : (byte)0; } }
+
+  public static Offset<NetworkMessage.SC_Quit> CreateSC_Quit(FlatBufferBuilder builder,
+      bool totalout = false,
+      byte level = 0) {
+    builder.StartTable(2);
+    SC_Quit.AddLevel(builder, level);
+    SC_Quit.AddTotalout(builder, totalout);
+    return SC_Quit.EndSC_Quit(builder);
+  }
+
+  public static void StartSC_Quit(FlatBufferBuilder builder) { builder.StartTable(2); }
+  public static void AddTotalout(FlatBufferBuilder builder, bool totalout) { builder.AddBool(0, totalout, false); }
+  public static void AddLevel(FlatBufferBuilder builder, byte level) { builder.AddByte(1, level, 0); }
+  public static Offset<NetworkMessage.SC_Quit> EndSC_Quit(FlatBufferBuilder builder) {
+    int o = builder.EndTable();
+    return new Offset<NetworkMessage.SC_Quit>(o);
+  }
+  public SC_Quit_FBS UnPack() {
+    var _o = new SC_Quit_FBS();
+    this.UnPackTo(_o);
+    return _o;
+  }
+  public void UnPackTo(SC_Quit_FBS _o) {
+    _o.Totalout = this.Totalout;
+    _o.Level = this.Level;
+  }
+  public static Offset<NetworkMessage.SC_Quit> Pack(FlatBufferBuilder builder, SC_Quit_FBS _o) {
+    if (_o == null) return default(Offset<NetworkMessage.SC_Quit>);
+    return CreateSC_Quit(
+      builder,
+      _o.Totalout,
+      _o.Level);
+  }
+}
+
+public class SC_Quit_FBS
+{
+  public bool Totalout { get; set; }
+  public byte Level { get; set; }
+
+  public SC_Quit_FBS() {
+    this.Totalout = false;
+    this.Level = 0;
+  }
+}
+
+
+static public class SC_QuitVerify
+{
+  static public bool Verify(Google.FlatBuffers.Verifier verifier, uint tablePos)
+  {
+    return verifier.VerifyTableStart(tablePos)
+      && verifier.VerifyField(tablePos, 4 /*Totalout*/, 1 /*bool*/, 1, false)
+      && verifier.VerifyField(tablePos, 6 /*Level*/, 1 /*byte*/, 1, false)
+      && verifier.VerifyTableEnd(tablePos);
+  }
+}
 
 }

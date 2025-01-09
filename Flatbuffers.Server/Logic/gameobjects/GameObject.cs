@@ -61,6 +61,12 @@ namespace Game.Logic
             }
         }
         
+        public virtual eGender Gender
+        {
+	        get { return eGender.Neutral; }
+	        set { }
+        }
+        
         public virtual int ObjectID
         {
             get => mObjectID;

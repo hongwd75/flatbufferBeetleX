@@ -19,38 +19,56 @@ namespace NetworkMessage {
 enum eChatType : int8_t {
   eChatType_CT_System = 0,
   eChatType_CT_Say = 1,
-  eChatType_CT_Chat = 2,
-  eChatType_CT_Guild = 3,
-  eChatType_CT_Help = 4,
+  eChatType_CT_Send = 2,
+  eChatType_CT_Chat = 3,
+  eChatType_CT_Guild = 4,
+  eChatType_CT_Merchant = 5,
+  eChatType_CT_Loot = 6,
+  eChatType_CT_Broadcast = 7,
+  eChatType_CT_Help = 8,
+  eChatType_CT_Staff = 9,
+  eChatType_CT_Important = 10,
   eChatType_MIN = eChatType_CT_System,
-  eChatType_MAX = eChatType_CT_Help
+  eChatType_MAX = eChatType_CT_Important
 };
 
-inline const eChatType (&EnumValueseChatType())[5] {
+inline const eChatType (&EnumValueseChatType())[11] {
   static const eChatType values[] = {
     eChatType_CT_System,
     eChatType_CT_Say,
+    eChatType_CT_Send,
     eChatType_CT_Chat,
     eChatType_CT_Guild,
-    eChatType_CT_Help
+    eChatType_CT_Merchant,
+    eChatType_CT_Loot,
+    eChatType_CT_Broadcast,
+    eChatType_CT_Help,
+    eChatType_CT_Staff,
+    eChatType_CT_Important
   };
   return values;
 }
 
 inline const char * const *EnumNameseChatType() {
-  static const char * const names[6] = {
+  static const char * const names[12] = {
     "CT_System",
     "CT_Say",
+    "CT_Send",
     "CT_Chat",
     "CT_Guild",
+    "CT_Merchant",
+    "CT_Loot",
+    "CT_Broadcast",
     "CT_Help",
+    "CT_Staff",
+    "CT_Important",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameeChatType(eChatType e) {
-  if (::flatbuffers::IsOutRange(e, eChatType_CT_System, eChatType_CT_Help)) return "";
+  if (::flatbuffers::IsOutRange(e, eChatType_CT_System, eChatType_CT_Important)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNameseChatType()[index];
 }
@@ -88,35 +106,117 @@ inline const char *EnumNameeChatLoc(eChatLoc e) {
   return EnumNameseChatLoc()[index];
 }
 
+enum eDialogType : int8_t {
+  eDialogType_Ok = 0,
+  eDialogType_Warmap = 1,
+  eDialogType_YesNo = 1,
+  eDialogType_MIN = eDialogType_Ok,
+  eDialogType_MAX = eDialogType_YesNo
+};
+
+inline const eDialogType (&EnumValueseDialogType())[3] {
+  static const eDialogType values[] = {
+    eDialogType_Ok,
+    eDialogType_Warmap,
+    eDialogType_YesNo
+  };
+  return values;
+}
+
+inline const char * const *EnumNameseDialogType() {
+  static const char * const names[3] = {
+    "Ok",
+    "Warmap",
+    "YesNo",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameeDialogType(eDialogType e) {
+  if (::flatbuffers::IsOutRange(e, eDialogType_Ok, eDialogType_YesNo)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNameseDialogType()[index];
+}
+
+enum eDialogCode : int8_t {
+  eDialogCode_SimpleWarning = 0,
+  eDialogCode_GuildInvite = 3,
+  eDialogCode_GroupInvite = 5,
+  eDialogCode_CustomDialog = 6,
+  eDialogCode_GuildLeave = 8,
+  eDialogCode_MIN = eDialogCode_SimpleWarning,
+  eDialogCode_MAX = eDialogCode_GuildLeave
+};
+
+inline const eDialogCode (&EnumValueseDialogCode())[5] {
+  static const eDialogCode values[] = {
+    eDialogCode_SimpleWarning,
+    eDialogCode_GuildInvite,
+    eDialogCode_GroupInvite,
+    eDialogCode_CustomDialog,
+    eDialogCode_GuildLeave
+  };
+  return values;
+}
+
+inline const char * const *EnumNameseDialogCode() {
+  static const char * const names[10] = {
+    "SimpleWarning",
+    "",
+    "",
+    "GuildInvite",
+    "",
+    "GroupInvite",
+    "CustomDialog",
+    "",
+    "GuildLeave",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameeDialogCode(eDialogCode e) {
+  if (::flatbuffers::IsOutRange(e, eDialogCode_SimpleWarning, eDialogCode_GuildLeave)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNameseDialogCode()[index];
+}
+
 enum ServerPackets : uint16_t {
   ServerPackets_SC_LoginAns = 1,
   ServerPackets_SC_AccountInfo = 2,
   ServerPackets_SC_StringMessage = 3,
+  ServerPackets_SC_DialogBoxMessage = 4,
+  ServerPackets_SC_Quit = 5,
   ServerPackets_MIN = ServerPackets_SC_LoginAns,
-  ServerPackets_MAX = ServerPackets_SC_StringMessage
+  ServerPackets_MAX = ServerPackets_SC_Quit
 };
 
-inline const ServerPackets (&EnumValuesServerPackets())[3] {
+inline const ServerPackets (&EnumValuesServerPackets())[5] {
   static const ServerPackets values[] = {
     ServerPackets_SC_LoginAns,
     ServerPackets_SC_AccountInfo,
-    ServerPackets_SC_StringMessage
+    ServerPackets_SC_StringMessage,
+    ServerPackets_SC_DialogBoxMessage,
+    ServerPackets_SC_Quit
   };
   return values;
 }
 
 inline const char * const *EnumNamesServerPackets() {
-  static const char * const names[4] = {
+  static const char * const names[6] = {
     "SC_LoginAns",
     "SC_AccountInfo",
     "SC_StringMessage",
+    "SC_DialogBoxMessage",
+    "SC_Quit",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameServerPackets(ServerPackets e) {
-  if (::flatbuffers::IsOutRange(e, ServerPackets_SC_LoginAns, ServerPackets_SC_StringMessage)) return "";
+  if (::flatbuffers::IsOutRange(e, ServerPackets_SC_LoginAns, ServerPackets_SC_Quit)) return "";
   const size_t index = static_cast<size_t>(e) - static_cast<size_t>(ServerPackets_SC_LoginAns);
   return EnumNamesServerPackets()[index];
 }

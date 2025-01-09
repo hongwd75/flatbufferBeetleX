@@ -17,7 +17,6 @@ public class DOLCharacters : DataObject
 	private string m_name;			//24 Bytes
 	//0x00					//24 bytes empty
 	//Locationstring		//24 bytes empty when sent
-	private string m_guildid;		//not sent in 0x55/0x57
 	private string m_lastName;		//not sent in 0x55/0x57
 	private int m_race;
 	private int m_gender;
@@ -35,18 +34,7 @@ public class DOLCharacters : DataObject
 	private long m_bntyPts;
 	private long m_realmPts;
 	private int m_realmLevel;
-	//0x00					//01 byte
-	//int mUnk2;			//04 byte
-	//int mStr;				//01 byte
-	//int mDex;				//01 byte
-	//int mCon;				//01 byte
-	//int mQui;				//01 byte
-	//int mInt;				//01 byte
-	//int mPie;				//01 byte
-	//int mEmp;				//01 byte
-	//int mChr;				//01 byte
-	//0x00					//44 bytes for inventory and stuff
-
+	
 	private byte m_activeWeaponSlot;
 	private bool m_isCloakHoodUp;
 	private bool m_isCloakInvisible;
@@ -128,7 +116,7 @@ public class DOLCharacters : DataObject
 	private bool m_safetyFlag;
 	private int m_craftingPrimarySkill = 0;
 	private bool m_cancelStyle;
-	private bool m_isAnonymous;
+	
 
 	private byte m_customisationStep = 1;
 
@@ -628,23 +616,6 @@ public class DOLCharacters : DataObject
 		{
 			Dirty = true;
 			m_lastName = value;
-		}
-	}
-
-	/// <summary>
-	/// ID of the guild this character is in
-	/// </summary>
-	[DataElement(AllowDbNull = true, Index = true)]
-	public string GuildID
-	{
-		get
-		{
-			return m_guildid;
-		}
-		set
-		{
-			Dirty = true;
-			m_guildid = value;
 		}
 	}
 
@@ -1573,21 +1544,6 @@ public class DOLCharacters : DataObject
 		{
 			Dirty = true;
 			m_cancelStyle = value;
-		}
-	}
-
-	/// <summary>
-	/// is anonymous( can not seen him in /who and some other things
-	/// /anon to toggle
-	/// </summary>
-	[DataElement(AllowDbNull = false)]
-	public bool IsAnonymous
-	{
-		get { return m_isAnonymous; }
-		set
-		{
-			Dirty = true;
-			m_isAnonymous = value;
 		}
 	}
 
