@@ -1,8 +1,12 @@
 ﻿using System.Collections;
 using Game.Logic.Events;
 using Game.Logic.Geometry;
+using Game.Logic.Language;
+using Game.Logic.Skills;
 using Game.Logic.World;
 using Logic.database;
+using Logic.database.table;
+using NetworkMessage;
 
 namespace Game.Logic
 {
@@ -22,12 +26,13 @@ namespace Game.Logic
         protected int mObjectID;
         protected bool m_saveInDB;
         protected string m_InternalID; // DB에 있는 유니크 ID
-        
+        protected string m_ownerID;
         protected byte m_level = 0;
-        
+        protected ushort m_model = 0; 
         protected volatile eObjectState mObjectState;
         protected Region mCurrentRegion;
         protected string mName;
+        protected string m_guildName;
         protected long m_spawnTick = 0;
         #endregion
 
@@ -46,7 +51,18 @@ namespace Game.Logic
 	        get { return Level; }
 	        set { }
         }
-
+        public virtual ushort Model
+        {
+	        get { return m_model; }
+	        set { m_model = value; }
+        }
+        public virtual string GuildName
+        {
+	        get { return m_guildName; }
+	        set { m_guildName = value; }
+        }
+        public virtual bool IsAttackable => false;
+        
         public virtual byte GetDisplayLevel(GamePlayer player)
         {
 	        return Level;
@@ -74,6 +90,15 @@ namespace Game.Logic
             {
                 mObjectID = value;
             } 
+        }
+        
+        public virtual string OwnerID
+        {
+	        get { return m_ownerID; }
+	        set
+	        {
+		        m_ownerID = value;
+	        }
         }
         
         public long SpawnTick
@@ -466,6 +491,132 @@ namespace Game.Logic
         {
 	        int constep = Math.Max(1, (level + 10) / 10);
 	        return Math.Max((int)0, (int)(level + constep * con));
+        }
+
+        #endregion
+        #region Spell Cast
+        public virtual bool HasEffect(Spell spell)
+        {
+	        return false;
+        }
+        public virtual bool HasEffect(Type effectType)
+        {
+	        return false;
+        }
+
+        #endregion
+        #region Broadcast Utils
+        public virtual void BroadcastUpdate()
+        {
+	        if (ObjectState != eObjectState.Active)
+		        return;
+			
+	        foreach (GamePlayer player in GetPlayersInRadius(WorldManager.VISIBILITY_DISTANCE))
+	        {
+		        if (player == null)
+			        continue;
+
+		        player.Out.SendObjectUpdate(this);
+	        }
+        }
+        
+        #endregion        
+        #region ==== Get Name ==========================================================================================
+        public virtual string GetName(int article, bool firstLetterUppercase, string lang, ITranslatableObject obj)
+        {
+	        switch (lang)
+	        {
+		        case "EN":
+		        {
+			        return GetName(article, firstLetterUppercase);
+		        }
+		        default:
+		        {
+			        if (obj is GameNPC)
+			        {
+				        var translation = (DBLanguageNPC)LanguageMgr.GetTranslation(lang, obj);
+				        if (translation != null) return translation.Name;
+			        }
+
+			        return GetName(article, firstLetterUppercase);;
+		        }
+	        }
+        }
+        
+        private const string m_vowels = "aeuio"; // 모음
+        public virtual string GetName(int article, bool firstLetterUppercase)
+        {
+	        /*
+	         * http://www.camelotherald.com/more/888.shtml
+	         * - All monsters names whose names begin with a vowel should now use the article 'an' instead of 'a'.
+	         * 
+	         * http://www.camelotherald.com/more/865.shtml
+	         * - Instances where objects that began with a vowel but were prefixed by the article "a" (a orb of animation) have been corrected.
+	         */
+
+	        if (Name.Length < 1)
+		        return "";
+
+	        // actually this should be only for Named mobs (like dragon, legion) but there is no way to find that out
+	        if (char.IsUpper(Name[0]) && this is GameLiving) // proper noun
+	        {
+		        return Name;
+	        }
+
+	        if (article == 0)
+	        {
+		        if (firstLetterUppercase)
+			        return LanguageMgr.GetTranslation(ServerProperties.Properties.DB_LANGUAGE, "GameObject.GetName.Article1", Name);
+		        else
+			        return LanguageMgr.GetTranslation(ServerProperties.Properties.DB_LANGUAGE, "GameObject.GetName.Article2", Name);
+	        }
+	        else
+	        {
+		        // if first letter is a vowel
+		        if (m_vowels.IndexOf(Name[0]) != -1)
+		        {
+			        if (firstLetterUppercase)
+				        return LanguageMgr.GetTranslation(ServerProperties.Properties.DB_LANGUAGE, "GameObject.GetName.Article3", Name);
+			        else
+				        return LanguageMgr.GetTranslation(ServerProperties.Properties.DB_LANGUAGE, "GameObject.GetName.Article4", Name);
+		        }
+		        else
+		        {
+			        if (firstLetterUppercase)
+				        return LanguageMgr.GetTranslation(ServerProperties.Properties.DB_LANGUAGE, "GameObject.GetName.Article5", Name);
+			        else
+				        return LanguageMgr.GetTranslation(ServerProperties.Properties.DB_LANGUAGE, "GameObject.GetName.Article6", Name);
+		        }
+	        }
+        }
+        #endregion
+        
+        #region Interact
+
+        /// <summary>
+        /// The distance this object can be interacted with
+        /// </summary>
+        public virtual int InteractDistance
+        {
+	        get { return WorldManager.INTERACT_DISTANCE; }
+        }
+
+        /// <summary>
+        /// This function is called from the ObjectInteractRequestHandler
+        /// </summary>
+        /// <param name="player">GamePlayer that interacts with this object</param>
+        /// <returns>false if interaction is prevented</returns>
+        public virtual bool Interact(GamePlayer player)
+        {
+	        if (player.Network.Account.PrivLevel == 1 && !this.IsWithinRadius(player, InteractDistance))
+	        {
+		        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Network.Account.Language, "GameObject.Interact.TooFarAway", GetName(0, true)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+		        return false;
+	        }
+
+	        Notify(GameObjectEvent.Interact, this, new InteractEventArgs(player));
+	        player.Notify(GameObjectEvent.InteractWith, player, new InteractWithEventArgs(this));
+	        return true;
         }
 
         #endregion

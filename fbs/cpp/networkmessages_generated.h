@@ -62,6 +62,26 @@ struct SC_PlayerUpdate;
 struct SC_PlayerUpdateBuilder;
 struct SC_PlayerUpdate_FBS;
 
+struct SC_VariousUpdate;
+struct SC_VariousUpdateBuilder;
+struct SC_VariousUpdate_FBS;
+
+struct SC_RemoveObject;
+struct SC_RemoveObjectBuilder;
+struct SC_RemoveObject_FBS;
+
+struct SC_PlayerCreate;
+struct SC_PlayerCreateBuilder;
+struct SC_PlayerCreate_FBS;
+
+struct SC_ObjectUpdate;
+struct SC_ObjectUpdateBuilder;
+struct SC_ObjectUpdate_FBS;
+
+struct SC_ConcentrationList;
+struct SC_ConcentrationListBuilder;
+struct SC_ConcentrationList_FBS;
+
 struct SC_StringMessage;
 struct SC_StringMessageBuilder;
 struct SC_StringMessage_FBS;
@@ -96,6 +116,16 @@ bool operator==(const SC_UpdatePosition_FBS &lhs, const SC_UpdatePosition_FBS &r
 bool operator!=(const SC_UpdatePosition_FBS &lhs, const SC_UpdatePosition_FBS &rhs);
 bool operator==(const SC_PlayerUpdate_FBS &lhs, const SC_PlayerUpdate_FBS &rhs);
 bool operator!=(const SC_PlayerUpdate_FBS &lhs, const SC_PlayerUpdate_FBS &rhs);
+bool operator==(const SC_VariousUpdate_FBS &lhs, const SC_VariousUpdate_FBS &rhs);
+bool operator!=(const SC_VariousUpdate_FBS &lhs, const SC_VariousUpdate_FBS &rhs);
+bool operator==(const SC_RemoveObject_FBS &lhs, const SC_RemoveObject_FBS &rhs);
+bool operator!=(const SC_RemoveObject_FBS &lhs, const SC_RemoveObject_FBS &rhs);
+bool operator==(const SC_PlayerCreate_FBS &lhs, const SC_PlayerCreate_FBS &rhs);
+bool operator!=(const SC_PlayerCreate_FBS &lhs, const SC_PlayerCreate_FBS &rhs);
+bool operator==(const SC_ObjectUpdate_FBS &lhs, const SC_ObjectUpdate_FBS &rhs);
+bool operator!=(const SC_ObjectUpdate_FBS &lhs, const SC_ObjectUpdate_FBS &rhs);
+bool operator==(const SC_ConcentrationList_FBS &lhs, const SC_ConcentrationList_FBS &rhs);
+bool operator!=(const SC_ConcentrationList_FBS &lhs, const SC_ConcentrationList_FBS &rhs);
 bool operator==(const SC_StringMessage_FBS &lhs, const SC_StringMessage_FBS &rhs);
 bool operator!=(const SC_StringMessage_FBS &lhs, const SC_StringMessage_FBS &rhs);
 bool operator==(const SC_DialogBoxMessage_FBS &lhs, const SC_DialogBoxMessage_FBS &rhs);
@@ -896,6 +926,660 @@ inline ::flatbuffers::Offset<SC_PlayerUpdate> CreateSC_PlayerUpdate(
 }
 
 ::flatbuffers::Offset<SC_PlayerUpdate> CreateSC_PlayerUpdate(::flatbuffers::FlatBufferBuilder &_fbb, const SC_PlayerUpdate_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct SC_VariousUpdate_FBS : public ::flatbuffers::NativeTable {
+  typedef SC_VariousUpdate TableType;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_VariousUpdate_FBS";
+  }
+  uint16_t level = 0;
+  int32_t maxhealth = 0;
+  std::string name{};
+  std::string classname{};
+  std::string baseclass{};
+  std::string lastname{};
+  std::string guildname{};
+  std::string language{};
+};
+
+struct SC_VariousUpdate FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SC_VariousUpdate_FBS NativeTableType;
+  typedef SC_VariousUpdateBuilder Builder;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_VariousUpdate";
+  }
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_LEVEL = 4,
+    VT_MAXHEALTH = 6,
+    VT_NAME = 8,
+    VT_CLASSNAME = 10,
+    VT_BASECLASS = 12,
+    VT_LASTNAME = 14,
+    VT_GUILDNAME = 16,
+    VT_LANGUAGE = 18
+  };
+  uint16_t level() const {
+    return GetField<uint16_t>(VT_LEVEL, 0);
+  }
+  int32_t maxhealth() const {
+    return GetField<int32_t>(VT_MAXHEALTH, 0);
+  }
+  const ::flatbuffers::String *name() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_NAME);
+  }
+  const ::flatbuffers::String *classname() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_CLASSNAME);
+  }
+  const ::flatbuffers::String *baseclass() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_BASECLASS);
+  }
+  const ::flatbuffers::String *lastname() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_LASTNAME);
+  }
+  const ::flatbuffers::String *guildname() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_GUILDNAME);
+  }
+  const ::flatbuffers::String *language() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_LANGUAGE);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint16_t>(verifier, VT_LEVEL, 2) &&
+           VerifyField<int32_t>(verifier, VT_MAXHEALTH, 4) &&
+           VerifyOffset(verifier, VT_NAME) &&
+           verifier.VerifyString(name()) &&
+           VerifyOffset(verifier, VT_CLASSNAME) &&
+           verifier.VerifyString(classname()) &&
+           VerifyOffset(verifier, VT_BASECLASS) &&
+           verifier.VerifyString(baseclass()) &&
+           VerifyOffset(verifier, VT_LASTNAME) &&
+           verifier.VerifyString(lastname()) &&
+           VerifyOffset(verifier, VT_GUILDNAME) &&
+           verifier.VerifyString(guildname()) &&
+           VerifyOffset(verifier, VT_LANGUAGE) &&
+           verifier.VerifyString(language()) &&
+           verifier.EndTable();
+  }
+  SC_VariousUpdate_FBS *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(SC_VariousUpdate_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<SC_VariousUpdate> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_VariousUpdate_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct SC_VariousUpdateBuilder {
+  typedef SC_VariousUpdate Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_level(uint16_t level) {
+    fbb_.AddElement<uint16_t>(SC_VariousUpdate::VT_LEVEL, level, 0);
+  }
+  void add_maxhealth(int32_t maxhealth) {
+    fbb_.AddElement<int32_t>(SC_VariousUpdate::VT_MAXHEALTH, maxhealth, 0);
+  }
+  void add_name(::flatbuffers::Offset<::flatbuffers::String> name) {
+    fbb_.AddOffset(SC_VariousUpdate::VT_NAME, name);
+  }
+  void add_classname(::flatbuffers::Offset<::flatbuffers::String> classname) {
+    fbb_.AddOffset(SC_VariousUpdate::VT_CLASSNAME, classname);
+  }
+  void add_baseclass(::flatbuffers::Offset<::flatbuffers::String> baseclass) {
+    fbb_.AddOffset(SC_VariousUpdate::VT_BASECLASS, baseclass);
+  }
+  void add_lastname(::flatbuffers::Offset<::flatbuffers::String> lastname) {
+    fbb_.AddOffset(SC_VariousUpdate::VT_LASTNAME, lastname);
+  }
+  void add_guildname(::flatbuffers::Offset<::flatbuffers::String> guildname) {
+    fbb_.AddOffset(SC_VariousUpdate::VT_GUILDNAME, guildname);
+  }
+  void add_language(::flatbuffers::Offset<::flatbuffers::String> language) {
+    fbb_.AddOffset(SC_VariousUpdate::VT_LANGUAGE, language);
+  }
+  explicit SC_VariousUpdateBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<SC_VariousUpdate> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<SC_VariousUpdate>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<SC_VariousUpdate> CreateSC_VariousUpdate(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint16_t level = 0,
+    int32_t maxhealth = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> name = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> classname = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> baseclass = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> lastname = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> guildname = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> language = 0) {
+  SC_VariousUpdateBuilder builder_(_fbb);
+  builder_.add_language(language);
+  builder_.add_guildname(guildname);
+  builder_.add_lastname(lastname);
+  builder_.add_baseclass(baseclass);
+  builder_.add_classname(classname);
+  builder_.add_name(name);
+  builder_.add_maxhealth(maxhealth);
+  builder_.add_level(level);
+  return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<SC_VariousUpdate> CreateSC_VariousUpdateDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint16_t level = 0,
+    int32_t maxhealth = 0,
+    const char *name = nullptr,
+    const char *classname = nullptr,
+    const char *baseclass = nullptr,
+    const char *lastname = nullptr,
+    const char *guildname = nullptr,
+    const char *language = nullptr) {
+  auto name__ = name ? _fbb.CreateString(name) : 0;
+  auto classname__ = classname ? _fbb.CreateString(classname) : 0;
+  auto baseclass__ = baseclass ? _fbb.CreateString(baseclass) : 0;
+  auto lastname__ = lastname ? _fbb.CreateString(lastname) : 0;
+  auto guildname__ = guildname ? _fbb.CreateString(guildname) : 0;
+  auto language__ = language ? _fbb.CreateString(language) : 0;
+  return NetworkMessage::CreateSC_VariousUpdate(
+      _fbb,
+      level,
+      maxhealth,
+      name__,
+      classname__,
+      baseclass__,
+      lastname__,
+      guildname__,
+      language__);
+}
+
+::flatbuffers::Offset<SC_VariousUpdate> CreateSC_VariousUpdate(::flatbuffers::FlatBufferBuilder &_fbb, const SC_VariousUpdate_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct SC_RemoveObject_FBS : public ::flatbuffers::NativeTable {
+  typedef SC_RemoveObject TableType;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_RemoveObject_FBS";
+  }
+  uint16_t objectid = 0;
+  uint16_t type = 0;
+};
+
+struct SC_RemoveObject FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SC_RemoveObject_FBS NativeTableType;
+  typedef SC_RemoveObjectBuilder Builder;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_RemoveObject";
+  }
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_OBJECTID = 4,
+    VT_TYPE = 6
+  };
+  uint16_t objectid() const {
+    return GetField<uint16_t>(VT_OBJECTID, 0);
+  }
+  uint16_t type() const {
+    return GetField<uint16_t>(VT_TYPE, 0);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint16_t>(verifier, VT_OBJECTID, 2) &&
+           VerifyField<uint16_t>(verifier, VT_TYPE, 2) &&
+           verifier.EndTable();
+  }
+  SC_RemoveObject_FBS *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(SC_RemoveObject_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<SC_RemoveObject> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_RemoveObject_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct SC_RemoveObjectBuilder {
+  typedef SC_RemoveObject Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_objectid(uint16_t objectid) {
+    fbb_.AddElement<uint16_t>(SC_RemoveObject::VT_OBJECTID, objectid, 0);
+  }
+  void add_type(uint16_t type) {
+    fbb_.AddElement<uint16_t>(SC_RemoveObject::VT_TYPE, type, 0);
+  }
+  explicit SC_RemoveObjectBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<SC_RemoveObject> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<SC_RemoveObject>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<SC_RemoveObject> CreateSC_RemoveObject(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint16_t objectid = 0,
+    uint16_t type = 0) {
+  SC_RemoveObjectBuilder builder_(_fbb);
+  builder_.add_type(type);
+  builder_.add_objectid(objectid);
+  return builder_.Finish();
+}
+
+::flatbuffers::Offset<SC_RemoveObject> CreateSC_RemoveObject(::flatbuffers::FlatBufferBuilder &_fbb, const SC_RemoveObject_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct SC_PlayerCreate_FBS : public ::flatbuffers::NativeTable {
+  typedef SC_PlayerCreate TableType;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_PlayerCreate_FBS";
+  }
+  std::shared_ptr<NetworkMessage::Vector3Int> position{};
+  int32_t sessionid = 0;
+  uint16_t objectid = 0;
+  uint16_t heading = 0;
+  uint16_t model = 0;
+  uint16_t level = 0;
+  uint8_t flags = 0;
+  std::string name{};
+  std::string guildname{};
+  std::string lastname{};
+  SC_PlayerCreate_FBS() = default;
+  SC_PlayerCreate_FBS(const SC_PlayerCreate_FBS &o);
+  SC_PlayerCreate_FBS(SC_PlayerCreate_FBS&&) FLATBUFFERS_NOEXCEPT = default;
+  SC_PlayerCreate_FBS &operator=(SC_PlayerCreate_FBS o) FLATBUFFERS_NOEXCEPT;
+};
+
+struct SC_PlayerCreate FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SC_PlayerCreate_FBS NativeTableType;
+  typedef SC_PlayerCreateBuilder Builder;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_PlayerCreate";
+  }
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_POSITION = 4,
+    VT_SESSIONID = 6,
+    VT_OBJECTID = 8,
+    VT_HEADING = 10,
+    VT_MODEL = 12,
+    VT_LEVEL = 14,
+    VT_FLAGS = 16,
+    VT_NAME = 18,
+    VT_GUILDNAME = 20,
+    VT_LASTNAME = 22
+  };
+  const NetworkMessage::Vector3Int *position() const {
+    return GetStruct<const NetworkMessage::Vector3Int *>(VT_POSITION);
+  }
+  int32_t sessionid() const {
+    return GetField<int32_t>(VT_SESSIONID, 0);
+  }
+  uint16_t objectid() const {
+    return GetField<uint16_t>(VT_OBJECTID, 0);
+  }
+  uint16_t heading() const {
+    return GetField<uint16_t>(VT_HEADING, 0);
+  }
+  uint16_t model() const {
+    return GetField<uint16_t>(VT_MODEL, 0);
+  }
+  uint16_t level() const {
+    return GetField<uint16_t>(VT_LEVEL, 0);
+  }
+  uint8_t flags() const {
+    return GetField<uint8_t>(VT_FLAGS, 0);
+  }
+  const ::flatbuffers::String *name() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_NAME);
+  }
+  const ::flatbuffers::String *guildname() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_GUILDNAME);
+  }
+  const ::flatbuffers::String *lastname() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_LASTNAME);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<NetworkMessage::Vector3Int>(verifier, VT_POSITION, 4) &&
+           VerifyField<int32_t>(verifier, VT_SESSIONID, 4) &&
+           VerifyField<uint16_t>(verifier, VT_OBJECTID, 2) &&
+           VerifyField<uint16_t>(verifier, VT_HEADING, 2) &&
+           VerifyField<uint16_t>(verifier, VT_MODEL, 2) &&
+           VerifyField<uint16_t>(verifier, VT_LEVEL, 2) &&
+           VerifyField<uint8_t>(verifier, VT_FLAGS, 1) &&
+           VerifyOffset(verifier, VT_NAME) &&
+           verifier.VerifyString(name()) &&
+           VerifyOffset(verifier, VT_GUILDNAME) &&
+           verifier.VerifyString(guildname()) &&
+           VerifyOffset(verifier, VT_LASTNAME) &&
+           verifier.VerifyString(lastname()) &&
+           verifier.EndTable();
+  }
+  SC_PlayerCreate_FBS *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(SC_PlayerCreate_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<SC_PlayerCreate> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_PlayerCreate_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct SC_PlayerCreateBuilder {
+  typedef SC_PlayerCreate Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_position(const NetworkMessage::Vector3Int *position) {
+    fbb_.AddStruct(SC_PlayerCreate::VT_POSITION, position);
+  }
+  void add_sessionid(int32_t sessionid) {
+    fbb_.AddElement<int32_t>(SC_PlayerCreate::VT_SESSIONID, sessionid, 0);
+  }
+  void add_objectid(uint16_t objectid) {
+    fbb_.AddElement<uint16_t>(SC_PlayerCreate::VT_OBJECTID, objectid, 0);
+  }
+  void add_heading(uint16_t heading) {
+    fbb_.AddElement<uint16_t>(SC_PlayerCreate::VT_HEADING, heading, 0);
+  }
+  void add_model(uint16_t model) {
+    fbb_.AddElement<uint16_t>(SC_PlayerCreate::VT_MODEL, model, 0);
+  }
+  void add_level(uint16_t level) {
+    fbb_.AddElement<uint16_t>(SC_PlayerCreate::VT_LEVEL, level, 0);
+  }
+  void add_flags(uint8_t flags) {
+    fbb_.AddElement<uint8_t>(SC_PlayerCreate::VT_FLAGS, flags, 0);
+  }
+  void add_name(::flatbuffers::Offset<::flatbuffers::String> name) {
+    fbb_.AddOffset(SC_PlayerCreate::VT_NAME, name);
+  }
+  void add_guildname(::flatbuffers::Offset<::flatbuffers::String> guildname) {
+    fbb_.AddOffset(SC_PlayerCreate::VT_GUILDNAME, guildname);
+  }
+  void add_lastname(::flatbuffers::Offset<::flatbuffers::String> lastname) {
+    fbb_.AddOffset(SC_PlayerCreate::VT_LASTNAME, lastname);
+  }
+  explicit SC_PlayerCreateBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<SC_PlayerCreate> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<SC_PlayerCreate>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<SC_PlayerCreate> CreateSC_PlayerCreate(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const NetworkMessage::Vector3Int *position = nullptr,
+    int32_t sessionid = 0,
+    uint16_t objectid = 0,
+    uint16_t heading = 0,
+    uint16_t model = 0,
+    uint16_t level = 0,
+    uint8_t flags = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> name = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> guildname = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> lastname = 0) {
+  SC_PlayerCreateBuilder builder_(_fbb);
+  builder_.add_lastname(lastname);
+  builder_.add_guildname(guildname);
+  builder_.add_name(name);
+  builder_.add_sessionid(sessionid);
+  builder_.add_position(position);
+  builder_.add_level(level);
+  builder_.add_model(model);
+  builder_.add_heading(heading);
+  builder_.add_objectid(objectid);
+  builder_.add_flags(flags);
+  return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<SC_PlayerCreate> CreateSC_PlayerCreateDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const NetworkMessage::Vector3Int *position = nullptr,
+    int32_t sessionid = 0,
+    uint16_t objectid = 0,
+    uint16_t heading = 0,
+    uint16_t model = 0,
+    uint16_t level = 0,
+    uint8_t flags = 0,
+    const char *name = nullptr,
+    const char *guildname = nullptr,
+    const char *lastname = nullptr) {
+  auto name__ = name ? _fbb.CreateString(name) : 0;
+  auto guildname__ = guildname ? _fbb.CreateString(guildname) : 0;
+  auto lastname__ = lastname ? _fbb.CreateString(lastname) : 0;
+  return NetworkMessage::CreateSC_PlayerCreate(
+      _fbb,
+      position,
+      sessionid,
+      objectid,
+      heading,
+      model,
+      level,
+      flags,
+      name__,
+      guildname__,
+      lastname__);
+}
+
+::flatbuffers::Offset<SC_PlayerCreate> CreateSC_PlayerCreate(::flatbuffers::FlatBufferBuilder &_fbb, const SC_PlayerCreate_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct SC_ObjectUpdate_FBS : public ::flatbuffers::NativeTable {
+  typedef SC_ObjectUpdate TableType;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_ObjectUpdate_FBS";
+  }
+  uint16_t heading = 0;
+  std::shared_ptr<NetworkMessage::Vector3Int> currentzonepos{};
+  std::shared_ptr<NetworkMessage::Vector3Int> targetzonepos{};
+  uint16_t myobjectid = 0;
+  uint16_t targetobjectid = 0;
+  uint8_t healthpercent = 0;
+  uint8_t flags = 0;
+  uint8_t zoneskinid = 0;
+  uint8_t targetzone = 0;
+  SC_ObjectUpdate_FBS() = default;
+  SC_ObjectUpdate_FBS(const SC_ObjectUpdate_FBS &o);
+  SC_ObjectUpdate_FBS(SC_ObjectUpdate_FBS&&) FLATBUFFERS_NOEXCEPT = default;
+  SC_ObjectUpdate_FBS &operator=(SC_ObjectUpdate_FBS o) FLATBUFFERS_NOEXCEPT;
+};
+
+struct SC_ObjectUpdate FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SC_ObjectUpdate_FBS NativeTableType;
+  typedef SC_ObjectUpdateBuilder Builder;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_ObjectUpdate";
+  }
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_HEADING = 4,
+    VT_CURRENTZONEPOS = 6,
+    VT_TARGETZONEPOS = 8,
+    VT_MYOBJECTID = 10,
+    VT_TARGETOBJECTID = 12,
+    VT_HEALTHPERCENT = 14,
+    VT_FLAGS = 16,
+    VT_ZONESKINID = 18,
+    VT_TARGETZONE = 20
+  };
+  uint16_t heading() const {
+    return GetField<uint16_t>(VT_HEADING, 0);
+  }
+  const NetworkMessage::Vector3Int *currentzonepos() const {
+    return GetStruct<const NetworkMessage::Vector3Int *>(VT_CURRENTZONEPOS);
+  }
+  const NetworkMessage::Vector3Int *targetzonepos() const {
+    return GetStruct<const NetworkMessage::Vector3Int *>(VT_TARGETZONEPOS);
+  }
+  uint16_t myobjectid() const {
+    return GetField<uint16_t>(VT_MYOBJECTID, 0);
+  }
+  uint16_t targetobjectid() const {
+    return GetField<uint16_t>(VT_TARGETOBJECTID, 0);
+  }
+  uint8_t healthpercent() const {
+    return GetField<uint8_t>(VT_HEALTHPERCENT, 0);
+  }
+  uint8_t flags() const {
+    return GetField<uint8_t>(VT_FLAGS, 0);
+  }
+  uint8_t zoneskinid() const {
+    return GetField<uint8_t>(VT_ZONESKINID, 0);
+  }
+  uint8_t targetzone() const {
+    return GetField<uint8_t>(VT_TARGETZONE, 0);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint16_t>(verifier, VT_HEADING, 2) &&
+           VerifyField<NetworkMessage::Vector3Int>(verifier, VT_CURRENTZONEPOS, 4) &&
+           VerifyField<NetworkMessage::Vector3Int>(verifier, VT_TARGETZONEPOS, 4) &&
+           VerifyField<uint16_t>(verifier, VT_MYOBJECTID, 2) &&
+           VerifyField<uint16_t>(verifier, VT_TARGETOBJECTID, 2) &&
+           VerifyField<uint8_t>(verifier, VT_HEALTHPERCENT, 1) &&
+           VerifyField<uint8_t>(verifier, VT_FLAGS, 1) &&
+           VerifyField<uint8_t>(verifier, VT_ZONESKINID, 1) &&
+           VerifyField<uint8_t>(verifier, VT_TARGETZONE, 1) &&
+           verifier.EndTable();
+  }
+  SC_ObjectUpdate_FBS *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(SC_ObjectUpdate_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<SC_ObjectUpdate> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_ObjectUpdate_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct SC_ObjectUpdateBuilder {
+  typedef SC_ObjectUpdate Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_heading(uint16_t heading) {
+    fbb_.AddElement<uint16_t>(SC_ObjectUpdate::VT_HEADING, heading, 0);
+  }
+  void add_currentzonepos(const NetworkMessage::Vector3Int *currentzonepos) {
+    fbb_.AddStruct(SC_ObjectUpdate::VT_CURRENTZONEPOS, currentzonepos);
+  }
+  void add_targetzonepos(const NetworkMessage::Vector3Int *targetzonepos) {
+    fbb_.AddStruct(SC_ObjectUpdate::VT_TARGETZONEPOS, targetzonepos);
+  }
+  void add_myobjectid(uint16_t myobjectid) {
+    fbb_.AddElement<uint16_t>(SC_ObjectUpdate::VT_MYOBJECTID, myobjectid, 0);
+  }
+  void add_targetobjectid(uint16_t targetobjectid) {
+    fbb_.AddElement<uint16_t>(SC_ObjectUpdate::VT_TARGETOBJECTID, targetobjectid, 0);
+  }
+  void add_healthpercent(uint8_t healthpercent) {
+    fbb_.AddElement<uint8_t>(SC_ObjectUpdate::VT_HEALTHPERCENT, healthpercent, 0);
+  }
+  void add_flags(uint8_t flags) {
+    fbb_.AddElement<uint8_t>(SC_ObjectUpdate::VT_FLAGS, flags, 0);
+  }
+  void add_zoneskinid(uint8_t zoneskinid) {
+    fbb_.AddElement<uint8_t>(SC_ObjectUpdate::VT_ZONESKINID, zoneskinid, 0);
+  }
+  void add_targetzone(uint8_t targetzone) {
+    fbb_.AddElement<uint8_t>(SC_ObjectUpdate::VT_TARGETZONE, targetzone, 0);
+  }
+  explicit SC_ObjectUpdateBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<SC_ObjectUpdate> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<SC_ObjectUpdate>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<SC_ObjectUpdate> CreateSC_ObjectUpdate(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint16_t heading = 0,
+    const NetworkMessage::Vector3Int *currentzonepos = nullptr,
+    const NetworkMessage::Vector3Int *targetzonepos = nullptr,
+    uint16_t myobjectid = 0,
+    uint16_t targetobjectid = 0,
+    uint8_t healthpercent = 0,
+    uint8_t flags = 0,
+    uint8_t zoneskinid = 0,
+    uint8_t targetzone = 0) {
+  SC_ObjectUpdateBuilder builder_(_fbb);
+  builder_.add_targetzonepos(targetzonepos);
+  builder_.add_currentzonepos(currentzonepos);
+  builder_.add_targetobjectid(targetobjectid);
+  builder_.add_myobjectid(myobjectid);
+  builder_.add_heading(heading);
+  builder_.add_targetzone(targetzone);
+  builder_.add_zoneskinid(zoneskinid);
+  builder_.add_flags(flags);
+  builder_.add_healthpercent(healthpercent);
+  return builder_.Finish();
+}
+
+::flatbuffers::Offset<SC_ObjectUpdate> CreateSC_ObjectUpdate(::flatbuffers::FlatBufferBuilder &_fbb, const SC_ObjectUpdate_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct SC_ConcentrationList_FBS : public ::flatbuffers::NativeTable {
+  typedef SC_ConcentrationList TableType;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_ConcentrationList_FBS";
+  }
+  std::vector<std::shared_ptr<NetworkMessage::ConEffectData_FBS>> coninfo{};
+  SC_ConcentrationList_FBS() = default;
+  SC_ConcentrationList_FBS(const SC_ConcentrationList_FBS &o);
+  SC_ConcentrationList_FBS(SC_ConcentrationList_FBS&&) FLATBUFFERS_NOEXCEPT = default;
+  SC_ConcentrationList_FBS &operator=(SC_ConcentrationList_FBS o) FLATBUFFERS_NOEXCEPT;
+};
+
+struct SC_ConcentrationList FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SC_ConcentrationList_FBS NativeTableType;
+  typedef SC_ConcentrationListBuilder Builder;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_ConcentrationList";
+  }
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_CONINFO = 4
+  };
+  const ::flatbuffers::Vector<::flatbuffers::Offset<NetworkMessage::ConEffectData>> *coninfo() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<NetworkMessage::ConEffectData>> *>(VT_CONINFO);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_CONINFO) &&
+           verifier.VerifyVector(coninfo()) &&
+           verifier.VerifyVectorOfTables(coninfo()) &&
+           verifier.EndTable();
+  }
+  SC_ConcentrationList_FBS *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(SC_ConcentrationList_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<SC_ConcentrationList> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_ConcentrationList_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct SC_ConcentrationListBuilder {
+  typedef SC_ConcentrationList Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_coninfo(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<NetworkMessage::ConEffectData>>> coninfo) {
+    fbb_.AddOffset(SC_ConcentrationList::VT_CONINFO, coninfo);
+  }
+  explicit SC_ConcentrationListBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<SC_ConcentrationList> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<SC_ConcentrationList>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<SC_ConcentrationList> CreateSC_ConcentrationList(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<NetworkMessage::ConEffectData>>> coninfo = 0) {
+  SC_ConcentrationListBuilder builder_(_fbb);
+  builder_.add_coninfo(coninfo);
+  return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<SC_ConcentrationList> CreateSC_ConcentrationListDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<::flatbuffers::Offset<NetworkMessage::ConEffectData>> *coninfo = nullptr) {
+  auto coninfo__ = coninfo ? _fbb.CreateVector<::flatbuffers::Offset<NetworkMessage::ConEffectData>>(*coninfo) : 0;
+  return NetworkMessage::CreateSC_ConcentrationList(
+      _fbb,
+      coninfo__);
+}
+
+::flatbuffers::Offset<SC_ConcentrationList> CreateSC_ConcentrationList(::flatbuffers::FlatBufferBuilder &_fbb, const SC_ConcentrationList_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 struct SC_StringMessage_FBS : public ::flatbuffers::NativeTable {
   typedef SC_StringMessage TableType;
@@ -1718,6 +2402,353 @@ inline ::flatbuffers::Offset<SC_PlayerUpdate> CreateSC_PlayerUpdate(::flatbuffer
       _head,
       _health,
       _state);
+}
+
+
+inline bool operator==(const SC_VariousUpdate_FBS &lhs, const SC_VariousUpdate_FBS &rhs) {
+  return
+      (lhs.level == rhs.level) &&
+      (lhs.maxhealth == rhs.maxhealth) &&
+      (lhs.name == rhs.name) &&
+      (lhs.classname == rhs.classname) &&
+      (lhs.baseclass == rhs.baseclass) &&
+      (lhs.lastname == rhs.lastname) &&
+      (lhs.guildname == rhs.guildname) &&
+      (lhs.language == rhs.language);
+}
+
+inline bool operator!=(const SC_VariousUpdate_FBS &lhs, const SC_VariousUpdate_FBS &rhs) {
+    return !(lhs == rhs);
+}
+
+
+inline SC_VariousUpdate_FBS *SC_VariousUpdate::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<SC_VariousUpdate_FBS>(new SC_VariousUpdate_FBS());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void SC_VariousUpdate::UnPackTo(SC_VariousUpdate_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = level(); _o->level = _e; }
+  { auto _e = maxhealth(); _o->maxhealth = _e; }
+  { auto _e = name(); if (_e) _o->name = _e->str(); }
+  { auto _e = classname(); if (_e) _o->classname = _e->str(); }
+  { auto _e = baseclass(); if (_e) _o->baseclass = _e->str(); }
+  { auto _e = lastname(); if (_e) _o->lastname = _e->str(); }
+  { auto _e = guildname(); if (_e) _o->guildname = _e->str(); }
+  { auto _e = language(); if (_e) _o->language = _e->str(); }
+}
+
+inline ::flatbuffers::Offset<SC_VariousUpdate> SC_VariousUpdate::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_VariousUpdate_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateSC_VariousUpdate(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<SC_VariousUpdate> CreateSC_VariousUpdate(::flatbuffers::FlatBufferBuilder &_fbb, const SC_VariousUpdate_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const SC_VariousUpdate_FBS* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _level = _o->level;
+  auto _maxhealth = _o->maxhealth;
+  auto _name = _o->name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->name);
+  auto _classname = _o->classname.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->classname);
+  auto _baseclass = _o->baseclass.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->baseclass);
+  auto _lastname = _o->lastname.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->lastname);
+  auto _guildname = _o->guildname.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->guildname);
+  auto _language = _o->language.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->language);
+  return NetworkMessage::CreateSC_VariousUpdate(
+      _fbb,
+      _level,
+      _maxhealth,
+      _name,
+      _classname,
+      _baseclass,
+      _lastname,
+      _guildname,
+      _language);
+}
+
+
+inline bool operator==(const SC_RemoveObject_FBS &lhs, const SC_RemoveObject_FBS &rhs) {
+  return
+      (lhs.objectid == rhs.objectid) &&
+      (lhs.type == rhs.type);
+}
+
+inline bool operator!=(const SC_RemoveObject_FBS &lhs, const SC_RemoveObject_FBS &rhs) {
+    return !(lhs == rhs);
+}
+
+
+inline SC_RemoveObject_FBS *SC_RemoveObject::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<SC_RemoveObject_FBS>(new SC_RemoveObject_FBS());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void SC_RemoveObject::UnPackTo(SC_RemoveObject_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = objectid(); _o->objectid = _e; }
+  { auto _e = type(); _o->type = _e; }
+}
+
+inline ::flatbuffers::Offset<SC_RemoveObject> SC_RemoveObject::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_RemoveObject_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateSC_RemoveObject(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<SC_RemoveObject> CreateSC_RemoveObject(::flatbuffers::FlatBufferBuilder &_fbb, const SC_RemoveObject_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const SC_RemoveObject_FBS* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _objectid = _o->objectid;
+  auto _type = _o->type;
+  return NetworkMessage::CreateSC_RemoveObject(
+      _fbb,
+      _objectid,
+      _type);
+}
+
+
+inline bool operator==(const SC_PlayerCreate_FBS &lhs, const SC_PlayerCreate_FBS &rhs) {
+  return
+      ((lhs.position == rhs.position) || (lhs.position && rhs.position && *lhs.position == *rhs.position)) &&
+      (lhs.sessionid == rhs.sessionid) &&
+      (lhs.objectid == rhs.objectid) &&
+      (lhs.heading == rhs.heading) &&
+      (lhs.model == rhs.model) &&
+      (lhs.level == rhs.level) &&
+      (lhs.flags == rhs.flags) &&
+      (lhs.name == rhs.name) &&
+      (lhs.guildname == rhs.guildname) &&
+      (lhs.lastname == rhs.lastname);
+}
+
+inline bool operator!=(const SC_PlayerCreate_FBS &lhs, const SC_PlayerCreate_FBS &rhs) {
+    return !(lhs == rhs);
+}
+
+
+inline SC_PlayerCreate_FBS::SC_PlayerCreate_FBS(const SC_PlayerCreate_FBS &o)
+      : position((o.position) ? new NetworkMessage::Vector3Int(*o.position) : nullptr),
+        sessionid(o.sessionid),
+        objectid(o.objectid),
+        heading(o.heading),
+        model(o.model),
+        level(o.level),
+        flags(o.flags),
+        name(o.name),
+        guildname(o.guildname),
+        lastname(o.lastname) {
+}
+
+inline SC_PlayerCreate_FBS &SC_PlayerCreate_FBS::operator=(SC_PlayerCreate_FBS o) FLATBUFFERS_NOEXCEPT {
+  std::swap(position, o.position);
+  std::swap(sessionid, o.sessionid);
+  std::swap(objectid, o.objectid);
+  std::swap(heading, o.heading);
+  std::swap(model, o.model);
+  std::swap(level, o.level);
+  std::swap(flags, o.flags);
+  std::swap(name, o.name);
+  std::swap(guildname, o.guildname);
+  std::swap(lastname, o.lastname);
+  return *this;
+}
+
+inline SC_PlayerCreate_FBS *SC_PlayerCreate::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<SC_PlayerCreate_FBS>(new SC_PlayerCreate_FBS());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void SC_PlayerCreate::UnPackTo(SC_PlayerCreate_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = position(); if (_e) _o->position = std::shared_ptr<NetworkMessage::Vector3Int>(new NetworkMessage::Vector3Int(*_e)); }
+  { auto _e = sessionid(); _o->sessionid = _e; }
+  { auto _e = objectid(); _o->objectid = _e; }
+  { auto _e = heading(); _o->heading = _e; }
+  { auto _e = model(); _o->model = _e; }
+  { auto _e = level(); _o->level = _e; }
+  { auto _e = flags(); _o->flags = _e; }
+  { auto _e = name(); if (_e) _o->name = _e->str(); }
+  { auto _e = guildname(); if (_e) _o->guildname = _e->str(); }
+  { auto _e = lastname(); if (_e) _o->lastname = _e->str(); }
+}
+
+inline ::flatbuffers::Offset<SC_PlayerCreate> SC_PlayerCreate::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_PlayerCreate_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateSC_PlayerCreate(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<SC_PlayerCreate> CreateSC_PlayerCreate(::flatbuffers::FlatBufferBuilder &_fbb, const SC_PlayerCreate_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const SC_PlayerCreate_FBS* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _position = _o->position ? _o->position.get() : nullptr;
+  auto _sessionid = _o->sessionid;
+  auto _objectid = _o->objectid;
+  auto _heading = _o->heading;
+  auto _model = _o->model;
+  auto _level = _o->level;
+  auto _flags = _o->flags;
+  auto _name = _o->name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->name);
+  auto _guildname = _o->guildname.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->guildname);
+  auto _lastname = _o->lastname.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->lastname);
+  return NetworkMessage::CreateSC_PlayerCreate(
+      _fbb,
+      _position,
+      _sessionid,
+      _objectid,
+      _heading,
+      _model,
+      _level,
+      _flags,
+      _name,
+      _guildname,
+      _lastname);
+}
+
+
+inline bool operator==(const SC_ObjectUpdate_FBS &lhs, const SC_ObjectUpdate_FBS &rhs) {
+  return
+      (lhs.heading == rhs.heading) &&
+      ((lhs.currentzonepos == rhs.currentzonepos) || (lhs.currentzonepos && rhs.currentzonepos && *lhs.currentzonepos == *rhs.currentzonepos)) &&
+      ((lhs.targetzonepos == rhs.targetzonepos) || (lhs.targetzonepos && rhs.targetzonepos && *lhs.targetzonepos == *rhs.targetzonepos)) &&
+      (lhs.myobjectid == rhs.myobjectid) &&
+      (lhs.targetobjectid == rhs.targetobjectid) &&
+      (lhs.healthpercent == rhs.healthpercent) &&
+      (lhs.flags == rhs.flags) &&
+      (lhs.zoneskinid == rhs.zoneskinid) &&
+      (lhs.targetzone == rhs.targetzone);
+}
+
+inline bool operator!=(const SC_ObjectUpdate_FBS &lhs, const SC_ObjectUpdate_FBS &rhs) {
+    return !(lhs == rhs);
+}
+
+
+inline SC_ObjectUpdate_FBS::SC_ObjectUpdate_FBS(const SC_ObjectUpdate_FBS &o)
+      : heading(o.heading),
+        currentzonepos((o.currentzonepos) ? new NetworkMessage::Vector3Int(*o.currentzonepos) : nullptr),
+        targetzonepos((o.targetzonepos) ? new NetworkMessage::Vector3Int(*o.targetzonepos) : nullptr),
+        myobjectid(o.myobjectid),
+        targetobjectid(o.targetobjectid),
+        healthpercent(o.healthpercent),
+        flags(o.flags),
+        zoneskinid(o.zoneskinid),
+        targetzone(o.targetzone) {
+}
+
+inline SC_ObjectUpdate_FBS &SC_ObjectUpdate_FBS::operator=(SC_ObjectUpdate_FBS o) FLATBUFFERS_NOEXCEPT {
+  std::swap(heading, o.heading);
+  std::swap(currentzonepos, o.currentzonepos);
+  std::swap(targetzonepos, o.targetzonepos);
+  std::swap(myobjectid, o.myobjectid);
+  std::swap(targetobjectid, o.targetobjectid);
+  std::swap(healthpercent, o.healthpercent);
+  std::swap(flags, o.flags);
+  std::swap(zoneskinid, o.zoneskinid);
+  std::swap(targetzone, o.targetzone);
+  return *this;
+}
+
+inline SC_ObjectUpdate_FBS *SC_ObjectUpdate::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<SC_ObjectUpdate_FBS>(new SC_ObjectUpdate_FBS());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void SC_ObjectUpdate::UnPackTo(SC_ObjectUpdate_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = heading(); _o->heading = _e; }
+  { auto _e = currentzonepos(); if (_e) _o->currentzonepos = std::shared_ptr<NetworkMessage::Vector3Int>(new NetworkMessage::Vector3Int(*_e)); }
+  { auto _e = targetzonepos(); if (_e) _o->targetzonepos = std::shared_ptr<NetworkMessage::Vector3Int>(new NetworkMessage::Vector3Int(*_e)); }
+  { auto _e = myobjectid(); _o->myobjectid = _e; }
+  { auto _e = targetobjectid(); _o->targetobjectid = _e; }
+  { auto _e = healthpercent(); _o->healthpercent = _e; }
+  { auto _e = flags(); _o->flags = _e; }
+  { auto _e = zoneskinid(); _o->zoneskinid = _e; }
+  { auto _e = targetzone(); _o->targetzone = _e; }
+}
+
+inline ::flatbuffers::Offset<SC_ObjectUpdate> SC_ObjectUpdate::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_ObjectUpdate_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateSC_ObjectUpdate(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<SC_ObjectUpdate> CreateSC_ObjectUpdate(::flatbuffers::FlatBufferBuilder &_fbb, const SC_ObjectUpdate_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const SC_ObjectUpdate_FBS* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _heading = _o->heading;
+  auto _currentzonepos = _o->currentzonepos ? _o->currentzonepos.get() : nullptr;
+  auto _targetzonepos = _o->targetzonepos ? _o->targetzonepos.get() : nullptr;
+  auto _myobjectid = _o->myobjectid;
+  auto _targetobjectid = _o->targetobjectid;
+  auto _healthpercent = _o->healthpercent;
+  auto _flags = _o->flags;
+  auto _zoneskinid = _o->zoneskinid;
+  auto _targetzone = _o->targetzone;
+  return NetworkMessage::CreateSC_ObjectUpdate(
+      _fbb,
+      _heading,
+      _currentzonepos,
+      _targetzonepos,
+      _myobjectid,
+      _targetobjectid,
+      _healthpercent,
+      _flags,
+      _zoneskinid,
+      _targetzone);
+}
+
+
+inline bool operator==(const SC_ConcentrationList_FBS &lhs, const SC_ConcentrationList_FBS &rhs) {
+  return
+      (lhs.coninfo.size() == rhs.coninfo.size() && std::equal(lhs.coninfo.cbegin(), lhs.coninfo.cend(), rhs.coninfo.cbegin(), [](std::shared_ptr<NetworkMessage::ConEffectData_FBS> const &a, std::shared_ptr<NetworkMessage::ConEffectData_FBS> const &b) { return (a == b) || (a && b && *a == *b); }));
+}
+
+inline bool operator!=(const SC_ConcentrationList_FBS &lhs, const SC_ConcentrationList_FBS &rhs) {
+    return !(lhs == rhs);
+}
+
+
+inline SC_ConcentrationList_FBS::SC_ConcentrationList_FBS(const SC_ConcentrationList_FBS &o) {
+  coninfo.reserve(o.coninfo.size());
+  for (const auto &coninfo_ : o.coninfo) { coninfo.emplace_back((coninfo_) ? new NetworkMessage::ConEffectData_FBS(*coninfo_) : nullptr); }
+}
+
+inline SC_ConcentrationList_FBS &SC_ConcentrationList_FBS::operator=(SC_ConcentrationList_FBS o) FLATBUFFERS_NOEXCEPT {
+  std::swap(coninfo, o.coninfo);
+  return *this;
+}
+
+inline SC_ConcentrationList_FBS *SC_ConcentrationList::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<SC_ConcentrationList_FBS>(new SC_ConcentrationList_FBS());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void SC_ConcentrationList::UnPackTo(SC_ConcentrationList_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = coninfo(); if (_e) { _o->coninfo.resize(_e->size()); for (::flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { if(_o->coninfo[_i]) { _e->Get(_i)->UnPackTo(_o->coninfo[_i].get(), _resolver); } else { _o->coninfo[_i] = std::shared_ptr<NetworkMessage::ConEffectData_FBS>(_e->Get(_i)->UnPack(_resolver)); }; } } else { _o->coninfo.resize(0); } }
+}
+
+inline ::flatbuffers::Offset<SC_ConcentrationList> SC_ConcentrationList::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_ConcentrationList_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateSC_ConcentrationList(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<SC_ConcentrationList> CreateSC_ConcentrationList(::flatbuffers::FlatBufferBuilder &_fbb, const SC_ConcentrationList_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const SC_ConcentrationList_FBS* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _coninfo = _fbb.CreateVector<::flatbuffers::Offset<NetworkMessage::ConEffectData>> (_o->coninfo.size(), [](size_t i, _VectorArgs *__va) { return CreateConEffectData(*__va->__fbb, __va->__o->coninfo[i].get(), __va->__rehasher); }, &_va );
+  return NetworkMessage::CreateSC_ConcentrationList(
+      _fbb,
+      _coninfo);
 }
 
 

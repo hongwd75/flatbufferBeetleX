@@ -529,78 +529,30 @@ namespace Game.Logic.World;
         {
             get { return m_loadObjects; }
         }
-
-        //Dinberg: Added this for instances.
-        /// <summary>
-        /// Added to allow instances; the 'appearance' of the region, the map the GameClient uses.
-        /// </summary>
+        
         public virtual ushort Skin
         {
             get { return ID; }
         }
 
-        /// <summary>
-        /// Should this region respond to time manager send requests
-        /// Normally yes, might be disabled for some instances.
-        /// </summary>
         public virtual bool UseTimeManager
         {
             get { return true; }
             set { }
         }
-
-
-        /// <summary>
-        /// Each region can return it's own game time
-        /// By default let WorldMgr handle it
-        /// </summary>
+        
         public virtual uint GameTime
         {
             get { return WorldMgr.GetCurrentGameTime(); }
             set { }
         }
-
-
-        /// <summary>
-        /// Get the day increment for this region.
-        /// By default let WorldMgr handle it
-        /// </summary>
+        
         public virtual uint DayIncrement
         {
             get { return WorldMgr.GetDayIncrement(); }
             set { }
         }
-
-        /// <summary>
-        /// Create the appropriate GameKeep for this region
-        /// </summary>
-        /// <returns></returns>
-        public virtual AbstractGameKeep CreateGameKeep()
-        {
-            return new GameKeep();
-        }
-
-        /// <summary>
-        /// Create the appropriate GameKeepTower for this region
-        /// </summary>
-        /// <returns></returns>
-        public virtual AbstractGameKeep CreateGameKeepTower()
-        {
-            return new GameKeepTower();
-        }
-
-        /// <summary>
-        /// Create the appropriate GameKeepComponent for this region
-        /// </summary>
-        /// <returns></returns>
-        public virtual GameKeepComponent CreateGameKeepComponent()
-        {
-            return new GameKeepComponent();
-        }
-
-        /// <summary>
-        /// Determine if the current time is AM.
-        /// </summary>
+        
         public virtual bool IsAM
         {
             get

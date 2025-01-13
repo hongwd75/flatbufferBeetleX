@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using BeetleX;
 using Flatbuffers.Messages.Packets.Client;
 using Game.Logic;
+using Game.Logic.Utils;
 using Logic.database.table;
 
 namespace Game.Logic.network
@@ -30,11 +31,11 @@ namespace Game.Logic.network
         
         protected long mPingTime = DateTime.Now.Ticks;
         protected volatile eClientState m_clientState = eClientState.NotConnected;
-
+        protected ReaderWriterDictionary<Tuple<ushort, ushort>, long> m_GameObjectUpdateArray;
         protected long mRoomID = 0;      // room 형식의 게임용 room id
+        public bool IsConnectedBan = false;
         
         #region GET / SET
-
         public long RoomID 
         { 
             get => mRoomID;
@@ -108,7 +109,10 @@ namespace Game.Logic.network
             set { mPingTime = value; }
         }
 
-        public bool IsConnectedBan = false;
+        public ReaderWriterDictionary<Tuple<ushort, ushort>, long> GameObjectUpdateArray
+        {
+            get { return m_GameObjectUpdateArray; }
+        }        
         #endregion
 
         public bool IsConnected()
@@ -130,7 +134,16 @@ namespace Game.Logic.network
         
         public GameClient(ISession session)
         {
+            mPlayer = null;
             mSession = session;
+            mRoomID = -1;
+            mGamePlayerArrayID = -1;
+            m_GameObjectUpdateArray = new ReaderWriterDictionary<Tuple<ushort, ushort>, long>();
+            OutPacket output = (OutPacket)mSession.SocketProcessHandler;
+            if (output != null)
+            {
+                output.Client = this;
+            }
         }
 
 

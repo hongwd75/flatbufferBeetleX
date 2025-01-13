@@ -786,6 +786,607 @@ static public class SC_PlayerUpdateVerify
       && verifier.VerifyTableEnd(tablePos);
   }
 }
+public struct SC_VariousUpdate : IFlatbufferObject
+{
+  private Table __p;
+  public ByteBuffer ByteBuffer { get { return __p.bb; } }
+  public static void ValidateVersion() { FlatBufferConstants.FLATBUFFERS_24_3_25(); }
+  public static SC_VariousUpdate GetRootAsSC_VariousUpdate(ByteBuffer _bb) { return GetRootAsSC_VariousUpdate(_bb, new SC_VariousUpdate()); }
+  public static SC_VariousUpdate GetRootAsSC_VariousUpdate(ByteBuffer _bb, SC_VariousUpdate obj) { return (obj.__assign(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
+  public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
+  public SC_VariousUpdate __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
+
+  public ushort Level { get { int o = __p.__offset(4); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public int Maxhealth { get { int o = __p.__offset(6); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
+  public string Name { get { int o = __p.__offset(8); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
+#if ENABLE_SPAN_T
+  public Span<byte> GetNameBytes() { return __p.__vector_as_span<byte>(8, 1); }
+#else
+  public ArraySegment<byte>? GetNameBytes() { return __p.__vector_as_arraysegment(8); }
+#endif
+  public byte[] GetNameArray() { return __p.__vector_as_array<byte>(8); }
+  public string Classname { get { int o = __p.__offset(10); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
+#if ENABLE_SPAN_T
+  public Span<byte> GetClassnameBytes() { return __p.__vector_as_span<byte>(10, 1); }
+#else
+  public ArraySegment<byte>? GetClassnameBytes() { return __p.__vector_as_arraysegment(10); }
+#endif
+  public byte[] GetClassnameArray() { return __p.__vector_as_array<byte>(10); }
+  public string Baseclass { get { int o = __p.__offset(12); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
+#if ENABLE_SPAN_T
+  public Span<byte> GetBaseclassBytes() { return __p.__vector_as_span<byte>(12, 1); }
+#else
+  public ArraySegment<byte>? GetBaseclassBytes() { return __p.__vector_as_arraysegment(12); }
+#endif
+  public byte[] GetBaseclassArray() { return __p.__vector_as_array<byte>(12); }
+  public string Lastname { get { int o = __p.__offset(14); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
+#if ENABLE_SPAN_T
+  public Span<byte> GetLastnameBytes() { return __p.__vector_as_span<byte>(14, 1); }
+#else
+  public ArraySegment<byte>? GetLastnameBytes() { return __p.__vector_as_arraysegment(14); }
+#endif
+  public byte[] GetLastnameArray() { return __p.__vector_as_array<byte>(14); }
+  public string Guildname { get { int o = __p.__offset(16); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
+#if ENABLE_SPAN_T
+  public Span<byte> GetGuildnameBytes() { return __p.__vector_as_span<byte>(16, 1); }
+#else
+  public ArraySegment<byte>? GetGuildnameBytes() { return __p.__vector_as_arraysegment(16); }
+#endif
+  public byte[] GetGuildnameArray() { return __p.__vector_as_array<byte>(16); }
+  public string Language { get { int o = __p.__offset(18); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
+#if ENABLE_SPAN_T
+  public Span<byte> GetLanguageBytes() { return __p.__vector_as_span<byte>(18, 1); }
+#else
+  public ArraySegment<byte>? GetLanguageBytes() { return __p.__vector_as_arraysegment(18); }
+#endif
+  public byte[] GetLanguageArray() { return __p.__vector_as_array<byte>(18); }
+
+  public static Offset<NetworkMessage.SC_VariousUpdate> CreateSC_VariousUpdate(FlatBufferBuilder builder,
+      ushort level = 0,
+      int maxhealth = 0,
+      StringOffset nameOffset = default(StringOffset),
+      StringOffset classnameOffset = default(StringOffset),
+      StringOffset baseclassOffset = default(StringOffset),
+      StringOffset lastnameOffset = default(StringOffset),
+      StringOffset guildnameOffset = default(StringOffset),
+      StringOffset languageOffset = default(StringOffset)) {
+    builder.StartTable(8);
+    SC_VariousUpdate.AddLanguage(builder, languageOffset);
+    SC_VariousUpdate.AddGuildname(builder, guildnameOffset);
+    SC_VariousUpdate.AddLastname(builder, lastnameOffset);
+    SC_VariousUpdate.AddBaseclass(builder, baseclassOffset);
+    SC_VariousUpdate.AddClassname(builder, classnameOffset);
+    SC_VariousUpdate.AddName(builder, nameOffset);
+    SC_VariousUpdate.AddMaxhealth(builder, maxhealth);
+    SC_VariousUpdate.AddLevel(builder, level);
+    return SC_VariousUpdate.EndSC_VariousUpdate(builder);
+  }
+
+  public static void StartSC_VariousUpdate(FlatBufferBuilder builder) { builder.StartTable(8); }
+  public static void AddLevel(FlatBufferBuilder builder, ushort level) { builder.AddUshort(0, level, 0); }
+  public static void AddMaxhealth(FlatBufferBuilder builder, int maxhealth) { builder.AddInt(1, maxhealth, 0); }
+  public static void AddName(FlatBufferBuilder builder, StringOffset nameOffset) { builder.AddOffset(2, nameOffset.Value, 0); }
+  public static void AddClassname(FlatBufferBuilder builder, StringOffset classnameOffset) { builder.AddOffset(3, classnameOffset.Value, 0); }
+  public static void AddBaseclass(FlatBufferBuilder builder, StringOffset baseclassOffset) { builder.AddOffset(4, baseclassOffset.Value, 0); }
+  public static void AddLastname(FlatBufferBuilder builder, StringOffset lastnameOffset) { builder.AddOffset(5, lastnameOffset.Value, 0); }
+  public static void AddGuildname(FlatBufferBuilder builder, StringOffset guildnameOffset) { builder.AddOffset(6, guildnameOffset.Value, 0); }
+  public static void AddLanguage(FlatBufferBuilder builder, StringOffset languageOffset) { builder.AddOffset(7, languageOffset.Value, 0); }
+  public static Offset<NetworkMessage.SC_VariousUpdate> EndSC_VariousUpdate(FlatBufferBuilder builder) {
+    int o = builder.EndTable();
+    return new Offset<NetworkMessage.SC_VariousUpdate>(o);
+  }
+  public SC_VariousUpdate_FBS UnPack() {
+    var _o = new SC_VariousUpdate_FBS();
+    this.UnPackTo(_o);
+    return _o;
+  }
+  public void UnPackTo(SC_VariousUpdate_FBS _o) {
+    _o.Level = this.Level;
+    _o.Maxhealth = this.Maxhealth;
+    _o.Name = this.Name;
+    _o.Classname = this.Classname;
+    _o.Baseclass = this.Baseclass;
+    _o.Lastname = this.Lastname;
+    _o.Guildname = this.Guildname;
+    _o.Language = this.Language;
+  }
+  public static Offset<NetworkMessage.SC_VariousUpdate> Pack(FlatBufferBuilder builder, SC_VariousUpdate_FBS _o) {
+    if (_o == null) return default(Offset<NetworkMessage.SC_VariousUpdate>);
+    var _name = _o.Name == null ? default(StringOffset) : builder.CreateString(_o.Name);
+    var _classname = _o.Classname == null ? default(StringOffset) : builder.CreateString(_o.Classname);
+    var _baseclass = _o.Baseclass == null ? default(StringOffset) : builder.CreateString(_o.Baseclass);
+    var _lastname = _o.Lastname == null ? default(StringOffset) : builder.CreateString(_o.Lastname);
+    var _guildname = _o.Guildname == null ? default(StringOffset) : builder.CreateString(_o.Guildname);
+    var _language = _o.Language == null ? default(StringOffset) : builder.CreateString(_o.Language);
+    return CreateSC_VariousUpdate(
+      builder,
+      _o.Level,
+      _o.Maxhealth,
+      _name,
+      _classname,
+      _baseclass,
+      _lastname,
+      _guildname,
+      _language);
+  }
+}
+
+public class SC_VariousUpdate_FBS
+{
+  public ushort Level { get; set; }
+  public int Maxhealth { get; set; }
+  public string Name { get; set; }
+  public string Classname { get; set; }
+  public string Baseclass { get; set; }
+  public string Lastname { get; set; }
+  public string Guildname { get; set; }
+  public string Language { get; set; }
+
+  public SC_VariousUpdate_FBS() {
+    this.Level = 0;
+    this.Maxhealth = 0;
+    this.Name = null;
+    this.Classname = null;
+    this.Baseclass = null;
+    this.Lastname = null;
+    this.Guildname = null;
+    this.Language = null;
+  }
+}
+
+
+static public class SC_VariousUpdateVerify
+{
+  static public bool Verify(Google.FlatBuffers.Verifier verifier, uint tablePos)
+  {
+    return verifier.VerifyTableStart(tablePos)
+      && verifier.VerifyField(tablePos, 4 /*Level*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 6 /*Maxhealth*/, 4 /*int*/, 4, false)
+      && verifier.VerifyString(tablePos, 8 /*Name*/, false)
+      && verifier.VerifyString(tablePos, 10 /*Classname*/, false)
+      && verifier.VerifyString(tablePos, 12 /*Baseclass*/, false)
+      && verifier.VerifyString(tablePos, 14 /*Lastname*/, false)
+      && verifier.VerifyString(tablePos, 16 /*Guildname*/, false)
+      && verifier.VerifyString(tablePos, 18 /*Language*/, false)
+      && verifier.VerifyTableEnd(tablePos);
+  }
+}
+public struct SC_RemoveObject : IFlatbufferObject
+{
+  private Table __p;
+  public ByteBuffer ByteBuffer { get { return __p.bb; } }
+  public static void ValidateVersion() { FlatBufferConstants.FLATBUFFERS_24_3_25(); }
+  public static SC_RemoveObject GetRootAsSC_RemoveObject(ByteBuffer _bb) { return GetRootAsSC_RemoveObject(_bb, new SC_RemoveObject()); }
+  public static SC_RemoveObject GetRootAsSC_RemoveObject(ByteBuffer _bb, SC_RemoveObject obj) { return (obj.__assign(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
+  public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
+  public SC_RemoveObject __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
+
+  public ushort Objectid { get { int o = __p.__offset(4); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public ushort Type { get { int o = __p.__offset(6); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+
+  public static Offset<NetworkMessage.SC_RemoveObject> CreateSC_RemoveObject(FlatBufferBuilder builder,
+      ushort objectid = 0,
+      ushort type = 0) {
+    builder.StartTable(2);
+    SC_RemoveObject.AddType(builder, type);
+    SC_RemoveObject.AddObjectid(builder, objectid);
+    return SC_RemoveObject.EndSC_RemoveObject(builder);
+  }
+
+  public static void StartSC_RemoveObject(FlatBufferBuilder builder) { builder.StartTable(2); }
+  public static void AddObjectid(FlatBufferBuilder builder, ushort objectid) { builder.AddUshort(0, objectid, 0); }
+  public static void AddType(FlatBufferBuilder builder, ushort type) { builder.AddUshort(1, type, 0); }
+  public static Offset<NetworkMessage.SC_RemoveObject> EndSC_RemoveObject(FlatBufferBuilder builder) {
+    int o = builder.EndTable();
+    return new Offset<NetworkMessage.SC_RemoveObject>(o);
+  }
+  public SC_RemoveObject_FBS UnPack() {
+    var _o = new SC_RemoveObject_FBS();
+    this.UnPackTo(_o);
+    return _o;
+  }
+  public void UnPackTo(SC_RemoveObject_FBS _o) {
+    _o.Objectid = this.Objectid;
+    _o.Type = this.Type;
+  }
+  public static Offset<NetworkMessage.SC_RemoveObject> Pack(FlatBufferBuilder builder, SC_RemoveObject_FBS _o) {
+    if (_o == null) return default(Offset<NetworkMessage.SC_RemoveObject>);
+    return CreateSC_RemoveObject(
+      builder,
+      _o.Objectid,
+      _o.Type);
+  }
+}
+
+public class SC_RemoveObject_FBS
+{
+  public ushort Objectid { get; set; }
+  public ushort Type { get; set; }
+
+  public SC_RemoveObject_FBS() {
+    this.Objectid = 0;
+    this.Type = 0;
+  }
+}
+
+
+static public class SC_RemoveObjectVerify
+{
+  static public bool Verify(Google.FlatBuffers.Verifier verifier, uint tablePos)
+  {
+    return verifier.VerifyTableStart(tablePos)
+      && verifier.VerifyField(tablePos, 4 /*Objectid*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 6 /*Type*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyTableEnd(tablePos);
+  }
+}
+public struct SC_PlayerCreate : IFlatbufferObject
+{
+  private Table __p;
+  public ByteBuffer ByteBuffer { get { return __p.bb; } }
+  public static void ValidateVersion() { FlatBufferConstants.FLATBUFFERS_24_3_25(); }
+  public static SC_PlayerCreate GetRootAsSC_PlayerCreate(ByteBuffer _bb) { return GetRootAsSC_PlayerCreate(_bb, new SC_PlayerCreate()); }
+  public static SC_PlayerCreate GetRootAsSC_PlayerCreate(ByteBuffer _bb, SC_PlayerCreate obj) { return (obj.__assign(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
+  public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
+  public SC_PlayerCreate __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
+
+  public NetworkMessage.Vector3Int? Position { get { int o = __p.__offset(4); return o != 0 ? (NetworkMessage.Vector3Int?)(new NetworkMessage.Vector3Int()).__assign(o + __p.bb_pos, __p.bb) : null; } }
+  public int Sessionid { get { int o = __p.__offset(6); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
+  public ushort Objectid { get { int o = __p.__offset(8); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public ushort Heading { get { int o = __p.__offset(10); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public ushort Model { get { int o = __p.__offset(12); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public ushort Level { get { int o = __p.__offset(14); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public byte Flags { get { int o = __p.__offset(16); return o != 0 ? __p.bb.Get(o + __p.bb_pos) : (byte)0; } }
+  public string Name { get { int o = __p.__offset(18); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
+#if ENABLE_SPAN_T
+  public Span<byte> GetNameBytes() { return __p.__vector_as_span<byte>(18, 1); }
+#else
+  public ArraySegment<byte>? GetNameBytes() { return __p.__vector_as_arraysegment(18); }
+#endif
+  public byte[] GetNameArray() { return __p.__vector_as_array<byte>(18); }
+  public string Guildname { get { int o = __p.__offset(20); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
+#if ENABLE_SPAN_T
+  public Span<byte> GetGuildnameBytes() { return __p.__vector_as_span<byte>(20, 1); }
+#else
+  public ArraySegment<byte>? GetGuildnameBytes() { return __p.__vector_as_arraysegment(20); }
+#endif
+  public byte[] GetGuildnameArray() { return __p.__vector_as_array<byte>(20); }
+  public string Lastname { get { int o = __p.__offset(22); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
+#if ENABLE_SPAN_T
+  public Span<byte> GetLastnameBytes() { return __p.__vector_as_span<byte>(22, 1); }
+#else
+  public ArraySegment<byte>? GetLastnameBytes() { return __p.__vector_as_arraysegment(22); }
+#endif
+  public byte[] GetLastnameArray() { return __p.__vector_as_array<byte>(22); }
+
+  public static Offset<NetworkMessage.SC_PlayerCreate> CreateSC_PlayerCreate(FlatBufferBuilder builder,
+      NetworkMessage.Vector3Int_FBS position = null,
+      int sessionid = 0,
+      ushort objectid = 0,
+      ushort heading = 0,
+      ushort model = 0,
+      ushort level = 0,
+      byte flags = 0,
+      StringOffset nameOffset = default(StringOffset),
+      StringOffset guildnameOffset = default(StringOffset),
+      StringOffset lastnameOffset = default(StringOffset)) {
+    builder.StartTable(10);
+    SC_PlayerCreate.AddLastname(builder, lastnameOffset);
+    SC_PlayerCreate.AddGuildname(builder, guildnameOffset);
+    SC_PlayerCreate.AddName(builder, nameOffset);
+    SC_PlayerCreate.AddSessionid(builder, sessionid);
+    SC_PlayerCreate.AddPosition(builder, NetworkMessage.Vector3Int.Pack(builder, position));
+    SC_PlayerCreate.AddLevel(builder, level);
+    SC_PlayerCreate.AddModel(builder, model);
+    SC_PlayerCreate.AddHeading(builder, heading);
+    SC_PlayerCreate.AddObjectid(builder, objectid);
+    SC_PlayerCreate.AddFlags(builder, flags);
+    return SC_PlayerCreate.EndSC_PlayerCreate(builder);
+  }
+
+  public static void StartSC_PlayerCreate(FlatBufferBuilder builder) { builder.StartTable(10); }
+  public static void AddPosition(FlatBufferBuilder builder, Offset<NetworkMessage.Vector3Int> positionOffset) { builder.AddStruct(0, positionOffset.Value, 0); }
+  public static void AddSessionid(FlatBufferBuilder builder, int sessionid) { builder.AddInt(1, sessionid, 0); }
+  public static void AddObjectid(FlatBufferBuilder builder, ushort objectid) { builder.AddUshort(2, objectid, 0); }
+  public static void AddHeading(FlatBufferBuilder builder, ushort heading) { builder.AddUshort(3, heading, 0); }
+  public static void AddModel(FlatBufferBuilder builder, ushort model) { builder.AddUshort(4, model, 0); }
+  public static void AddLevel(FlatBufferBuilder builder, ushort level) { builder.AddUshort(5, level, 0); }
+  public static void AddFlags(FlatBufferBuilder builder, byte flags) { builder.AddByte(6, flags, 0); }
+  public static void AddName(FlatBufferBuilder builder, StringOffset nameOffset) { builder.AddOffset(7, nameOffset.Value, 0); }
+  public static void AddGuildname(FlatBufferBuilder builder, StringOffset guildnameOffset) { builder.AddOffset(8, guildnameOffset.Value, 0); }
+  public static void AddLastname(FlatBufferBuilder builder, StringOffset lastnameOffset) { builder.AddOffset(9, lastnameOffset.Value, 0); }
+  public static Offset<NetworkMessage.SC_PlayerCreate> EndSC_PlayerCreate(FlatBufferBuilder builder) {
+    int o = builder.EndTable();
+    return new Offset<NetworkMessage.SC_PlayerCreate>(o);
+  }
+  public SC_PlayerCreate_FBS UnPack() {
+    var _o = new SC_PlayerCreate_FBS();
+    this.UnPackTo(_o);
+    return _o;
+  }
+  public void UnPackTo(SC_PlayerCreate_FBS _o) {
+    _o.Position = this.Position.HasValue ? this.Position.Value.UnPack() : null;
+    _o.Sessionid = this.Sessionid;
+    _o.Objectid = this.Objectid;
+    _o.Heading = this.Heading;
+    _o.Model = this.Model;
+    _o.Level = this.Level;
+    _o.Flags = this.Flags;
+    _o.Name = this.Name;
+    _o.Guildname = this.Guildname;
+    _o.Lastname = this.Lastname;
+  }
+  public static Offset<NetworkMessage.SC_PlayerCreate> Pack(FlatBufferBuilder builder, SC_PlayerCreate_FBS _o) {
+    if (_o == null) return default(Offset<NetworkMessage.SC_PlayerCreate>);
+    var _name = _o.Name == null ? default(StringOffset) : builder.CreateString(_o.Name);
+    var _guildname = _o.Guildname == null ? default(StringOffset) : builder.CreateString(_o.Guildname);
+    var _lastname = _o.Lastname == null ? default(StringOffset) : builder.CreateString(_o.Lastname);
+    return CreateSC_PlayerCreate(
+      builder,
+      _o.Position,
+      _o.Sessionid,
+      _o.Objectid,
+      _o.Heading,
+      _o.Model,
+      _o.Level,
+      _o.Flags,
+      _name,
+      _guildname,
+      _lastname);
+  }
+}
+
+public class SC_PlayerCreate_FBS
+{
+  public NetworkMessage.Vector3Int_FBS Position { get; set; }
+  public int Sessionid { get; set; }
+  public ushort Objectid { get; set; }
+  public ushort Heading { get; set; }
+  public ushort Model { get; set; }
+  public ushort Level { get; set; }
+  public byte Flags { get; set; }
+  public string Name { get; set; }
+  public string Guildname { get; set; }
+  public string Lastname { get; set; }
+
+  public SC_PlayerCreate_FBS() {
+    this.Position = new NetworkMessage.Vector3Int_FBS();
+    this.Sessionid = 0;
+    this.Objectid = 0;
+    this.Heading = 0;
+    this.Model = 0;
+    this.Level = 0;
+    this.Flags = 0;
+    this.Name = null;
+    this.Guildname = null;
+    this.Lastname = null;
+  }
+}
+
+
+static public class SC_PlayerCreateVerify
+{
+  static public bool Verify(Google.FlatBuffers.Verifier verifier, uint tablePos)
+  {
+    return verifier.VerifyTableStart(tablePos)
+      && verifier.VerifyField(tablePos, 4 /*Position*/, 12 /*NetworkMessage.Vector3Int*/, 4, false)
+      && verifier.VerifyField(tablePos, 6 /*Sessionid*/, 4 /*int*/, 4, false)
+      && verifier.VerifyField(tablePos, 8 /*Objectid*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 10 /*Heading*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 12 /*Model*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 14 /*Level*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 16 /*Flags*/, 1 /*byte*/, 1, false)
+      && verifier.VerifyString(tablePos, 18 /*Name*/, false)
+      && verifier.VerifyString(tablePos, 20 /*Guildname*/, false)
+      && verifier.VerifyString(tablePos, 22 /*Lastname*/, false)
+      && verifier.VerifyTableEnd(tablePos);
+  }
+}
+public struct SC_ObjectUpdate : IFlatbufferObject
+{
+  private Table __p;
+  public ByteBuffer ByteBuffer { get { return __p.bb; } }
+  public static void ValidateVersion() { FlatBufferConstants.FLATBUFFERS_24_3_25(); }
+  public static SC_ObjectUpdate GetRootAsSC_ObjectUpdate(ByteBuffer _bb) { return GetRootAsSC_ObjectUpdate(_bb, new SC_ObjectUpdate()); }
+  public static SC_ObjectUpdate GetRootAsSC_ObjectUpdate(ByteBuffer _bb, SC_ObjectUpdate obj) { return (obj.__assign(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
+  public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
+  public SC_ObjectUpdate __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
+
+  public ushort Heading { get { int o = __p.__offset(4); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public NetworkMessage.Vector3Int? Currentzonepos { get { int o = __p.__offset(6); return o != 0 ? (NetworkMessage.Vector3Int?)(new NetworkMessage.Vector3Int()).__assign(o + __p.bb_pos, __p.bb) : null; } }
+  public NetworkMessage.Vector3Int? Targetzonepos { get { int o = __p.__offset(8); return o != 0 ? (NetworkMessage.Vector3Int?)(new NetworkMessage.Vector3Int()).__assign(o + __p.bb_pos, __p.bb) : null; } }
+  public ushort Myobjectid { get { int o = __p.__offset(10); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public ushort Targetobjectid { get { int o = __p.__offset(12); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public byte Healthpercent { get { int o = __p.__offset(14); return o != 0 ? __p.bb.Get(o + __p.bb_pos) : (byte)0; } }
+  public byte Flags { get { int o = __p.__offset(16); return o != 0 ? __p.bb.Get(o + __p.bb_pos) : (byte)0; } }
+  public byte Zoneskinid { get { int o = __p.__offset(18); return o != 0 ? __p.bb.Get(o + __p.bb_pos) : (byte)0; } }
+  public byte Targetzone { get { int o = __p.__offset(20); return o != 0 ? __p.bb.Get(o + __p.bb_pos) : (byte)0; } }
+
+  public static Offset<NetworkMessage.SC_ObjectUpdate> CreateSC_ObjectUpdate(FlatBufferBuilder builder,
+      ushort heading = 0,
+      NetworkMessage.Vector3Int_FBS currentzonepos = null,
+      NetworkMessage.Vector3Int_FBS targetzonepos = null,
+      ushort myobjectid = 0,
+      ushort targetobjectid = 0,
+      byte healthpercent = 0,
+      byte flags = 0,
+      byte zoneskinid = 0,
+      byte targetzone = 0) {
+    builder.StartTable(9);
+    SC_ObjectUpdate.AddTargetzonepos(builder, NetworkMessage.Vector3Int.Pack(builder, targetzonepos));
+    SC_ObjectUpdate.AddCurrentzonepos(builder, NetworkMessage.Vector3Int.Pack(builder, currentzonepos));
+    SC_ObjectUpdate.AddTargetobjectid(builder, targetobjectid);
+    SC_ObjectUpdate.AddMyobjectid(builder, myobjectid);
+    SC_ObjectUpdate.AddHeading(builder, heading);
+    SC_ObjectUpdate.AddTargetzone(builder, targetzone);
+    SC_ObjectUpdate.AddZoneskinid(builder, zoneskinid);
+    SC_ObjectUpdate.AddFlags(builder, flags);
+    SC_ObjectUpdate.AddHealthpercent(builder, healthpercent);
+    return SC_ObjectUpdate.EndSC_ObjectUpdate(builder);
+  }
+
+  public static void StartSC_ObjectUpdate(FlatBufferBuilder builder) { builder.StartTable(9); }
+  public static void AddHeading(FlatBufferBuilder builder, ushort heading) { builder.AddUshort(0, heading, 0); }
+  public static void AddCurrentzonepos(FlatBufferBuilder builder, Offset<NetworkMessage.Vector3Int> currentzoneposOffset) { builder.AddStruct(1, currentzoneposOffset.Value, 0); }
+  public static void AddTargetzonepos(FlatBufferBuilder builder, Offset<NetworkMessage.Vector3Int> targetzoneposOffset) { builder.AddStruct(2, targetzoneposOffset.Value, 0); }
+  public static void AddMyobjectid(FlatBufferBuilder builder, ushort myobjectid) { builder.AddUshort(3, myobjectid, 0); }
+  public static void AddTargetobjectid(FlatBufferBuilder builder, ushort targetobjectid) { builder.AddUshort(4, targetobjectid, 0); }
+  public static void AddHealthpercent(FlatBufferBuilder builder, byte healthpercent) { builder.AddByte(5, healthpercent, 0); }
+  public static void AddFlags(FlatBufferBuilder builder, byte flags) { builder.AddByte(6, flags, 0); }
+  public static void AddZoneskinid(FlatBufferBuilder builder, byte zoneskinid) { builder.AddByte(7, zoneskinid, 0); }
+  public static void AddTargetzone(FlatBufferBuilder builder, byte targetzone) { builder.AddByte(8, targetzone, 0); }
+  public static Offset<NetworkMessage.SC_ObjectUpdate> EndSC_ObjectUpdate(FlatBufferBuilder builder) {
+    int o = builder.EndTable();
+    return new Offset<NetworkMessage.SC_ObjectUpdate>(o);
+  }
+  public SC_ObjectUpdate_FBS UnPack() {
+    var _o = new SC_ObjectUpdate_FBS();
+    this.UnPackTo(_o);
+    return _o;
+  }
+  public void UnPackTo(SC_ObjectUpdate_FBS _o) {
+    _o.Heading = this.Heading;
+    _o.Currentzonepos = this.Currentzonepos.HasValue ? this.Currentzonepos.Value.UnPack() : null;
+    _o.Targetzonepos = this.Targetzonepos.HasValue ? this.Targetzonepos.Value.UnPack() : null;
+    _o.Myobjectid = this.Myobjectid;
+    _o.Targetobjectid = this.Targetobjectid;
+    _o.Healthpercent = this.Healthpercent;
+    _o.Flags = this.Flags;
+    _o.Zoneskinid = this.Zoneskinid;
+    _o.Targetzone = this.Targetzone;
+  }
+  public static Offset<NetworkMessage.SC_ObjectUpdate> Pack(FlatBufferBuilder builder, SC_ObjectUpdate_FBS _o) {
+    if (_o == null) return default(Offset<NetworkMessage.SC_ObjectUpdate>);
+    return CreateSC_ObjectUpdate(
+      builder,
+      _o.Heading,
+      _o.Currentzonepos,
+      _o.Targetzonepos,
+      _o.Myobjectid,
+      _o.Targetobjectid,
+      _o.Healthpercent,
+      _o.Flags,
+      _o.Zoneskinid,
+      _o.Targetzone);
+  }
+}
+
+public class SC_ObjectUpdate_FBS
+{
+  public ushort Heading { get; set; }
+  public NetworkMessage.Vector3Int_FBS Currentzonepos { get; set; }
+  public NetworkMessage.Vector3Int_FBS Targetzonepos { get; set; }
+  public ushort Myobjectid { get; set; }
+  public ushort Targetobjectid { get; set; }
+  public byte Healthpercent { get; set; }
+  public byte Flags { get; set; }
+  public byte Zoneskinid { get; set; }
+  public byte Targetzone { get; set; }
+
+  public SC_ObjectUpdate_FBS() {
+    this.Heading = 0;
+    this.Currentzonepos = new NetworkMessage.Vector3Int_FBS();
+    this.Targetzonepos = new NetworkMessage.Vector3Int_FBS();
+    this.Myobjectid = 0;
+    this.Targetobjectid = 0;
+    this.Healthpercent = 0;
+    this.Flags = 0;
+    this.Zoneskinid = 0;
+    this.Targetzone = 0;
+  }
+}
+
+
+static public class SC_ObjectUpdateVerify
+{
+  static public bool Verify(Google.FlatBuffers.Verifier verifier, uint tablePos)
+  {
+    return verifier.VerifyTableStart(tablePos)
+      && verifier.VerifyField(tablePos, 4 /*Heading*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 6 /*Currentzonepos*/, 12 /*NetworkMessage.Vector3Int*/, 4, false)
+      && verifier.VerifyField(tablePos, 8 /*Targetzonepos*/, 12 /*NetworkMessage.Vector3Int*/, 4, false)
+      && verifier.VerifyField(tablePos, 10 /*Myobjectid*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 12 /*Targetobjectid*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 14 /*Healthpercent*/, 1 /*byte*/, 1, false)
+      && verifier.VerifyField(tablePos, 16 /*Flags*/, 1 /*byte*/, 1, false)
+      && verifier.VerifyField(tablePos, 18 /*Zoneskinid*/, 1 /*byte*/, 1, false)
+      && verifier.VerifyField(tablePos, 20 /*Targetzone*/, 1 /*byte*/, 1, false)
+      && verifier.VerifyTableEnd(tablePos);
+  }
+}
+public struct SC_ConcentrationList : IFlatbufferObject
+{
+  private Table __p;
+  public ByteBuffer ByteBuffer { get { return __p.bb; } }
+  public static void ValidateVersion() { FlatBufferConstants.FLATBUFFERS_24_3_25(); }
+  public static SC_ConcentrationList GetRootAsSC_ConcentrationList(ByteBuffer _bb) { return GetRootAsSC_ConcentrationList(_bb, new SC_ConcentrationList()); }
+  public static SC_ConcentrationList GetRootAsSC_ConcentrationList(ByteBuffer _bb, SC_ConcentrationList obj) { return (obj.__assign(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
+  public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
+  public SC_ConcentrationList __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
+
+  public NetworkMessage.ConEffectData? Coninfo(int j) { int o = __p.__offset(4); return o != 0 ? (NetworkMessage.ConEffectData?)(new NetworkMessage.ConEffectData()).__assign(__p.__indirect(__p.__vector(o) + j * 4), __p.bb) : null; }
+  public int ConinfoLength { get { int o = __p.__offset(4); return o != 0 ? __p.__vector_len(o) : 0; } }
+
+  public static Offset<NetworkMessage.SC_ConcentrationList> CreateSC_ConcentrationList(FlatBufferBuilder builder,
+      VectorOffset coninfoOffset = default(VectorOffset)) {
+    builder.StartTable(1);
+    SC_ConcentrationList.AddConinfo(builder, coninfoOffset);
+    return SC_ConcentrationList.EndSC_ConcentrationList(builder);
+  }
+
+  public static void StartSC_ConcentrationList(FlatBufferBuilder builder) { builder.StartTable(1); }
+  public static void AddConinfo(FlatBufferBuilder builder, VectorOffset coninfoOffset) { builder.AddOffset(0, coninfoOffset.Value, 0); }
+  public static VectorOffset CreateConinfoVector(FlatBufferBuilder builder, Offset<NetworkMessage.ConEffectData>[] data) { builder.StartVector(4, data.Length, 4); for (int i = data.Length - 1; i >= 0; i--) builder.AddOffset(data[i].Value); return builder.EndVector(); }
+  public static VectorOffset CreateConinfoVectorBlock(FlatBufferBuilder builder, Offset<NetworkMessage.ConEffectData>[] data) { builder.StartVector(4, data.Length, 4); builder.Add(data); return builder.EndVector(); }
+  public static VectorOffset CreateConinfoVectorBlock(FlatBufferBuilder builder, ArraySegment<Offset<NetworkMessage.ConEffectData>> data) { builder.StartVector(4, data.Count, 4); builder.Add(data); return builder.EndVector(); }
+  public static VectorOffset CreateConinfoVectorBlock(FlatBufferBuilder builder, IntPtr dataPtr, int sizeInBytes) { builder.StartVector(1, sizeInBytes, 1); builder.Add<Offset<NetworkMessage.ConEffectData>>(dataPtr, sizeInBytes); return builder.EndVector(); }
+  public static void StartConinfoVector(FlatBufferBuilder builder, int numElems) { builder.StartVector(4, numElems, 4); }
+  public static Offset<NetworkMessage.SC_ConcentrationList> EndSC_ConcentrationList(FlatBufferBuilder builder) {
+    int o = builder.EndTable();
+    return new Offset<NetworkMessage.SC_ConcentrationList>(o);
+  }
+  public SC_ConcentrationList_FBS UnPack() {
+    var _o = new SC_ConcentrationList_FBS();
+    this.UnPackTo(_o);
+    return _o;
+  }
+  public void UnPackTo(SC_ConcentrationList_FBS _o) {
+    _o.Coninfo = new List<NetworkMessage.ConEffectData_FBS>();
+    for (var _j = 0; _j < this.ConinfoLength; ++_j) {_o.Coninfo.Add(this.Coninfo(_j).HasValue ? this.Coninfo(_j).Value.UnPack() : null);}
+  }
+  public static Offset<NetworkMessage.SC_ConcentrationList> Pack(FlatBufferBuilder builder, SC_ConcentrationList_FBS _o) {
+    if (_o == null) return default(Offset<NetworkMessage.SC_ConcentrationList>);
+    var _coninfo = default(VectorOffset);
+    if (_o.Coninfo != null) {
+      var __coninfo = new Offset<NetworkMessage.ConEffectData>[_o.Coninfo.Count];
+      for (var _j = 0; _j < __coninfo.Length; ++_j) { __coninfo[_j] = NetworkMessage.ConEffectData.Pack(builder, _o.Coninfo[_j]); }
+      _coninfo = CreateConinfoVector(builder, __coninfo);
+    }
+    return CreateSC_ConcentrationList(
+      builder,
+      _coninfo);
+  }
+}
+
+public class SC_ConcentrationList_FBS
+{
+  public List<NetworkMessage.ConEffectData_FBS> Coninfo { get; set; }
+
+  public SC_ConcentrationList_FBS() {
+    this.Coninfo = null;
+  }
+}
+
+
+static public class SC_ConcentrationListVerify
+{
+  static public bool Verify(Google.FlatBuffers.Verifier verifier, uint tablePos)
+  {
+    return verifier.VerifyTableStart(tablePos)
+      && verifier.VerifyVectorOfTables(tablePos, 4 /*Coninfo*/, NetworkMessage.ConEffectDataVerify.Verify, false)
+      && verifier.VerifyTableEnd(tablePos);
+  }
+}
 public struct SC_StringMessage : IFlatbufferObject
 {
   private Table __p;

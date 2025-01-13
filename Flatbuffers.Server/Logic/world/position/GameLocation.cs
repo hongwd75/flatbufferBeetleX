@@ -6,7 +6,7 @@ namespace Game.Logic.World;
 public class GameLocation : IGameLocation
     {
         public GameLocation(String name, ushort regionId, ushort zoneId, int x, int y, int z, ushort heading)
-            : this(name, Position.Create(regionId, Coordinate.Create(x,y,z)+WorldMgr.GetZone(zoneId).Offset, heading)) { }
+            : this(name, Position.Create(regionId, Coordinate.Create(x,y,z)+WorldManager.GetZone(zoneId).Offset, heading)) { }
 
         public GameLocation(String name, ushort regionId, int x, int y, int z)
             : this(name, Position.Create(regionId, x, y, z, heading: 0)) { }

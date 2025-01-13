@@ -29,7 +29,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Logic\Commands\player commands" />
       <Folder Include="Logic\Guild" />
       <Folder Include="Logic\managers\playermanager" />
       <Folder Include="Logic\network\ReceivePacket" />

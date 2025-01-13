@@ -1,9 +1,24 @@
 namespace NetworkMessage;
 
+table ConEffectData
+{
+	count : ubyte;
+	concentration : ubyte;
+	icon	: ushort;
+	effectname : string;
+	ownername : string;
+}
+
 struct Vector3 {
 	x: float;
 	y: float;
 	z: float;
+}
+
+struct Vector3Int {
+	x : int;
+	y : int;
+	z : int;
 }
 
 table CreatePlayerInfo {

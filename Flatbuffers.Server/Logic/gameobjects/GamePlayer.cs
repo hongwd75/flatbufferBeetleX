@@ -12,7 +12,10 @@ namespace Game.Logic
     public class GamePlayer : GameLiving
     {
         private GameClient mNetwork = null;
-
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private readonly object m_LockObject = new object();
+        
+        
         protected DOLCharacters mdbCharacter;
         
         internal DOLCharacters DBCharacter
@@ -28,6 +31,8 @@ namespace Game.Logic
                 mNetwork = value;
             }
         }
+
+        public OutPacket Out => Network.Out;
         
         public string ObjectId
         {
@@ -60,12 +65,36 @@ namespace Game.Logic
 	        }
         }
         
+        public virtual string LastName
+        {
+	        get { return DBCharacter != null ? DBCharacter.LastName : string.Empty; }
+	        set
+	        {
+		        if (DBCharacter == null) return;
+		        DBCharacter.LastName = value;
+		        //update last name for all players if client is playing
+		        if (ObjectState == eObjectState.Active)
+		        {
+			        Out.SendUpdatePlayer();
+			        foreach (GamePlayer player in GetPlayersInRadius(WorldManager.VISIBILITY_DISTANCE))
+			        {
+				        if (player == null) continue;
+				        if (player != this)
+				        {
+					        player.Out.SendObjectRemove(this);
+					        player.Out.SendPlayerCreate(this);
+					        player.Out.SendLivingEquipmentUpdate(this);
+				        }
+			        }
+		        }
+	        }
+        }        
+        
         public Position BindPosition
         {
             get
             {
                 if(DBCharacter == null) return Position.Zero;
-                
                 return DBCharacter.GetBindPosition();
             }
             set
@@ -113,8 +142,29 @@ namespace Game.Logic
             }
             return MoveTo(BindPosition);
         }
-        
-		#region Invulnerability
+
+        protected virtual void CleanupOnDisconnect()
+        {
+	        StopAttack();
+	        Stealth(false);
+	        try
+	        {
+		        EffectList.SaveAllEffects();
+		        CancelAllConcentrationEffects();
+		        EffectList.CancelAll();
+	        }
+	        catch (Exception e)
+	        {
+		        log.ErrorFormat("Cannot cancel all effects - {0}", e);
+	        }	        
+        }
+
+        public override void Delete()
+        {
+	        //Todo. 데이터 제거
+        }
+
+        #region Invulnerability
 		public delegate void InvulnerabilityExpiredCallback(GamePlayer player);
 		protected InvulnerabilityTimer m_invulnerabilityTimer;
 		protected long m_invulnerabilityTick;

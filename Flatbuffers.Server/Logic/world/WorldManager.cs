@@ -152,7 +152,12 @@ namespace Game.Logic.World
 
                 m_dayIncrement = Math.Max(0, Math.Min(1000, ServerProperties.Properties.WORLD_DAY_INCREMENT)); // increments > 1000 do not render smoothly on clients
                 m_dayStartTick = Environment.TickCount - (int)(DAY / Math.Max(1, m_dayIncrement) / 2); // set start time to 12pm
-                m_dayResetTimer = new System.Threading.Timer(new TimerCallback(DayReset), null, DAY / Math.Max(1, m_dayIncrement) / 2, DAY / Math.Max(1, m_dayIncrement));                
+                m_dayResetTimer = new System.Threading.Timer(new TimerCallback(DayReset), null, DAY / Math.Max(1, m_dayIncrement) / 2, DAY / Math.Max(1, m_dayIncrement));
+                
+                m_relocationThread = new Thread(new ThreadStart(RelocateRegions));
+                m_relocationThread.Name = "RelocateReg";
+                m_relocationThread.IsBackground = true;
+                m_relocationThread.Start();                
             }
             catch (Exception e)
             {
@@ -326,7 +331,7 @@ namespace Game.Logic.World
             m_zones.AddOrReplace(zoneID, zone);
             log.InfoFormat("   - Added a zone, {0}, to region {1}", zoneData.Description, region.Name);
         }
-        
+
         private static void RelocateRegions()
         {
             log.InfoFormat("started RelocateRegions() thread ID:{0}", Thread.CurrentThread.ManagedThreadId);

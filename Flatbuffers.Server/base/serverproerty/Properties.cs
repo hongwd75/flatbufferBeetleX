@@ -6,6 +6,8 @@ namespace Game.Logic.ServerProperties
 {
 	public class Properties
 	{
+		[ServerProperty("system", "db_language", "DB 기본 언어 설정", "EN")]
+		public static string DB_LANGUAGE;		
 		[ServerProperty("system", "use_sync_timer", "sync timers utility 사용 설정", true)]
 		public static bool USE_SYNC_UTILITY;		
 		[ServerProperty("system", "staff_login", "직원 로그인 전용 - 직원만 로그인을 허용할지 여부를 설정합니다. 값: True, False", false)]

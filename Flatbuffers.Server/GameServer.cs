@@ -396,8 +396,12 @@ namespace Game.Logic
                     mTimer.Change(SaveInterval*MINUTE_CONV, Timeout.Infinite);
             }
         }
-        
-
         #endregion
+        
+        public virtual bool Disconnect(GameClient baseClient)
+        {
+            NetworkHandler.Disconnect(baseClient);
+            return true;
+        }        
     }
 }

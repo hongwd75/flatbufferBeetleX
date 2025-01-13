@@ -50,11 +50,30 @@ namespace Game.Logic.network
         {
         }
 
+        public virtual void OnDisconnect()
+        {
+            Session = null;
+            if (Client != null)
+            {
+                if (Client.PlayerArrayID >= 0)
+                {
+                    if (Client.ClientState != GameClient.eClientState.Playing)
+                    {
+                        // 게임중이면 슬롯에서 빼지 않고, 게임 완료 후, 슬롯에서 제거
+                        GameServer.Instance.Clients.Remove(Client.PlayerArrayID);
+                    }
+                }
+                // Todo. 플레이어 내부 처리 추가 필요
+            }
+        }
+
         //=======================================================================================================
         // 생성 패킷
+        public abstract void SendTime();
         public abstract void SendLoginDenied(eLoginError error);
         public abstract void SendLoginInfo();
-        public abstract void SendTime();
+        public abstract void SendObjectUpdate(GameObject obj);
+        public abstract void SendLivingDataUpdate(GameLiving living, bool updateStrings);
         public abstract void SendPlayerQuit(bool totalOut);
         public abstract void SendMessage(string message, eChatType type, eChatLoc loc);
         public abstract void SendDialogBox(eDialogCode code, ushort data1, ushort data2, ushort data3, ushort data4, eDialogType type,

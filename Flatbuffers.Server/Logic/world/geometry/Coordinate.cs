@@ -1,4 +1,6 @@
-﻿namespace Game.Logic.Geometry
+﻿using NetworkMessage;
+
+namespace Game.Logic.Geometry
 {
     public struct Coordinate
     {
@@ -24,6 +26,14 @@
             if (ignoreZ) return (loc - this).Length2D;
             else return (loc - this).Length;
         }
+
+        public Vector3Int_FBS Vector3int
+        {
+            get
+            {
+                return new Vector3Int_FBS(){X=X,Y=Y,Z=Z};
+            }
+        }  
 
         public Angle GetOrientationTo(Coordinate loc)
             => (loc - this).Orientation;

@@ -1,6 +1,12 @@
 ﻿using System.Reflection;
 using System.Text;
+using Game.Logic.CharacterClasses;
+using Game.Logic.Commands;
+using Game.Logic.datatable;
+using Game.Logic.Inventory;
+using Game.Logic.Language;
 using Game.Logic.PropertyCalc;
+using Game.Logic.Styles;
 using Game.Logic.Utils;
 using Game.Logic.World;
 using log4net;
@@ -325,7 +331,7 @@ public class SkillBase
 		/// </summary>
 		/// <param name="lineName"></param>
 		/// <returns></returns>
-		[RefreshCommandAttribute]
+		[RefreshCommand]
 		public static int ReloadSpellLines()
 		{
 			int count = 0;
@@ -336,7 +342,7 @@ public class SkillBase
 				foreach (string lineName in m_spellLineIndex.Keys)
 				{
 					// Get SpellLine X Spell relation
-					var spells = DOLDB<DBLineXSpell>.SelectObjects(DB.Column(nameof(DBLineXSpell.LineName)).IsEqualTo(lineName));
+					var spells = GameDB<DBLineXSpell>.SelectObjects(DB.Column(nameof(DBLineXSpell.LineName)).IsEqualTo(lineName));
 					
 					// Load them if any records.
 					if (spells != null)
@@ -2240,49 +2246,8 @@ public class SkillBase
 				m_syncLockUpdates.ExitWriteLock();
 			}
 		}
-
-		/// <summary>
-		/// returns level 1 instantiated realm abilities, only for readonly use!
-		/// </summary>
-		/// <param name="classID"></param>
-		/// <returns></returns>
-		public static List<RealmAbility> GetClassRealmAbilities(int classID)
-		{
-			List<DBAbility> ras = new List<DBAbility>();
-			m_syncLockUpdates.EnterReadLock();
-			try
-			{
-				if (m_classRealmAbilities.ContainsKey(classID))
-				{
-					foreach (string str in m_classRealmAbilities[classID])
-					{
-						try
-						{
-							ras.Add(m_abilityIndex[str]);
-						}
-						catch
-						{
-						}
-					}
-				}
-			}
-			finally
-			{
-				m_syncLockUpdates.ExitReadLock();
-			}
-						
-			return ras.Select(e => GetNewAbilityInstance(e)).Where(ab => ab is RealmAbility).Cast<RealmAbility>().OrderByDescending(el => el.MaxLevel).ThenBy(el => el.KeyName).ToList();
-		}
-
-		/// <summary>
-		/// Return this character class RR5 Ability Level 1 or null
-		/// </summary>
-		/// <param name="charclass"></param>
-		/// <returns></returns>
-		public static Ability GetClassRR5Ability(int charclass)
-		{
-			return GetClassRealmAbilities(charclass).Where(ab => ab is RR5RealmAbility).FirstOrDefault();
-		}
+		
+		
 
 		/// <summary>
 		/// Get Ability by internal ID, used for Tooltip Details.
@@ -2414,7 +2379,7 @@ public class SkillBase
 			m_syncLockUpdates.EnterWriteLock();
 			try
 			{
-				var dbSpell = DOLDB<DBSpell>.SelectObject(DB.Column(nameof(DBSpell.SpellID)).IsEqualTo(spellID));
+				var dbSpell = GameDB<DBSpell>.SelectObject(DB.Column(nameof(DBSpell.SpellID)).IsEqualTo(spellID));
 	
 				if (dbSpell != null)
 				{

@@ -6,6 +6,22 @@ namespace Game.Logic.Utils
 {
     public class Util
     {
+        public static bool IsEmpty(string str, bool zeroMeansEmpty = false)
+        {
+            if (string.IsNullOrEmpty(str))
+                return true;
+			
+            // various common db troubles
+            string currentStr = str.ToLower();
+            if (currentStr == "null" ||currentStr == "\r\n" || currentStr == "\n")
+                return true;
+			
+            if (zeroMeansEmpty && currentStr.Trim() == "0")
+                return true;
+
+            return false;
+        }
+        
         public static string GetFormattedStackTraceFrom(Thread targetThread)
         {
             var sb = new StringBuilder();

@@ -1,4 +1,5 @@
-﻿using Game.Logic.Skills;
+﻿using Game.Logic.Effects;
+using Game.Logic.Skills;
 using Logic.database.table;
 
 namespace Game.Logic.Spells;

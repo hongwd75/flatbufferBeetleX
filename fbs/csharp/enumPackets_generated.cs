@@ -51,9 +51,14 @@ public enum ServerPackets : ushort
 {
   SC_LoginAns = 1,
   SC_AccountInfo = 2,
-  SC_StringMessage = 3,
-  SC_DialogBoxMessage = 4,
-  SC_Quit = 5,
+  SC_VariousUpdate = 3,
+  SC_ObjectUpdate = 4,
+  SC_PlayerCreate = 5,
+  SC_RemoveObject = 6,
+  SC_ConcentrationList = 7,
+  SC_StringMessage = 8,
+  SC_DialogBoxMessage = 9,
+  SC_Quit = 10,
 };
 
 public enum ClientPackets : ushort

@@ -39,6 +39,12 @@ enum eDialogCode : byte {
 enum ServerPackets : ushort {
 	SC_LoginAns	= 1,
 	SC_AccountInfo,
+	
+	SC_VariousUpdate,
+	SC_ObjectUpdate,
+	SC_PlayerCreate,
+	SC_RemoveObject,
+	SC_ConcentrationList,
 	SC_StringMessage,
 	SC_DialogBoxMessage,
 	SC_Quit

@@ -88,7 +88,17 @@ public class GameClientManager : IDisposable
         }
         return null;
     }
-    
+
+    public void Remove(int arrayindex)
+    {
+        lock (mClients.SyncRoot)
+        {
+            if (mClients[arrayindex] != null)
+            {
+                mClients[arrayindex] = null;
+            }
+        }
+    }
     
     private void PingCheck(object sender)
     {
@@ -103,7 +113,7 @@ public class GameClientManager : IDisposable
                     {
                         if (client.PingTime + PING_TIMEOUT * 1000 * 1000 * 10 < DateTime.Now.Ticks) // 1시간
                         {
-                            GameServer.Instance.NetworkHandler.Disconnect(client,false);
+                            GameServer.Instance.NetworkHandler.Disconnect(client);
                         }
                     }
                     else
@@ -111,7 +121,7 @@ public class GameClientManager : IDisposable
                         // in all other cases client gets 10min to get wether in charscreen or playing state
                         if (client.PingTime + PING_TIME < DateTime.Now.Ticks)
                         {
-                            GameServer.Instance.NetworkHandler.Disconnect(client,true);
+                            GameServer.Instance.NetworkHandler.Disconnect(client);
                         }
                     }
                 }

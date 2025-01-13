@@ -31,7 +31,7 @@ namespace Network.Protocol
 
 			if (GameServer.Instance.ServerStatus == eGameServerStatus.GSS_Closed)
 			{
-				GameServer.Instance.NetworkHandler.Disconnect(session,false);
+				GameServer.Instance.NetworkHandler.Disconnect(session);
 				return;
 			}
 
@@ -61,7 +61,7 @@ namespace Network.Protocol
 							// 중복 로그인 패킷은 무시
 							if (client.ClientState == GameClient.eClientState.Connecting)
 							{
-								return;
+								disconnect = true;
 							} else
 							if (client.ClientState == GameClient.eClientState.Playing)
 							{
@@ -74,7 +74,7 @@ namespace Network.Protocol
 
 					if (disconnect == true)
 					{
-						GameServer.Instance.NetworkHandler.Disconnect(session,false);
+						GameServer.Instance.NetworkHandler.Disconnect(session);
 						return;
 					}
 				}
@@ -120,7 +120,7 @@ namespace Network.Protocol
 				if (error != eLoginError.none)
 				{
 					output?.SendLoginDenied(error);
-					GameServer.Instance.NetworkHandler.Disconnect(session,false);
+					GameServer.Instance.NetworkHandler.Disconnect(session);
 				}
 				else
 				{
@@ -131,7 +131,7 @@ namespace Network.Protocol
 						if (client == null)
 						{
 							output?.SendLoginDenied(eLoginError.TooManyPlayersLoggedIn);
-							GameServer.Instance.NetworkHandler.Disconnect(session,false);
+							GameServer.Instance.NetworkHandler.Disconnect(session);
 							return;
 						}
 						else
@@ -151,11 +151,11 @@ namespace Network.Protocol
 			}
 			catch (DatabaseException e)
 			{
-				GameServer.Instance.NetworkHandler.Disconnect(session,true);
+				GameServer.Instance.NetworkHandler.Disconnect(session);
 			}			
 			catch (Exception e)
 			{
-				GameServer.Instance.NetworkHandler.Disconnect(session,true);
+				GameServer.Instance.NetworkHandler.Disconnect(session);
 			}
 			finally
 			{

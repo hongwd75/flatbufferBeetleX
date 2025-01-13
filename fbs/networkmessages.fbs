@@ -2,6 +2,8 @@ include "structs.fbs";
 include "enumPackets.fbs";
 namespace NetworkMessage;
 
+
+
 // 로그인 관련 메시지들
 table CS_LoginReq {
 	id 		: string;
@@ -59,6 +61,61 @@ table SC_PlayerUpdate {
 	head   : int;
 	health : int;
 	state  : int;
+}
+
+// SendUpdatePlayer
+table SC_VariousUpdate  
+{
+	level  		: ushort;
+	maxhealth 	: int;
+	name   		: string;
+	classname	: string;
+	baseclass	: string;
+	lastname	: string;
+	guildname	: string;
+	language	: string;
+}
+
+// SendObjectRemove
+table SC_RemoveObject
+{
+	objectid	: ushort;
+	type		: ushort;
+}
+
+// SendPlayerCreate
+table SC_PlayerCreate
+{
+	position		: Vector3Int;
+	sessionid		: int;
+	objectid		: ushort;
+	heading			: ushort;
+	model			: ushort;
+	level			: ushort;
+	flags			: ubyte;
+	// 케릭터 꾸밈 데이터 추가
+	name			: string;
+	guildname		: string;
+	lastname		: string;
+}
+
+// SendLivingEquipmentUpdate
+
+table SC_ObjectUpdate
+{
+	heading			: ushort;
+	currentzonepos 	: Vector3Int;
+	targetzonepos	: Vector3Int;
+	myobjectid		: ushort;
+	targetobjectid	: ushort;
+	healthpercent 	: ubyte;
+	flags			: ubyte;
+	zoneskinid		: ubyte;
+	targetzone		: ubyte;
+}
+
+table SC_ConcentrationList {
+	coninfo : [ConEffectData];
 }
 
 table SC_StringMessage

@@ -185,17 +185,27 @@ inline const char *EnumNameeDialogCode(eDialogCode e) {
 enum ServerPackets : uint16_t {
   ServerPackets_SC_LoginAns = 1,
   ServerPackets_SC_AccountInfo = 2,
-  ServerPackets_SC_StringMessage = 3,
-  ServerPackets_SC_DialogBoxMessage = 4,
-  ServerPackets_SC_Quit = 5,
+  ServerPackets_SC_VariousUpdate = 3,
+  ServerPackets_SC_ObjectUpdate = 4,
+  ServerPackets_SC_PlayerCreate = 5,
+  ServerPackets_SC_RemoveObject = 6,
+  ServerPackets_SC_ConcentrationList = 7,
+  ServerPackets_SC_StringMessage = 8,
+  ServerPackets_SC_DialogBoxMessage = 9,
+  ServerPackets_SC_Quit = 10,
   ServerPackets_MIN = ServerPackets_SC_LoginAns,
   ServerPackets_MAX = ServerPackets_SC_Quit
 };
 
-inline const ServerPackets (&EnumValuesServerPackets())[5] {
+inline const ServerPackets (&EnumValuesServerPackets())[10] {
   static const ServerPackets values[] = {
     ServerPackets_SC_LoginAns,
     ServerPackets_SC_AccountInfo,
+    ServerPackets_SC_VariousUpdate,
+    ServerPackets_SC_ObjectUpdate,
+    ServerPackets_SC_PlayerCreate,
+    ServerPackets_SC_RemoveObject,
+    ServerPackets_SC_ConcentrationList,
     ServerPackets_SC_StringMessage,
     ServerPackets_SC_DialogBoxMessage,
     ServerPackets_SC_Quit
@@ -204,9 +214,14 @@ inline const ServerPackets (&EnumValuesServerPackets())[5] {
 }
 
 inline const char * const *EnumNamesServerPackets() {
-  static const char * const names[6] = {
+  static const char * const names[11] = {
     "SC_LoginAns",
     "SC_AccountInfo",
+    "SC_VariousUpdate",
+    "SC_ObjectUpdate",
+    "SC_PlayerCreate",
+    "SC_RemoveObject",
+    "SC_ConcentrationList",
     "SC_StringMessage",
     "SC_DialogBoxMessage",
     "SC_Quit",

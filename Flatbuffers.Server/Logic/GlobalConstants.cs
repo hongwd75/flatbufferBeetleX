@@ -1,19 +1,31 @@
-﻿namespace Game.Logic;
+﻿using Game.Logic.Inventory;
+
+namespace Game.Logic;
 
 public enum ePrivLevel : uint
 {
-    /// <summary>
-    /// Normal player
-    /// </summary>
     Player = 1,
-    /// <summary>
-    /// A GM
-    /// </summary>
     GM = 2,
-    /// <summary>
-    /// An Admin
-    /// </summary>
     Admin = 3,
+}
+
+
+[Flags]
+public enum ePropertyType : ushort
+{
+    Focus = 1,
+    Resist = 1 << 1,
+    Skill = 1 << 2,
+    SkillMeleeWeapon = 1 << 3,
+    SkillMagical = 1 << 4,
+    SkillDualWield = 1 << 5,
+    SkillArchery = 1 << 6,
+    ResistMagical = 1 << 7,
+    Albion = 1 << 8,
+    Midgard = 1 << 9,
+    Hibernia = 1 << 10,
+    Common = 1 << 11,
+    CapIncrease = 1 << 12,
 }
 
 public enum eDamageType : byte

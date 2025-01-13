@@ -1,10 +1,12 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Collections;
+using System.Net.Http.Headers;
 using Game.Logic.AI.Brain;
 using Game.Logic.Effects;
 using Game.Logic.Events;
 using Game.Logic.Geometry;
 using Game.Logic.PropertyCalc;
 using Game.Logic.Skills;
+using Game.Logic.Spells;
 using Game.Logic.Utils;
 using Game.Logic.World;
 using Game.Logic.World.Timer;
@@ -21,19 +23,31 @@ public class GameLiving : GameObject
 	#region ==== ENUM ======================================================================================================
 	public enum eActiveWeaponSlot : byte
 	{
-		/// <summary>
-		/// Weapon slot righthand
-		/// </summary>
-		Standard = 0x00,
-		/// <summary>
-		/// Weaponslot twohanded
-		/// </summary>
-		TwoHanded = 0x01,
-		/// <summary>
-		/// Weaponslot distance
-		/// </summary>
-		Distance = 0x02
+		Standard = 0x00, /// Weapon slot righthand
+		TwoHanded = 0x01, /// Weaponslot twohanded
+		Distance = 0x02 /// Weaponslot distance
 	}
+	
+	public enum eAttackResult : int
+	{
+		Any = 0,
+		HitUnstyled = 1,
+		HitStyle = 2,
+		NotAllowed_ServerRules = 3,
+		NoTarget = 5,
+		TargetDead = 6,
+		OutOfRange = 7,
+		Missed = 8,
+		Evaded = 9,
+		Blocked = 10,
+		Parried = 11,
+		NoValidTarget = 12,
+		TargetNotVisible = 14,
+		Fumbled = 15,
+		Bodyguarded = 16,
+		Phaseshift = 17,
+		Grappled = 18
+	}	
 	#endregion
 	
 	
@@ -66,6 +80,34 @@ public class GameLiving : GameObject
 	    set { m_visibleActiveWeaponSlots=value; }
     }
 
+    public virtual double ChanceToFumble
+    {
+	    get
+	    {
+		    double chanceToFumble = GetModified(eProperty.FumbleChance);
+		    chanceToFumble *= 0.001;
+
+		    if (chanceToFumble > 0.99) chanceToFumble = 0.99;
+		    if (chanceToFumble < 0) chanceToFumble = 0;
+
+		    return chanceToFumble;
+	    }
+    }
+
+    public virtual double ChanceToBeMissed
+    {
+	    get
+	    {
+		    double chanceToBeMissed = GetModified(eProperty.MissHit);
+		    chanceToBeMissed *= 0.001;
+
+		    if (chanceToBeMissed > 0.99) chanceToBeMissed = 0.99;
+		    if (chanceToBeMissed < 0) chanceToBeMissed = 0;
+
+		    return chanceToBeMissed;
+	    }
+    }
+    
     #region ## Attacker
     protected AttackAction m_attackAction;
     protected readonly List<GameObject> m_attackers;
@@ -87,9 +129,102 @@ public class GameLiving : GameObject
 			m_attackers.Remove(attacker);
         }
 	}
-	
+
+	protected long m_lastAttackedByEnemyTick;
 	protected long m_lastAttackedTick;
-	public virtual long LastAttackedTick => m_lastAttackedTick;
+	public virtual long LastAttackedTick
+	{
+		get
+		{
+			return m_lastAttackedTick;
+		}
+		set
+		{
+			m_lastAttackedTick = value;
+			if (this is GameNPC npc)
+			{
+				if (npc.Brain is IControlledBrain controlledBrain)
+				{
+					controlledBrain.Owner.m_lastAttackedTick = value;
+				}
+			}			
+		}
+	}
+	public virtual long LastAttackedByEnemyTick
+	{
+		get
+		{
+			return m_lastAttackedByEnemyTick;
+		}
+		set
+		{
+			m_lastAttackedByEnemyTick = value;
+			if (this is GameNPC npc)
+			{
+				if (npc.Brain is IControlledBrain controlledBrain)
+				{
+					controlledBrain.Owner.LastAttackedByEnemyTick = value;
+				}
+			}
+		}
+	}
+
+	public long LastCombatTick
+	{
+		get
+		{
+			return m_lastAttackedByEnemyTick > m_lastAttackedTick ? m_lastAttackedByEnemyTick : m_lastAttackedTick;
+		}
+	}
+	public virtual bool InCombat
+	{
+		get
+		{
+			bool ret = true;
+			Region region = CurrentRegion;
+			if (region == null || LastCombatTick == 0)
+			{
+				ret = false;
+			}
+			else
+			{
+				ret = LastCombatTick + 10000 >= region.Time;
+			}
+			
+			if (ret == false)
+			{
+				if (Attackers.Count > 0)
+				{
+					Attackers.Clear();
+				}
+			}
+
+			return ret;
+		}
+	}
+	public virtual bool InCombatInLast(int milliseconds)
+	{
+		bool ret = true;
+		Region region = CurrentRegion;
+		if (region == null || LastCombatTick == 0)
+		{
+			ret = false;
+		}
+		else
+		{
+			ret = LastCombatTick + milliseconds >= region.Time;
+		}
+			
+		if (ret == false)
+		{
+			if (Attackers.Count > 0)
+			{
+				Attackers.Clear();
+			}
+		}
+
+		return ret;
+	}
 	
 	public virtual void Die(GameObject killer)
 	{
@@ -183,7 +318,115 @@ public class GameLiving : GameObject
 		Notify(GameLivingEvent.Dying, this, new DyingEventArgs(killer));
 	}    
     #endregion
+	#region Spell Cast
+	public virtual double Effectiveness
+	{
+		get { return 1.0; }
+		set { }
+	}
+	public virtual bool IsCasting
+	{
+		get { return m_runningSpellHandler != null && m_runningSpellHandler.IsCasting; }
+	}
+	public override bool HasEffect(Spell spell)
+	{
+		lock (EffectList)
+		{
+			foreach (IGameEffect effect in EffectList)
+			{
+				if (effect is GameSpellEffect)
+				{
+					GameSpellEffect spellEffect = effect as GameSpellEffect;
 
+					if (spellEffect.Spell.SpellType == spell.SpellType &&
+					    spellEffect.Spell.EffectGroup == spell.EffectGroup)
+						return true;
+				}
+			}
+		}
+
+		return base.HasEffect(spell);
+	}
+	public override bool HasEffect(Type effectType)
+	{
+		lock (EffectList)
+		{
+			foreach (IGameEffect effect in EffectList)
+				if (effect.GetType() == effectType)
+					return true;
+		}
+
+		return base.HasEffect(effectType);
+	}
+
+	protected ISpellHandler m_runningSpellHandler;
+	public ISpellHandler CurrentSpellHandler
+	{
+		get { return m_runningSpellHandler; }
+		set { m_runningSpellHandler = value; }
+	}
+	public virtual void OnAfterSpellCastSequence(ISpellHandler handler)
+	{
+		m_runningSpellHandler.CastingCompleteEvent -= new CastingCompleteCallback(OnAfterSpellCastSequence);
+		m_runningSpellHandler = null;
+	}
+	public virtual void StopCurrentSpellcast()
+	{
+		if (m_runningSpellHandler != null)
+			m_runningSpellHandler.InterruptCasting();
+	}
+	public virtual bool CastSpell(Spell spell, SpellLine line)
+	{
+		if (IsStunned || IsMezzed)
+		{
+			Notify(GameLivingEvent.CastFailed, this, new CastFailedEventArgs(null, CastFailedEventArgs.Reasons.CrowdControlled));
+			return false;
+		}
+
+		if ((m_runningSpellHandler != null && spell.CastTime > 0))
+		{
+			Notify(GameLivingEvent.CastFailed, this, new CastFailedEventArgs(null, CastFailedEventArgs.Reasons.AlreadyCasting));
+			return false;
+		}
+
+		ISpellHandler spellhandler = ScriptMgr.CreateSpellHandler(this, spell, line);
+		if (spellhandler != null)
+		{
+			if (spell.CastTime > 0)
+			{
+				m_runningSpellHandler = spellhandler;
+				spellhandler.CastingCompleteEvent += new CastingCompleteCallback(OnAfterSpellCastSequence);
+			}
+			return spellhandler.CastSpell();
+		}
+		else
+		{
+			if (log.IsWarnEnabled)
+				log.Warn(Name + " wants to cast but spell " + spell.Name + " not implemented yet");
+		}
+
+		return false;
+	}
+
+	public virtual bool CastSpell(ISpellCastingAbilityHandler ab)
+	{
+		ISpellHandler spellhandler = ScriptMgr.CreateSpellHandler(this, ab.Spell, ab.SpellLine);
+		if (spellhandler != null)
+		{
+			// Instant cast abilities should not interfere with the spell queue
+			if (spellhandler.Spell.CastTime > 0)
+			{
+				m_runningSpellHandler = spellhandler;
+				m_runningSpellHandler.CastingCompleteEvent += new CastingCompleteCallback(OnAfterSpellCastSequence);
+			}
+
+			spellhandler.Ability = ab;
+			return spellhandler.CastSpell();
+		}
+		return false;
+	}
+
+	#endregion
     #region Attack action
     public virtual void EnemyKilled(GameLiving enemy)
     {
@@ -811,6 +1054,37 @@ public class GameLiving : GameObject
 		set { m_maxSpeedBase = value; }
 	}
 
+	private readonly ConcentrationList m_concEffects;
+	public ConcentrationList ConcentrationEffects { get { return m_concEffects; } }
+	public void CancelAllConcentrationEffects()
+	{
+		CancelAllConcentrationEffects(false);
+	}
+
+	public void CancelAllConcentrationEffects(bool leaveSelf)
+	{
+		// cancel conc spells
+		ConcentrationEffects.CancelAll(leaveSelf);
+
+		// cancel all active conc spell effects from other casters
+		ArrayList concEffects = new ArrayList();
+		lock (EffectList)
+		{
+			foreach (IGameEffect effect in EffectList)
+			{
+				if (effect is GameSpellEffect && ((GameSpellEffect)effect).Spell.Concentration > 0)
+				{
+					if (!leaveSelf || leaveSelf && ((GameSpellEffect)effect).SpellHandler.Caster != this)
+						concEffects.Add(effect);
+				}
+			}
+		}
+		foreach (GameSpellEffect effect in concEffects)
+		{
+			effect.Cancel(false);
+		}
+	}
+	
 	/// <summary>
 	/// Gets or sets the target of this living
 	/// </summary>
@@ -860,7 +1134,7 @@ public class GameLiving : GameObject
 				{
 					if (player == null)
 						continue;
-					player.Out.SendLivingDataUpdate(this, false);
+					player.Network.Out.SendLivingDataUpdate(this, false);
 				}
 			}
 		}
@@ -922,7 +1196,78 @@ public class GameLiving : GameObject
 	{
 		return base.MoveTo(position);
 	}
-	#endregion		
+	#endregion
+
+	#region Crowd control
+	protected bool m_stunned;
+	public bool IsStunned
+	{
+		get { return m_stunned; }
+		set { m_stunned = value; }
+	}
+
+	protected bool m_mezzed;
+	public bool IsMezzed
+	{
+		get { return m_mezzed; }
+		set { m_mezzed = value; }
+	}
+	protected bool m_disarmed = false;
+	protected long m_disarmedTime = 0;
+	public bool IsDisarmed
+	{
+		get { return (m_disarmedTime > 0 && m_disarmedTime > CurrentRegion.Time); }
+	}
+	public long DisarmedTime
+	{
+		get { return m_disarmedTime; }
+		set { m_disarmedTime = value; }
+	}
+
+	protected bool m_isSilenced = false;
+	protected long m_silencedTime = 0;
+	public bool IsSilenced
+	{
+		get { return (m_silencedTime > 0 && m_silencedTime > CurrentRegion.Time); }
+	}
+	public long SilencedTime
+	{
+		get { return m_silencedTime; }
+		set { m_silencedTime = value; }
+	}
+	
+	protected volatile byte m_diseasedCount;
+	public virtual void Disease(bool active)
+	{
+		if (active) m_diseasedCount++;
+		else m_diseasedCount--;
+
+		if (m_diseasedCount < 0)
+		{
+			if (log.IsErrorEnabled)
+				log.Error("m_diseasedCount is less than zero.\n" + Environment.StackTrace);
+		}
+	}
+	public virtual bool IsDiseased
+	{
+		get { return m_diseasedCount > 0; }
+	}
+	
+	protected sbyte m_turningDisabledCount;
+	public bool IsTurningDisabled
+	{
+		get { return m_turningDisabledCount > 0; }
+	}
+	public virtual void DisableTurning(bool add)
+	{
+		if (add) m_turningDisabledCount++;
+		else m_turningDisabledCount--;
+
+		if (m_turningDisabledCount < 0)
+			m_turningDisabledCount=0;
+	}	
+	#endregion
+
     /// <summary>
     /// 생성 초기화
     /// </summary>

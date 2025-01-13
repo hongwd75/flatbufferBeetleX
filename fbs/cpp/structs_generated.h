@@ -15,14 +15,24 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 24 &&
 
 namespace NetworkMessage {
 
+struct ConEffectData;
+struct ConEffectDataBuilder;
+struct ConEffectData_FBS;
+
 struct Vector3;
+
+struct Vector3Int;
 
 struct CreatePlayerInfo;
 struct CreatePlayerInfoBuilder;
 struct CreatePlayerInfo_FBS;
 
+bool operator==(const ConEffectData_FBS &lhs, const ConEffectData_FBS &rhs);
+bool operator!=(const ConEffectData_FBS &lhs, const ConEffectData_FBS &rhs);
 bool operator==(const Vector3 &lhs, const Vector3 &rhs);
 bool operator!=(const Vector3 &lhs, const Vector3 &rhs);
+bool operator==(const Vector3Int &lhs, const Vector3Int &rhs);
+bool operator!=(const Vector3Int &lhs, const Vector3Int &rhs);
 bool operator==(const CreatePlayerInfo_FBS &lhs, const CreatePlayerInfo_FBS &rhs);
 bool operator!=(const CreatePlayerInfo_FBS &lhs, const CreatePlayerInfo_FBS &rhs);
 
@@ -69,6 +79,172 @@ inline bool operator!=(const Vector3 &lhs, const Vector3 &rhs) {
     return !(lhs == rhs);
 }
 
+
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Vector3Int FLATBUFFERS_FINAL_CLASS {
+ private:
+  int32_t x_;
+  int32_t y_;
+  int32_t z_;
+
+ public:
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.Vector3Int";
+  }
+  Vector3Int()
+      : x_(0),
+        y_(0),
+        z_(0) {
+  }
+  Vector3Int(int32_t _x, int32_t _y, int32_t _z)
+      : x_(::flatbuffers::EndianScalar(_x)),
+        y_(::flatbuffers::EndianScalar(_y)),
+        z_(::flatbuffers::EndianScalar(_z)) {
+  }
+  int32_t x() const {
+    return ::flatbuffers::EndianScalar(x_);
+  }
+  int32_t y() const {
+    return ::flatbuffers::EndianScalar(y_);
+  }
+  int32_t z() const {
+    return ::flatbuffers::EndianScalar(z_);
+  }
+};
+FLATBUFFERS_STRUCT_END(Vector3Int, 12);
+
+inline bool operator==(const Vector3Int &lhs, const Vector3Int &rhs) {
+  return
+      (lhs.x() == rhs.x()) &&
+      (lhs.y() == rhs.y()) &&
+      (lhs.z() == rhs.z());
+}
+
+inline bool operator!=(const Vector3Int &lhs, const Vector3Int &rhs) {
+    return !(lhs == rhs);
+}
+
+
+struct ConEffectData_FBS : public ::flatbuffers::NativeTable {
+  typedef ConEffectData TableType;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.ConEffectData_FBS";
+  }
+  uint8_t count = 0;
+  uint8_t concentration = 0;
+  uint16_t icon = 0;
+  std::string effectname{};
+  std::string ownername{};
+};
+
+struct ConEffectData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef ConEffectData_FBS NativeTableType;
+  typedef ConEffectDataBuilder Builder;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.ConEffectData";
+  }
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_COUNT = 4,
+    VT_CONCENTRATION = 6,
+    VT_ICON = 8,
+    VT_EFFECTNAME = 10,
+    VT_OWNERNAME = 12
+  };
+  uint8_t count() const {
+    return GetField<uint8_t>(VT_COUNT, 0);
+  }
+  uint8_t concentration() const {
+    return GetField<uint8_t>(VT_CONCENTRATION, 0);
+  }
+  uint16_t icon() const {
+    return GetField<uint16_t>(VT_ICON, 0);
+  }
+  const ::flatbuffers::String *effectname() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_EFFECTNAME);
+  }
+  const ::flatbuffers::String *ownername() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_OWNERNAME);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint8_t>(verifier, VT_COUNT, 1) &&
+           VerifyField<uint8_t>(verifier, VT_CONCENTRATION, 1) &&
+           VerifyField<uint16_t>(verifier, VT_ICON, 2) &&
+           VerifyOffset(verifier, VT_EFFECTNAME) &&
+           verifier.VerifyString(effectname()) &&
+           VerifyOffset(verifier, VT_OWNERNAME) &&
+           verifier.VerifyString(ownername()) &&
+           verifier.EndTable();
+  }
+  ConEffectData_FBS *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(ConEffectData_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<ConEffectData> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const ConEffectData_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct ConEffectDataBuilder {
+  typedef ConEffectData Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_count(uint8_t count) {
+    fbb_.AddElement<uint8_t>(ConEffectData::VT_COUNT, count, 0);
+  }
+  void add_concentration(uint8_t concentration) {
+    fbb_.AddElement<uint8_t>(ConEffectData::VT_CONCENTRATION, concentration, 0);
+  }
+  void add_icon(uint16_t icon) {
+    fbb_.AddElement<uint16_t>(ConEffectData::VT_ICON, icon, 0);
+  }
+  void add_effectname(::flatbuffers::Offset<::flatbuffers::String> effectname) {
+    fbb_.AddOffset(ConEffectData::VT_EFFECTNAME, effectname);
+  }
+  void add_ownername(::flatbuffers::Offset<::flatbuffers::String> ownername) {
+    fbb_.AddOffset(ConEffectData::VT_OWNERNAME, ownername);
+  }
+  explicit ConEffectDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<ConEffectData> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<ConEffectData>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<ConEffectData> CreateConEffectData(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint8_t count = 0,
+    uint8_t concentration = 0,
+    uint16_t icon = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> effectname = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> ownername = 0) {
+  ConEffectDataBuilder builder_(_fbb);
+  builder_.add_ownername(ownername);
+  builder_.add_effectname(effectname);
+  builder_.add_icon(icon);
+  builder_.add_concentration(concentration);
+  builder_.add_count(count);
+  return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<ConEffectData> CreateConEffectDataDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint8_t count = 0,
+    uint8_t concentration = 0,
+    uint16_t icon = 0,
+    const char *effectname = nullptr,
+    const char *ownername = nullptr) {
+  auto effectname__ = effectname ? _fbb.CreateString(effectname) : 0;
+  auto ownername__ = ownername ? _fbb.CreateString(ownername) : 0;
+  return NetworkMessage::CreateConEffectData(
+      _fbb,
+      count,
+      concentration,
+      icon,
+      effectname__,
+      ownername__);
+}
+
+::flatbuffers::Offset<ConEffectData> CreateConEffectData(::flatbuffers::FlatBufferBuilder &_fbb, const ConEffectData_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 struct CreatePlayerInfo_FBS : public ::flatbuffers::NativeTable {
   typedef CreatePlayerInfo TableType;
@@ -193,6 +369,59 @@ inline ::flatbuffers::Offset<CreatePlayerInfo> CreateCreatePlayerInfoDirect(
 }
 
 ::flatbuffers::Offset<CreatePlayerInfo> CreateCreatePlayerInfo(::flatbuffers::FlatBufferBuilder &_fbb, const CreatePlayerInfo_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+
+inline bool operator==(const ConEffectData_FBS &lhs, const ConEffectData_FBS &rhs) {
+  return
+      (lhs.count == rhs.count) &&
+      (lhs.concentration == rhs.concentration) &&
+      (lhs.icon == rhs.icon) &&
+      (lhs.effectname == rhs.effectname) &&
+      (lhs.ownername == rhs.ownername);
+}
+
+inline bool operator!=(const ConEffectData_FBS &lhs, const ConEffectData_FBS &rhs) {
+    return !(lhs == rhs);
+}
+
+
+inline ConEffectData_FBS *ConEffectData::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<ConEffectData_FBS>(new ConEffectData_FBS());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void ConEffectData::UnPackTo(ConEffectData_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = count(); _o->count = _e; }
+  { auto _e = concentration(); _o->concentration = _e; }
+  { auto _e = icon(); _o->icon = _e; }
+  { auto _e = effectname(); if (_e) _o->effectname = _e->str(); }
+  { auto _e = ownername(); if (_e) _o->ownername = _e->str(); }
+}
+
+inline ::flatbuffers::Offset<ConEffectData> ConEffectData::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const ConEffectData_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateConEffectData(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<ConEffectData> CreateConEffectData(::flatbuffers::FlatBufferBuilder &_fbb, const ConEffectData_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const ConEffectData_FBS* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _count = _o->count;
+  auto _concentration = _o->concentration;
+  auto _icon = _o->icon;
+  auto _effectname = _o->effectname.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->effectname);
+  auto _ownername = _o->ownername.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->ownername);
+  return NetworkMessage::CreateConEffectData(
+      _fbb,
+      _count,
+      _concentration,
+      _icon,
+      _effectname,
+      _ownername);
+}
 
 
 inline bool operator==(const CreatePlayerInfo_FBS &lhs, const CreatePlayerInfo_FBS &rhs) {
