@@ -19,7 +19,14 @@ namespace Game.Logic.network
             builder.Finish((int)packedOffset.GetType().GetField("Value").GetValue(packedOffset));
             Send(packetType, builder.SizedByteArray());
         }
-        
+
+        protected void SendFlatBufferPacket<T>(ServerPackets packetType, T request)
+            where T : class
+        {
+            FlatBufferBuilder sendBuilder = new FlatBufferBuilder(1024);
+            SendFlatBufferPacket(packetType, sendBuilder, request);
+        }
+
         public GameClient Client
         {
             get => mGameClient;
@@ -76,8 +83,13 @@ namespace Game.Logic.network
         public abstract void SendLivingDataUpdate(GameLiving living, bool updateStrings);
         public abstract void SendPlayerQuit(bool totalOut);
         public abstract void SendMessage(string message, eChatType type, eChatLoc loc);
-        public abstract void SendDialogBox(eDialogCode code, ushort data1, ushort data2, ushort data3, ushort data4, eDialogType type,
-            bool autoWrapText, string message);        
+        public abstract void SendDialogBox(eDialogCode code, ushort data1, ushort data2, ushort data3, ushort data4, eDialogType type, bool autoWrapText, string message);
+        public abstract void SendUpdatePlayer();
+        public abstract void SendObjectRemove(GameObject obj);
+        public abstract void SendPlayerCreate(GamePlayer obj);
+        public abstract void SendLivingEquipmentUpdate(GameLiving obj);
+        public abstract void SendConcentrationList();
+        public abstract void SendUpdateMaxSpeed();
 
     }
 }

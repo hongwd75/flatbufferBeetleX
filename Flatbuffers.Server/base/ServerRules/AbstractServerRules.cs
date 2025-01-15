@@ -1,13 +1,16 @@
-﻿using System.Net;
+﻿using System.Collections;
+using System.Net;
 using System.Reflection;
 using Flatbuffers.Messages.Enums;
 using Game.Logic.AI.Brain;
 using Game.Logic.datatable;
 using Game.Logic.Events;
+using Game.Logic.Inventory;
 using Game.Logic.Language;
 using Game.Logic.network;
 using Game.Logic.ServerProperties;
 using Game.Logic.Skills;
+using Game.Logic.Utils;
 using Game.Logic.World;
 using log4net;
 using Logic.database;
@@ -292,8 +295,6 @@ public abstract class AbstractServerRules : IServerRules
     }    
     #endregion
     
-    public abstract bool IsSameRealm(GameLiving source, GameLiving target, bool quiet);
-    public abstract string RulesDescription();
     
     #region MessageToLiving
     public virtual void MessageToLiving(GameLiving living, string message)
@@ -338,28 +339,343 @@ public abstract class AbstractServerRules : IServerRules
 	    return target.GuildName;
     }
     
-    public virtual string GetPlayerTitle(GamePlayer source, GamePlayer target)
-    {
-	    return target.CurrentTitle.GetValue(source, target);
-    }
-    
     public virtual string GetPlayerPrefixName(GamePlayer source, GamePlayer target)
     {
-	    string language;
-
-	    try
-	    {
-		    language = source.Network.Account.Language;
-	    }
-	    catch
-	    {
-		    language = LanguageMgr.DefaultLanguage;
-	    }
-
-	    if (IsSameRealm(source, target, true) && target.RealmLevel >= 110)
-		    return target.RealmRankTitle(language);
+	    // string language;
+	    //
+	    // try
+	    // {
+		   //  language = source.Network.Account.Language;
+	    // }
+	    // catch
+	    // {
+		   //  language = LanguageMgr.DefaultLanguage;
+	    // }
+	    //
+	    // if (IsSameRealm(source, target, true) && target.RealmLevel >= 110)
+		   //  return target.RealmRankTitle(language);
 
 	    return string.Empty;
     }    
     #endregion
+  
+	#region GetCompatibleObjectTypes
+	protected Hashtable m_compatibleObjectTypes = null;
+	protected virtual eObjectType[] GetCompatibleObjectTypes(eObjectType objectType)
+	{
+		if (m_compatibleObjectTypes == null)
+		{
+			m_compatibleObjectTypes = new Hashtable();
+			m_compatibleObjectTypes[(int)eObjectType.Staff] = new eObjectType[] { eObjectType.Staff };
+			m_compatibleObjectTypes[(int)eObjectType.Fired] = new eObjectType[] { eObjectType.Fired };
+
+			m_compatibleObjectTypes[(int)eObjectType.FistWraps] = new eObjectType[] { eObjectType.FistWraps };
+			m_compatibleObjectTypes[(int)eObjectType.MaulerStaff] = new eObjectType[] { eObjectType.MaulerStaff };
+
+			//alb
+			m_compatibleObjectTypes[(int)eObjectType.CrushingWeapon] = new eObjectType[] { eObjectType.CrushingWeapon, eObjectType.Blunt, eObjectType.Hammer };
+			m_compatibleObjectTypes[(int)eObjectType.SlashingWeapon] = new eObjectType[] { eObjectType.SlashingWeapon, eObjectType.Blades, eObjectType.Sword, eObjectType.Axe };
+			m_compatibleObjectTypes[(int)eObjectType.ThrustWeapon] = new eObjectType[] { eObjectType.ThrustWeapon, eObjectType.Piercing };
+			m_compatibleObjectTypes[(int)eObjectType.TwoHandedWeapon] = new eObjectType[] { eObjectType.TwoHandedWeapon, eObjectType.LargeWeapons };
+			m_compatibleObjectTypes[(int)eObjectType.PolearmWeapon] = new eObjectType[] { eObjectType.PolearmWeapon, eObjectType.CelticSpear, eObjectType.Spear };
+			m_compatibleObjectTypes[(int)eObjectType.Flexible] = new eObjectType[] { eObjectType.Flexible };
+			m_compatibleObjectTypes[(int)eObjectType.Longbow] = new eObjectType[] { eObjectType.Longbow };
+			m_compatibleObjectTypes[(int)eObjectType.Crossbow] = new eObjectType[] { eObjectType.Crossbow };
+			//TODO: case 5: abilityCheck = Abilities.Weapon_Thrown; break;
+
+			//mid
+			m_compatibleObjectTypes[(int)eObjectType.Hammer] = new eObjectType[] { eObjectType.Hammer, eObjectType.CrushingWeapon, eObjectType.Blunt };
+			m_compatibleObjectTypes[(int)eObjectType.Sword] = new eObjectType[] { eObjectType.Sword, eObjectType.SlashingWeapon, eObjectType.Blades };
+			m_compatibleObjectTypes[(int)eObjectType.LeftAxe] = new eObjectType[] { eObjectType.LeftAxe };
+			m_compatibleObjectTypes[(int)eObjectType.Axe] = new eObjectType[] { eObjectType.Axe, eObjectType.SlashingWeapon, eObjectType.Blades, eObjectType.LeftAxe };
+			m_compatibleObjectTypes[(int)eObjectType.HandToHand] = new eObjectType[] { eObjectType.HandToHand };
+			m_compatibleObjectTypes[(int)eObjectType.Spear] = new eObjectType[] { eObjectType.Spear, eObjectType.CelticSpear, eObjectType.PolearmWeapon };
+			m_compatibleObjectTypes[(int)eObjectType.CompositeBow] = new eObjectType[] { eObjectType.CompositeBow };
+			m_compatibleObjectTypes[(int)eObjectType.Thrown] = new eObjectType[] { eObjectType.Thrown };
+
+			//hib
+			m_compatibleObjectTypes[(int)eObjectType.Blunt] = new eObjectType[] { eObjectType.Blunt, eObjectType.CrushingWeapon, eObjectType.Hammer };
+			m_compatibleObjectTypes[(int)eObjectType.Blades] = new eObjectType[] { eObjectType.Blades, eObjectType.SlashingWeapon, eObjectType.Sword, eObjectType.Axe };
+			m_compatibleObjectTypes[(int)eObjectType.Piercing] = new eObjectType[] { eObjectType.Piercing, eObjectType.ThrustWeapon };
+			m_compatibleObjectTypes[(int)eObjectType.LargeWeapons] = new eObjectType[] { eObjectType.LargeWeapons, eObjectType.TwoHandedWeapon };
+			m_compatibleObjectTypes[(int)eObjectType.CelticSpear] = new eObjectType[] { eObjectType.CelticSpear, eObjectType.Spear, eObjectType.PolearmWeapon };
+			m_compatibleObjectTypes[(int)eObjectType.Scythe] = new eObjectType[] { eObjectType.Scythe };
+			m_compatibleObjectTypes[(int)eObjectType.RecurvedBow] = new eObjectType[] { eObjectType.RecurvedBow };
+
+			m_compatibleObjectTypes[(int)eObjectType.Shield] = new eObjectType[] { eObjectType.Shield };
+			m_compatibleObjectTypes[(int)eObjectType.Poison] = new eObjectType[] { eObjectType.Poison };
+			//TODO: case 45: abilityCheck = Abilities.instruments; break;
+		}
+
+		eObjectType[] res = (eObjectType[])m_compatibleObjectTypes[(int)objectType];
+		if (res == null)
+			return Array.Empty<eObjectType>();
+		return res;
+	}
+
+	#endregion    
+	public virtual bool CheckAbilityToUseItem(GameLiving living, ItemTemplate item)
+	{
+		if (living == null || item == null)
+			return false;
+
+		GamePlayer player = living as GamePlayer;
+
+		if (player != null && player.Network.Account.PrivLevel > (uint)ePrivLevel.Player)
+			return true;
+
+		if ((item.Object_Type == 0 || item.Object_Type >= (int)eObjectType._FirstHouse) && item.Object_Type <= (int)eObjectType._LastHouse)
+			return true;
+
+		if (!ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+		{
+			if (item.Realm != 0 && item.Realm != (int)living.Realm)
+				return false;
+		}
+
+		if (player != null && !Util.IsEmpty(item.AllowedClasses, true))
+		{
+			if (!Util.SplitCSV(item.AllowedClasses, true).Contains(player.CharacterClass.ID.ToString()))
+				return false;
+		}
+
+		//armor
+		if (item.Object_Type >= (int)eObjectType._FirstArmor && item.Object_Type <= (int)eObjectType._LastArmor)
+		{
+			int armorAbility = -1;
+
+			if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS && item.Item_Type != (int)eEquipmentItems.HEAD)
+			{
+				switch (player.Realm) // Choose based on player rather than item region
+				{
+					case eRealm.Albion: armorAbility = living.GetAbilityLevel(Abilities.AlbArmor); break;
+					case eRealm.Hibernia: armorAbility = living.GetAbilityLevel(Abilities.HibArmor); break;
+					case eRealm.Midgard: armorAbility =  living.GetAbilityLevel(Abilities.MidArmor); break;
+					default: break;
+				}
+			}
+			else
+			{
+				switch ((eRealm)item.Realm)
+				{
+					case eRealm.Albion: armorAbility = living.GetAbilityLevel(Abilities.AlbArmor); break;
+					case eRealm.Hibernia: armorAbility = living.GetAbilityLevel(Abilities.HibArmor); break;
+					case eRealm.Midgard: armorAbility = living.GetAbilityLevel(Abilities.MidArmor); break;
+					default: // use old system
+						armorAbility = Math.Max(armorAbility, living.GetAbilityLevel(Abilities.AlbArmor));
+						armorAbility = Math.Max(armorAbility, living.GetAbilityLevel(Abilities.HibArmor));
+						armorAbility = Math.Max(armorAbility, living.GetAbilityLevel(Abilities.MidArmor));
+						break;
+				}
+			}
+			switch ((eObjectType)item.Object_Type)
+			{
+				case eObjectType.GenericArmor: return armorAbility >= ArmorLevel.GenericArmor;
+				case eObjectType.Cloth: return armorAbility >= ArmorLevel.Cloth;
+				case eObjectType.Leather: return armorAbility >= ArmorLevel.Leather;
+				case eObjectType.Reinforced:
+				case eObjectType.Studded: return armorAbility >= ArmorLevel.Studded;
+				case eObjectType.Scale:
+				case eObjectType.Chain: return armorAbility >= ArmorLevel.Chain;
+				case eObjectType.Plate: return armorAbility >= ArmorLevel.Plate;
+				default: return false;
+			}
+		}
+
+		// non-armors
+		string abilityCheck = null;
+		string[] otherCheck = Array.Empty<string>();
+
+		switch ((eObjectType)item.Object_Type)
+		{
+			case eObjectType.GenericItem: return true;
+			case eObjectType.GenericArmor: return true;
+			case eObjectType.GenericWeapon: return true;
+			case eObjectType.Staff: abilityCheck = Abilities.Weapon_Staves; break;
+			case eObjectType.Fired: abilityCheck = Abilities.Weapon_Shortbows; break;
+			case eObjectType.FistWraps: abilityCheck = Abilities.Weapon_FistWraps; break;
+			case eObjectType.MaulerStaff: abilityCheck = Abilities.Weapon_MaulerStaff; break;
+
+			//alb
+			case eObjectType.CrushingWeapon:
+				if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+					switch (living.Realm)
+					{
+						case eRealm.Albion: abilityCheck = Abilities.Weapon_Crushing; break;
+						case eRealm.Hibernia: abilityCheck = Abilities.Weapon_Blunt; break;
+						case eRealm.Midgard: abilityCheck = Abilities.Weapon_Hammers; break;
+						default: break;
+					} 
+				else abilityCheck = Abilities.Weapon_Crushing;
+				break;
+			case eObjectType.SlashingWeapon:
+				if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+					switch (living.Realm)
+					{
+						case eRealm.Albion: abilityCheck = Abilities.Weapon_Slashing; break;
+						case eRealm.Hibernia: abilityCheck = Abilities.Weapon_Blades; break;
+						case eRealm.Midgard: abilityCheck = Abilities.Weapon_Swords; break;
+						default: break;
+					}
+				else abilityCheck = Abilities.Weapon_Slashing;
+				break;
+			case eObjectType.ThrustWeapon:
+				if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS && living.Realm == eRealm.Hibernia)
+					abilityCheck = Abilities.Weapon_Piercing;
+				else
+					abilityCheck = Abilities.Weapon_Thrusting;
+				break;
+			case eObjectType.TwoHandedWeapon:
+				if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS && living.Realm == eRealm.Hibernia)
+					abilityCheck = Abilities.Weapon_LargeWeapons;
+				else abilityCheck = Abilities.Weapon_TwoHanded;
+				break;
+			case eObjectType.PolearmWeapon:
+				if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+					switch (living.Realm)
+					{
+						case eRealm.Albion: abilityCheck = Abilities.Weapon_Polearms; break;
+						case eRealm.Hibernia: abilityCheck = Abilities.Weapon_CelticSpear; break;
+						case eRealm.Midgard: abilityCheck = Abilities.Weapon_Spears; break;
+						default: break;
+					}
+				else abilityCheck = Abilities.Weapon_Polearms;
+				break;
+			case eObjectType.Longbow:
+				otherCheck = new string[] { Abilities.Weapon_Longbows, Abilities.Weapon_Archery };
+				break;
+			case eObjectType.Crossbow: abilityCheck = Abilities.Weapon_Crossbow; break;
+			case eObjectType.Flexible: abilityCheck = Abilities.Weapon_Flexible; break;
+			//TODO: case 5: abilityCheck = Abilities.Weapon_Thrown;break;
+
+			//mid
+			case eObjectType.Sword:
+				if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+					switch (living.Realm)
+					{
+						case eRealm.Albion: abilityCheck = Abilities.Weapon_Slashing; break;
+						case eRealm.Hibernia: abilityCheck = Abilities.Weapon_Blades; break;
+						case eRealm.Midgard: abilityCheck = Abilities.Weapon_Swords; break;
+						default: break;
+					}
+				else abilityCheck = Abilities.Weapon_Swords; 
+				break;
+			case eObjectType.Hammer:
+				if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+					switch (living.Realm)
+					{
+						case eRealm.Albion: abilityCheck = Abilities.Weapon_Crushing; break;
+						case eRealm.Midgard: abilityCheck = Abilities.Weapon_Hammers; break;
+						case eRealm.Hibernia: abilityCheck = Abilities.Weapon_Blunt; break;
+						default: break;
+					}
+				else abilityCheck = Abilities.Weapon_Hammers; 
+				break;
+			case eObjectType.LeftAxe:
+			case eObjectType.Axe:
+				if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+					switch (living.Realm)
+					{
+						case eRealm.Albion: abilityCheck = Abilities.Weapon_Slashing; break;
+						case eRealm.Hibernia: abilityCheck = Abilities.Weapon_Blades; break;
+						case eRealm.Midgard: abilityCheck = Abilities.Weapon_Axes; break;
+						default: break;
+					}
+				else abilityCheck = Abilities.Weapon_Axes; 
+				break;
+			case eObjectType.Spear:
+				if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+					switch (living.Realm)
+					{
+						case eRealm.Albion: abilityCheck = Abilities.Weapon_Polearms; break;
+						case eRealm.Hibernia: abilityCheck = Abilities.Weapon_CelticSpear; break;
+						case eRealm.Midgard: abilityCheck = Abilities.Weapon_Spears; break;
+						default: break;
+					}
+				else abilityCheck = Abilities.Weapon_Spears; 
+				break;
+			case eObjectType.CompositeBow:
+				otherCheck = new string[] { Abilities.Weapon_CompositeBows, Abilities.Weapon_Archery };
+				break;
+			case eObjectType.Thrown: abilityCheck = Abilities.Weapon_Thrown; break;
+			case eObjectType.HandToHand: abilityCheck = Abilities.Weapon_HandToHand; break;
+
+			//hib
+			case eObjectType.RecurvedBow:
+				otherCheck = new string[] { Abilities.Weapon_RecurvedBows, Abilities.Weapon_Archery };
+				break;
+			case eObjectType.Blades:
+				if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+					switch (living.Realm)
+					{
+						case eRealm.Albion: abilityCheck = Abilities.Weapon_Slashing; break;
+						case eRealm.Hibernia: abilityCheck = Abilities.Weapon_Blades; break;
+						case eRealm.Midgard: abilityCheck = Abilities.Weapon_Swords; break;
+						default: break;
+					}
+				else abilityCheck = Abilities.Weapon_Blades; 
+				break;
+			case eObjectType.Blunt:
+				if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+					switch (living.Realm)
+					{
+						case eRealm.Albion: abilityCheck = Abilities.Weapon_Crushing; break;
+						case eRealm.Hibernia: abilityCheck = Abilities.Weapon_Blunt; break;
+						case eRealm.Midgard: abilityCheck = Abilities.Weapon_Hammers; break;
+						default: break;
+					}
+				else abilityCheck = Abilities.Weapon_Blunt;
+				break;
+			case eObjectType.Piercing:
+				if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS && living.Realm == eRealm.Albion)
+					abilityCheck = Abilities.Weapon_Thrusting;
+				else abilityCheck = Abilities.Weapon_Piercing;
+				break;
+			case eObjectType.LargeWeapons:
+				if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS && living.Realm == eRealm.Albion)
+					abilityCheck = Abilities.Weapon_TwoHanded;
+				else abilityCheck = Abilities.Weapon_LargeWeapons; break;
+			case eObjectType.CelticSpear:
+				if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+					switch (living.Realm)
+					{
+						case eRealm.Albion: abilityCheck = Abilities.Weapon_Polearms; break;
+						case eRealm.Hibernia: abilityCheck = Abilities.Weapon_CelticSpear; break;
+						case eRealm.Midgard: abilityCheck = Abilities.Weapon_Spears; break;
+						default: break;
+					}
+				else abilityCheck = Abilities.Weapon_CelticSpear;
+				break;
+			case eObjectType.Scythe: abilityCheck = Abilities.Weapon_Scythe; break;
+
+			//misc
+			case eObjectType.Magical: return true;
+			case eObjectType.Shield: return living.GetAbilityLevel(Abilities.Shield) >= item.Type_Damage;
+			case eObjectType.Bolt: abilityCheck = Abilities.Weapon_Crossbow; break;
+			case eObjectType.Arrow: otherCheck = new string[] { Abilities.Weapon_CompositeBows, Abilities.Weapon_Longbows, Abilities.Weapon_RecurvedBows, Abilities.Weapon_Shortbows }; break;
+			case eObjectType.Poison: return living.GetModifiedSpecLevel(Specs.Envenom) > 0;
+			case eObjectType.Instrument: return living.HasAbility(Abilities.Weapon_Instruments);
+				//TODO: different shield sizes
+		}
+
+		if (abilityCheck != null && living.HasAbility(abilityCheck))
+			return true;
+
+		foreach (string str in otherCheck)
+			if (living.HasAbility(str))
+				return true;
+
+		return false;
+	}
+
+	public abstract bool IsAllowedToBind(GamePlayer player, BindPoint point);
+    public abstract bool IsSameRealm(GameLiving source, GameLiving target, bool quiet);
+    public abstract bool IsAllowedCharsInAllRealms(GameClient client);
+    public abstract bool IsAllowedToGroup(GamePlayer source, GamePlayer target, bool quiet);
+    public abstract bool IsAllowedToJoinGuild(GamePlayer source, Guild.Guild guild);
+    public abstract bool IsAllowedToTrade(GameLiving source, GameLiving target, bool quiet);
+    public abstract bool IsAllowedToUnderstand(GameLiving source, GamePlayer target);
+    public abstract string RulesDescription();
+    
+    
 }

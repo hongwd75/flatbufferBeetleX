@@ -17,11 +17,12 @@ public enum eChatType : sbyte
   CT_Chat = 3,
   CT_Guild = 4,
   CT_Merchant = 5,
-  CT_Loot = 6,
-  CT_Broadcast = 7,
-  CT_Help = 8,
-  CT_Staff = 9,
-  CT_Important = 10,
+  CT_Spell = 6,
+  CT_Loot = 7,
+  CT_Broadcast = 8,
+  CT_Help = 9,
+  CT_Staff = 10,
+  CT_Important = 11,
 };
 
 public enum eChatLoc : sbyte
@@ -58,7 +59,8 @@ public enum ServerPackets : ushort
   SC_ConcentrationList = 7,
   SC_StringMessage = 8,
   SC_DialogBoxMessage = 9,
-  SC_Quit = 10,
+  SC_MaxSpeed = 10,
+  SC_Quit = 11,
 };
 
 public enum ClientPackets : ushort

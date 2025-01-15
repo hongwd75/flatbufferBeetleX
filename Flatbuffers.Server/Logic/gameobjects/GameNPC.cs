@@ -5,11 +5,13 @@ using Game.Logic.AI.Brain;
 using Game.Logic.datatable;
 using Game.Logic.Events;
 using Game.Logic.Geometry;
+using Game.Logic.Inventory;
 using Game.Logic.Language;
 using Game.Logic.PropertyCalc;
 using Game.Logic.ServerProperties;
 using Game.Logic.Skills;
 using Game.Logic.Spells;
+using Game.Logic.Styles;
 using Game.Logic.Utils;
 using Game.Logic.World;
 using Game.Logic.World.Timer;
@@ -1822,7 +1824,6 @@ namespace Game.Logic
 				MeleeDamageType = eDamageType.Slash;
 			}
 			m_activeWeaponSlot = eActiveWeaponSlot.Standard;
-			ActiveQuiverSlot = eActiveQuiverSlot.None;
 
 			m_faction = FactionMgr.GetFactionByID(dbMob.FactionID);
 			LoadEquipmentTemplateFromDatabase(dbMob.EquipmentTemplateID);
@@ -2268,507 +2269,6 @@ namespace Game.Logic
 
 		#endregion
 
-		#region Quest
-		/// <summary>
-		/// Holds all the quests this npc can give to players
-		/// </summary>
-		protected readonly ArrayList m_questListToGive = new ArrayList();
-
-		/// <summary>
-		/// Gets the questlist of this player
-		/// </summary>
-		public IList QuestListToGive
-		{
-			get { return m_questListToGive; }
-		}
-
-		/// <summary>
-		/// Adds a scripted quest type to the npc questlist
-		/// </summary>
-		/// <param name="questType">The quest type to add</param>
-		/// <returns>true if added, false if the npc has already the quest!</returns>
-		public void AddQuestToGive(Type questType)
-		{
-			lock (m_questListToGive.SyncRoot)
-			{
-				if (HasQuest(questType) == null)
-				{
-					AbstractQuest newQuest = (AbstractQuest)Activator.CreateInstance(questType);
-					if (newQuest != null) m_questListToGive.Add(newQuest);
-				}
-			}
-		}
-
-		/// <summary>
-		/// removes a scripted quest from this npc
-		/// </summary>
-		/// <param name="questType">The questType to remove</param>
-		/// <returns>true if added, false if the npc has already the quest!</returns>
-		public bool RemoveQuestToGive(Type questType)
-		{
-			lock (m_questListToGive.SyncRoot)
-			{
-				foreach (AbstractQuest q in m_questListToGive)
-				{
-					if (q.GetType().Equals(questType))
-					{
-						m_questListToGive.Remove(q);
-						return true;
-					}
-				}
-			}
-			return false;
-		}
-
-		/// <summary>
-		/// Check if the npc can give the specified quest to a player
-		/// Used for scripted quests
-		/// </summary>
-		/// <param name="questType">The type of the quest</param>
-		/// <param name="player">The player who search a quest</param>
-		/// <returns>the number of time the quest can be done again</returns>
-		public int CanGiveQuest(Type questType, GamePlayer player)
-		{
-			lock (m_questListToGive.SyncRoot)
-			{
-				foreach (AbstractQuest q in m_questListToGive)
-				{
-					if (q.GetType().Equals(questType) && q.CheckQuestQualification(player) && player.HasFinishedQuest(questType) < q.MaxQuestCount)
-					{
-						return q.MaxQuestCount - player.HasFinishedQuest(questType);
-					}
-				}
-			}
-			return 0;
-		}
-
-		/// <summary>
-		/// Return the proper indicator for quest
-		/// TODO: check when finish indicator is set
-		/// * when you have done the NPC quest
-		/// * when you are at the last step
-		/// </summary>
-		/// <param name="questType">Type of quest</param>
-		/// <param name="player">player requesting the quest</param>
-		/// <returns></returns>
-		public eQuestIndicator SetQuestIndicator(Type questType, GamePlayer player)
-		{
-			if (CanShowOneQuest(player)) return eQuestIndicator.Available;
-			if (player.HasFinishedQuest(questType) > 0) return eQuestIndicator.Finish;
-			return eQuestIndicator.None;
-		}
-
-		protected GameNPC m_teleporterIndicator = null;
-
-		/// <summary>
-		/// Should this NPC have an associated teleporter indicator
-		/// </summary>
-		public virtual bool ShowTeleporterIndicator
-		{
-			get { return false; }
-		}
-
-
-        /// <summary>
-        /// check if mob shows interact indicator for 
-        /// DQ reward quest
-        /// </summary>		
-        public bool CanShowInteractIndicator(GamePlayer player)
-        {
-            // browse Quests. // patch 0031
-            List<AbstractQuest> dqs;
-            lock (((ICollection)player.QuestList).SyncRoot)
-            {
-                dqs = new List<AbstractQuest>(player.QuestList);
-            }
-
-            foreach (AbstractQuest q in dqs)
-            {
-                DQRewardQ dqrQuest = null;
-                if (q is DQRewardQ)
-                {
-                    dqrQuest = (DQRewardQ)q;
-
-                    if (dqrQuest != null && dqrQuest.CheckInteractPendingIcon(this))
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-		
-		/// <summary>
-		/// Should the NPC show a quest indicator, this can be overriden for custom handling
-		/// Checks both scripted and data quests
-		/// </summary>
-		/// <param name="player"></param>
-		/// <returns>True if the NPC should show quest indicator, false otherwise</returns>
-		public virtual eQuestIndicator GetQuestIndicator(GamePlayer player)
-		{
-			// Available one ?
-			if (CanShowOneQuest(player))
-				return eQuestIndicator.Available;
-
-            // Interact goal?
-            if (CanShowInteractIndicator(player))
-            {
-                return eQuestIndicator.Pending; 
-            }
-			
-			
-			// Finishing one ?
-			if (CanFinishOneQuest(player))
-				return eQuestIndicator.Finish;
-
-			return eQuestIndicator.None;
-		}
-
-		/// <summary>
-		/// Check if the npc can show a quest indicator to a player
-		/// Checks both scripted and data quests
-		/// </summary>
-		/// <param name="player">The player to check</param>
-		/// <returns>true if yes, false if the npc can give any quest</returns>
-		public bool CanShowOneQuest(GamePlayer player)
-		{
-			// Scripted quests
-			lock (m_questListToGive.SyncRoot)
-			{
-				foreach (AbstractQuest q in m_questListToGive)
-				{
-					Type questType = q.GetType();
-					int doingQuest = (player.IsDoingQuest(questType) != null ? 1 : 0);
-					if (q.CheckQuestQualification(player) && player.HasFinishedQuest(questType) + doingQuest < q.MaxQuestCount)
-						return true;
-				}
-			}
-
-			// Data driven quests
-			lock (m_dataQuests)
-			{
-				foreach (DataQuest quest in DataQuestList)
-				{
-					if (quest.ShowIndicator &&
-						quest.CheckQuestQualification(player))
-					{
-						return true;
-					}
-				}
-			}
-
-            // Data driven reward quests 
-            lock (m_dqRewardQs)
-            {
-                foreach (DQRewardQ quest in DQRewardQList)
-                {
-                    if (quest.CheckQuestQualification(player))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-			return false;
-		}
-
-		/// <summary>
-		/// Check if the npc can finish one of DataQuest/RewardQuest Player is doing
-		/// This can't be check with AbstractQuest as they don't implement anyway of knowing who is the last target or last step !
-		/// </summary>
-		/// <param name="player">The player to check</param>
-		/// <returns>true if this npc is the last step of one quest, false otherwise</returns>
-		public bool CanFinishOneQuest(GamePlayer player)
-		{
-			// browse Quests.
-			List<AbstractQuest> dqs;
-			lock (((ICollection)player.QuestList).SyncRoot)
-			{
-				dqs = new List<AbstractQuest>(player.QuestList);
-			}
-
-			foreach (AbstractQuest q in dqs)
-			{
-				// Handle Data Quest here.
-
-				DataQuest quest = null;
-				if (q is DataQuest)
-				{
-					quest = (DataQuest)q;
-				}
-
-				if (quest != null && (quest.TargetName == Name && (quest.TargetRegion == 0 || quest.TargetRegion == CurrentRegionID)))
-				{
-					switch (quest.StepType)
-					{
-						case DataQuest.eStepType.DeliverFinish:
-						case DataQuest.eStepType.InteractFinish:
-						case DataQuest.eStepType.KillFinish:
-						case DataQuest.eStepType.WhisperFinish:
-						case DataQuest.eStepType.CollectFinish:
-							return true;
-					}
-				}
-
-
-                // Handle Data Reward Quest here.
-
-                DQRewardQ dqrQuest = null;
-                if (q is DQRewardQ)
-                {
-                    dqrQuest = (DQRewardQ)q;
-
-                    if (dqrQuest != null && dqrQuest.CheckGoalsCompleted() && dqrQuest.FinishName == Name) 
-                    {
-                        return true;
-                    }
-                }
-
-				// Handle Reward Quest here.
-
-				RewardQuest rwQuest = null;
-
-				if (q is RewardQuest)
-				{
-					rwQuest = (RewardQuest)q;
-				}
-
-				if (rwQuest != null && rwQuest.QuestGiver == this)
-				{
-					bool done = true;
-					foreach (RewardQuest.QuestGoal goal in rwQuest.Goals)
-					{
-						done &= goal.IsAchieved;
-					}
-
-					if (done)
-					{
-						return true;
-					}
-				}
-			}
-
-			return false;
-		}
-
-
-		/// <summary>
-		/// Give a quest a to specific player
-		/// used for scripted quests
-		/// </summary>
-		/// <param name="questType">The quest type</param>
-		/// <param name="player">The player that gets the quest</param>
-		/// <param name="startStep">The starting quest step</param>
-		/// <returns>true if added, false if the player do already the quest!</returns>
-		public bool GiveQuest(Type questType, GamePlayer player, int startStep)
-		{
-			AbstractQuest quest = HasQuest(questType);
-			if (quest != null)
-			{
-				AbstractQuest newQuest = (AbstractQuest)Activator.CreateInstance(questType, new object[] { player, startStep });
-				if (newQuest != null && player.AddQuest(newQuest))
-				{
-					player.Out.SendNPCsQuestEffect(this, GetQuestIndicator(player));
-					return true;
-				}
-			}
-			return false;
-		}
-
-		/// <summary>
-		/// Checks if this npc already has a specified quest
-		/// used for scripted quests
-		/// </summary>
-		/// <param name="questType">The quest type</param>
-		/// <returns>the quest if the npc have the quest or null if not</returns>
-		protected AbstractQuest HasQuest(Type questType)
-		{
-			lock (m_questListToGive.SyncRoot)
-			{
-				foreach (AbstractQuest q in m_questListToGive)
-				{
-					if (q.GetType().Equals(questType))
-						return q;
-				}
-			}
-			return null;
-		}
-
-		#endregion
-
-		#region Riding
-		//NPC's can have riders :-)
-		/// <summary>
-		/// Holds the rider of this NPC as weak reference
-		/// </summary>
-		public GamePlayer[] Riders;
-
-		/// <summary>
-		/// This function is called when a rider mounts this npc
-		/// Since only players can ride NPC's you should use the
-		/// GamePlayer.MountSteed function instead to make sure all
-		/// callbacks are called correctly
-		/// </summary>
-		/// <param name="rider">GamePlayer that is the rider</param>
-		/// <param name="forced">if true, mounting can't be prevented by handlers</param>
-		/// <returns>true if mounted successfully</returns>
-		public virtual bool RiderMount(GamePlayer rider, bool forced)
-		{
-			int exists = RiderArrayLocation(rider);
-			if (exists != -1)
-				return false;
-
-			rider.MoveTo(Position);
-
-			Notify(GameNPCEvent.RiderMount, this, new RiderMountEventArgs(rider, this));
-			int slot = GetFreeArrayLocation();
-			Riders[slot] = rider;
-			rider.Steed = this;
-			return true;
-		}
-
-		/// <summary>
-		/// This function is called when a rider mounts this npc
-		/// Since only players can ride NPC's you should use the
-		/// GamePlayer.MountSteed function instead to make sure all
-		/// callbacks are called correctly
-		/// </summary>
-		/// <param name="rider">GamePlayer that is the rider</param>
-		/// <param name="forced">if true, mounting can't be prevented by handlers</param>
-		/// <param name="slot">The desired slot to mount</param>
-		/// <returns>true if mounted successfully</returns>
-		public virtual bool RiderMount(GamePlayer rider, bool forced, int slot)
-		{
-			int exists = RiderArrayLocation(rider);
-			if (exists != -1)
-				return false;
-
-			if (Riders[slot] != null)
-				return false;
-
-			//rider.MoveTo(CurrentRegionID, X, Y, Z, Heading);
-
-			Notify(GameNPCEvent.RiderMount, this, new RiderMountEventArgs(rider, this));
-			Riders[slot] = rider;
-			rider.Steed = this;
-			return true;
-		}
-
-		/// <summary>
-		/// Called to dismount a rider from this npc.
-		/// Since only players can ride NPC's you should use the
-		/// GamePlayer.MountSteed function instead to make sure all
-		/// callbacks are called correctly
-		/// </summary>
-		/// <param name="forced">if true, the dismounting can't be prevented by handlers</param>
-		/// <param name="player">the player that is dismounting</param>
-		/// <returns>true if dismounted successfully</returns>
-		public virtual bool RiderDismount(bool forced, GamePlayer player)
-		{
-			if (Riders.Length <= 0)
-				return false;
-
-			int slot = RiderArrayLocation(player);
-			if (slot < 0)
-			{
-				return false;
-			}
-			Riders[slot] = null;
-
-			Notify(GameNPCEvent.RiderDismount, this, new RiderDismountEventArgs(player, this));
-			player.Steed = null;
-
-			return true;
-		}
-
-		/// <summary>
-		/// Get a free array location on the NPC
-		/// </summary>
-		/// <returns></returns>
-		public int GetFreeArrayLocation()
-		{
-			for (int i = 0; i < MAX_PASSENGERS; i++)
-			{
-				if (Riders[i] == null)
-					return i;
-			}
-			return -1;
-		}
-
-		/// <summary>
-		/// Get the riders array location
-		/// </summary>
-		/// <param name="player">the player to get location of</param>
-		/// <returns></returns>
-		public int RiderArrayLocation(GamePlayer player)
-		{
-			for (int i = 0; i < MAX_PASSENGERS; i++)
-			{
-				if (Riders[i] == player)
-					return i;
-			}
-			return -1;
-		}
-
-		/// <summary>
-		/// Get the riders slot on the npc
-		/// </summary>
-		/// <param name="player"></param>
-		/// <returns></returns>
-		public int RiderSlot(GamePlayer player)
-		{
-			int location = RiderArrayLocation(player);
-			if (location == -1)
-				return location;
-			return location + SLOT_OFFSET;
-		}
-
-		/// <summary>
-		/// The maximum passengers the NPC can take
-		/// </summary>
-		public virtual int MAX_PASSENGERS
-		{
-			get { return 1; }
-		}
-
-		/// <summary>
-		/// The minimum number of passengers required to move
-		/// </summary>
-		public virtual int REQUIRED_PASSENGERS
-		{
-			get { return 1; }
-		}
-
-		/// <summary>
-		/// The slot offset for this NPC
-		/// </summary>
-		public virtual int SLOT_OFFSET
-		{
-			get { return 0; }
-		}
-
-		/// <summary>
-		/// Gets a list of the current riders
-		/// </summary>
-		public GamePlayer[] CurrentRiders
-		{
-			get
-			{
-				List<GamePlayer> list = new List<GamePlayer>(MAX_PASSENGERS);
-				for (int i = 0; i < MAX_PASSENGERS; i++)
-				{
-					if (Riders == null || i >= Riders.Length)
-						break;
-
-					GamePlayer player = Riders[i];
-					if (player != null)
-						list.Add(player);
-				}
-				return list.ToArray();
-			}
-		}
-		#endregion
-
 		#region Add/Remove/Create/Remove/Update
 		/// <summary>
 		/// callback that npc was updated to the world
@@ -3193,34 +2693,34 @@ namespace Game.Logic
 			{
 				aggroLevel = Faction.GetAggroToFaction(player);
 				if (aggroLevel > 75)
-					aggroLevelString = LanguageMgr.GetTranslation(player.Client.Account.Language, "GameNPC.GetAggroLevelString.Aggressive1");
+					aggroLevelString = LanguageMgr.GetTranslation(player.Network.Account.Language, "GameNPC.GetAggroLevelString.Aggressive1");
 				else if (aggroLevel > 50)
-					aggroLevelString = LanguageMgr.GetTranslation(player.Client.Account.Language, "GameNPC.GetAggroLevelString.Hostile1");
+					aggroLevelString = LanguageMgr.GetTranslation(player.Network.Account.Language, "GameNPC.GetAggroLevelString.Hostile1");
 				else if (aggroLevel > 25)
-					aggroLevelString = LanguageMgr.GetTranslation(player.Client.Account.Language, "GameNPC.GetAggroLevelString.Neutral1");
+					aggroLevelString = LanguageMgr.GetTranslation(player.Network.Account.Language, "GameNPC.GetAggroLevelString.Neutral1");
 				else
-					aggroLevelString = LanguageMgr.GetTranslation(player.Client.Account.Language, "GameNPC.GetAggroLevelString.Friendly1");
+					aggroLevelString = LanguageMgr.GetTranslation(player.Network.Account.Language, "GameNPC.GetAggroLevelString.Friendly1");
 			}
 			else
 			{
 				IOldAggressiveBrain aggroBrain = Brain as IOldAggressiveBrain;
 				if (GameServer.ServerRules.IsSameRealm(this, player, true))
 				{
-					if (firstLetterUppercase) aggroLevelString = LanguageMgr.GetTranslation(player.Client.Account.Language, "GameNPC.GetAggroLevelString.Friendly2");
-					else aggroLevelString = LanguageMgr.GetTranslation(player.Client.Account.Language, "GameNPC.GetAggroLevelString.Friendly1");
+					if (firstLetterUppercase) aggroLevelString = LanguageMgr.GetTranslation(player.Network.Account.Language, "GameNPC.GetAggroLevelString.Friendly2");
+					else aggroLevelString = LanguageMgr.GetTranslation(player.Network.Account.Language, "GameNPC.GetAggroLevelString.Friendly1");
 				}
 				else if (aggroBrain != null && aggroBrain.AggroLevel > 0)
 				{
-					if (firstLetterUppercase) aggroLevelString = LanguageMgr.GetTranslation(player.Client.Account.Language, "GameNPC.GetAggroLevelString.Aggressive2");
-					else aggroLevelString = LanguageMgr.GetTranslation(player.Client.Account.Language, "GameNPC.GetAggroLevelString.Aggressive1");
+					if (firstLetterUppercase) aggroLevelString = LanguageMgr.GetTranslation(player.Network.Account.Language, "GameNPC.GetAggroLevelString.Aggressive2");
+					else aggroLevelString = LanguageMgr.GetTranslation(player.Network.Account.Language, "GameNPC.GetAggroLevelString.Aggressive1");
 				}
 				else
 				{
-					if (firstLetterUppercase) aggroLevelString = LanguageMgr.GetTranslation(player.Client.Account.Language, "GameNPC.GetAggroLevelString.Neutral2");
-					else aggroLevelString = LanguageMgr.GetTranslation(player.Client.Account.Language, "GameNPC.GetAggroLevelString.Neutral1");
+					if (firstLetterUppercase) aggroLevelString = LanguageMgr.GetTranslation(player.Network.Account.Language, "GameNPC.GetAggroLevelString.Neutral2");
+					else aggroLevelString = LanguageMgr.GetTranslation(player.Network.Account.Language, "GameNPC.GetAggroLevelString.Neutral1");
 				}
 			}
-			return LanguageMgr.GetTranslation(player.Client.Account.Language, "GameNPC.GetAggroLevelString.TowardsYou", aggroLevelString);
+			return LanguageMgr.GetTranslation(player.Network.Account.Language, "GameNPC.GetAggroLevelString.TowardsYou", aggroLevelString);
 		}
 
 		public string GetPronoun(int form, bool capitalize, string lang)
@@ -3323,23 +2823,23 @@ namespace Game.Logic
 		/// <returns>list with string messages</returns>
 		public override IList GetExamineMessages(GamePlayer player)
 		{
-			switch (player.Client.Account.Language)
+			switch (player.Network.Account.Language)
 			{
 				case "EN":
 					{
 						IList list = base.GetExamineMessages(player);
-						list.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameNPC.GetExamineMessages.YouExamine",
+						list.Add(LanguageMgr.GetTranslation(player.Network.Account.Language, "GameNPC.GetExamineMessages.YouExamine",
 															GetName(0, false), GetPronoun(0, true), GetAggroLevelString(player, false)));
 						return list;
 					}
 				default:
 					{
 						IList list = new ArrayList(4);
-						list.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObject.GetExamineMessages.YouTarget",
-															GetName(0, false, player.Client.Account.Language, this)));
-						list.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameNPC.GetExamineMessages.YouExamine",
-															GetName(0, false, player.Client.Account.Language, this),
-															GetPronoun(0, true, player.Client.Account.Language), GetAggroLevelString(player, false)));
+						list.Add(LanguageMgr.GetTranslation(player.Network.Account.Language, "GameObject.GetExamineMessages.YouTarget",
+															GetName(0, false, player.Network.Account.Language, this)));
+						list.Add(LanguageMgr.GetTranslation(player.Network.Account.Language, "GameNPC.GetExamineMessages.YouExamine",
+															GetName(0, false, player.Network.Account.Language, this),
+															GetPronoun(0, true, player.Network.Account.Language), GetAggroLevelString(player, false)));
 						return list;
 					}
 			}
@@ -3424,8 +2924,8 @@ namespace Game.Logic
 			if (!base.Interact(player)) return false;
 			if (!GameServer.ServerRules.IsSameRealm(this, player, true) && Faction.GetAggroToFaction(player) > 25)
 			{
-				player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameNPC.Interact.DirtyLook",
-					GetName(0, true, player.Client.Account.Language, this)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+				player.Out.SendMessage(LanguageMgr.GetTranslation(player.Network.Account.Language, "GameNPC.Interact.DirtyLook",
+					GetName(0, true, player.Network.Account.Language, this)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
 				Notify(GameObjectEvent.InteractFailed, this, new InteractEventArgs(player));
 				return false;
@@ -3440,13 +2940,13 @@ namespace Game.Logic
 
 				if (RiderSlot(player) != -1)
 				{
-					player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameNPC.Interact.AlreadyRiding", name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+					player.Out.SendMessage(LanguageMgr.GetTranslation(player.Network.Account.Language, "GameNPC.Interact.AlreadyRiding", name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 					return false;
 				}
 
 				if (GetFreeArrayLocation() == -1)
 				{
-					player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameNPC.Interact.IsFull", name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+					player.Out.SendMessage(LanguageMgr.GetTranslation(player.Network.Account.Language, "GameNPC.Interact.IsFull", name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 					return false;
 				}
 
@@ -4073,7 +3573,7 @@ namespace Game.Logic
 		/// <returns></returns>
 		public override int CalculateLeftHandSwingCount()
 		{
-			if (Util.Chance(m_leftHandSwingChance))
+			if (RandomUtil.Chance(m_leftHandSwingChance))
 				return 1;
 			return 0;
 		}
@@ -4103,7 +3603,7 @@ namespace Game.Logic
 				SwitchWeapon(eActiveWeaponSlot.TwoHanded);
 			else if (twohand != null && righthand != null)
 			{
-				if (Util.Chance(50))
+				if (RandomUtil.Chance(50))
 					SwitchWeapon(eActiveWeaponSlot.TwoHanded);
 				else SwitchWeapon(eActiveWeaponSlot.Standard);
 			}
@@ -5469,8 +4969,8 @@ namespace Game.Logic
 						// Suppress identical messages (multiple item drops).
 						if (str != lastloot)
 						{
-							player.Out.SendMessage(String.Format(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameNPC.DropLoot.Drops",
-								GetName(0, true, player.Client.Account.Language, this), str)), eChatType.CT_Loot, eChatLoc.CL_SystemWindow);
+							player.Out.SendMessage(String.Format(LanguageMgr.GetTranslation(player.Network.Account.Language, "GameNPC.DropLoot.Drops",
+								GetName(0, true, player.Network.Account.Language, this), str)), eChatType.CT_Loot, eChatLoc.CL_SystemWindow);
 							lastloot = str;
 						}
 					}
@@ -5517,9 +5017,6 @@ namespace Game.Logic
 			copyTarget.ExamineArticle = ExamineArticle;
 			copyTarget.MessageArticle = MessageArticle;
 			copyTarget.Intelligence = Intelligence;
-			copyTarget.IsCloakHoodUp = IsCloakHoodUp;
-			copyTarget.IsCloakInvisible = IsCloakInvisible;
-			copyTarget.IsHelmInvisible = IsHelmInvisible;
 			copyTarget.LeftHandSwingChance = LeftHandSwingChance;
 			copyTarget.Level = Level;
 			copyTarget.LoadedFromScript = LoadedFromScript;
@@ -5615,8 +5112,8 @@ namespace Game.Logic
 		{
 			Level = 1;
 			m_health = MaxHealth;
-			m_Realm = 0;
-			m_name = "new mob";
+			mRealm = 0;
+			mName = "new mob";
 			m_model = 408;
 			//Fill the living variables
 			//			CurrentSpeed = 0; // cause position addition recalculation

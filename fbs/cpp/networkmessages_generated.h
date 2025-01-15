@@ -90,6 +90,10 @@ struct SC_DialogBoxMessage;
 struct SC_DialogBoxMessageBuilder;
 struct SC_DialogBoxMessage_FBS;
 
+struct SC_MaxSpeed;
+struct SC_MaxSpeedBuilder;
+struct SC_MaxSpeed_FBS;
+
 struct SC_Quit;
 struct SC_QuitBuilder;
 struct SC_Quit_FBS;
@@ -130,6 +134,8 @@ bool operator==(const SC_StringMessage_FBS &lhs, const SC_StringMessage_FBS &rhs
 bool operator!=(const SC_StringMessage_FBS &lhs, const SC_StringMessage_FBS &rhs);
 bool operator==(const SC_DialogBoxMessage_FBS &lhs, const SC_DialogBoxMessage_FBS &rhs);
 bool operator!=(const SC_DialogBoxMessage_FBS &lhs, const SC_DialogBoxMessage_FBS &rhs);
+bool operator==(const SC_MaxSpeed_FBS &lhs, const SC_MaxSpeed_FBS &rhs);
+bool operator!=(const SC_MaxSpeed_FBS &lhs, const SC_MaxSpeed_FBS &rhs);
 bool operator==(const SC_Quit_FBS &lhs, const SC_Quit_FBS &rhs);
 bool operator!=(const SC_Quit_FBS &lhs, const SC_Quit_FBS &rhs);
 
@@ -1847,6 +1853,86 @@ inline ::flatbuffers::Offset<SC_DialogBoxMessage> CreateSC_DialogBoxMessageDirec
 
 ::flatbuffers::Offset<SC_DialogBoxMessage> CreateSC_DialogBoxMessage(::flatbuffers::FlatBufferBuilder &_fbb, const SC_DialogBoxMessage_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct SC_MaxSpeed_FBS : public ::flatbuffers::NativeTable {
+  typedef SC_MaxSpeed TableType;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_MaxSpeed_FBS";
+  }
+  uint16_t speed = 0;
+  bool turningdisabled = false;
+  uint8_t waterspeed = 0;
+};
+
+struct SC_MaxSpeed FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SC_MaxSpeed_FBS NativeTableType;
+  typedef SC_MaxSpeedBuilder Builder;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_MaxSpeed";
+  }
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_SPEED = 4,
+    VT_TURNINGDISABLED = 6,
+    VT_WATERSPEED = 8
+  };
+  uint16_t speed() const {
+    return GetField<uint16_t>(VT_SPEED, 0);
+  }
+  bool turningdisabled() const {
+    return GetField<uint8_t>(VT_TURNINGDISABLED, 0) != 0;
+  }
+  uint8_t waterspeed() const {
+    return GetField<uint8_t>(VT_WATERSPEED, 0);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint16_t>(verifier, VT_SPEED, 2) &&
+           VerifyField<uint8_t>(verifier, VT_TURNINGDISABLED, 1) &&
+           VerifyField<uint8_t>(verifier, VT_WATERSPEED, 1) &&
+           verifier.EndTable();
+  }
+  SC_MaxSpeed_FBS *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(SC_MaxSpeed_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<SC_MaxSpeed> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_MaxSpeed_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct SC_MaxSpeedBuilder {
+  typedef SC_MaxSpeed Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_speed(uint16_t speed) {
+    fbb_.AddElement<uint16_t>(SC_MaxSpeed::VT_SPEED, speed, 0);
+  }
+  void add_turningdisabled(bool turningdisabled) {
+    fbb_.AddElement<uint8_t>(SC_MaxSpeed::VT_TURNINGDISABLED, static_cast<uint8_t>(turningdisabled), 0);
+  }
+  void add_waterspeed(uint8_t waterspeed) {
+    fbb_.AddElement<uint8_t>(SC_MaxSpeed::VT_WATERSPEED, waterspeed, 0);
+  }
+  explicit SC_MaxSpeedBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<SC_MaxSpeed> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<SC_MaxSpeed>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<SC_MaxSpeed> CreateSC_MaxSpeed(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint16_t speed = 0,
+    bool turningdisabled = false,
+    uint8_t waterspeed = 0) {
+  SC_MaxSpeedBuilder builder_(_fbb);
+  builder_.add_speed(speed);
+  builder_.add_waterspeed(waterspeed);
+  builder_.add_turningdisabled(turningdisabled);
+  return builder_.Finish();
+}
+
+::flatbuffers::Offset<SC_MaxSpeed> CreateSC_MaxSpeed(::flatbuffers::FlatBufferBuilder &_fbb, const SC_MaxSpeed_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 struct SC_Quit_FBS : public ::flatbuffers::NativeTable {
   typedef SC_Quit TableType;
   static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
@@ -2863,6 +2949,51 @@ inline ::flatbuffers::Offset<SC_DialogBoxMessage> CreateSC_DialogBoxMessage(::fl
       _data3,
       _data4,
       _message);
+}
+
+
+inline bool operator==(const SC_MaxSpeed_FBS &lhs, const SC_MaxSpeed_FBS &rhs) {
+  return
+      (lhs.speed == rhs.speed) &&
+      (lhs.turningdisabled == rhs.turningdisabled) &&
+      (lhs.waterspeed == rhs.waterspeed);
+}
+
+inline bool operator!=(const SC_MaxSpeed_FBS &lhs, const SC_MaxSpeed_FBS &rhs) {
+    return !(lhs == rhs);
+}
+
+
+inline SC_MaxSpeed_FBS *SC_MaxSpeed::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<SC_MaxSpeed_FBS>(new SC_MaxSpeed_FBS());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void SC_MaxSpeed::UnPackTo(SC_MaxSpeed_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = speed(); _o->speed = _e; }
+  { auto _e = turningdisabled(); _o->turningdisabled = _e; }
+  { auto _e = waterspeed(); _o->waterspeed = _e; }
+}
+
+inline ::flatbuffers::Offset<SC_MaxSpeed> SC_MaxSpeed::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_MaxSpeed_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateSC_MaxSpeed(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<SC_MaxSpeed> CreateSC_MaxSpeed(::flatbuffers::FlatBufferBuilder &_fbb, const SC_MaxSpeed_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const SC_MaxSpeed_FBS* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _speed = _o->speed;
+  auto _turningdisabled = _o->turningdisabled;
+  auto _waterspeed = _o->waterspeed;
+  return NetworkMessage::CreateSC_MaxSpeed(
+      _fbb,
+      _speed,
+      _turningdisabled,
+      _waterspeed);
 }
 
 

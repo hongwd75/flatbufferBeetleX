@@ -4,21 +4,28 @@ using Game.Logic.AI.Brain;
 using Game.Logic.Effects;
 using Game.Logic.Events;
 using Game.Logic.Geometry;
+using Game.Logic.Inventory;
+using Game.Logic.Language;
 using Game.Logic.PropertyCalc;
 using Game.Logic.Skills;
 using Game.Logic.Spells;
 using Game.Logic.Utils;
 using Game.Logic.World;
 using Game.Logic.World.Timer;
-
+using Logic.database.table;
+using NetworkMessage;
+/*
+	RangedAttackState, RangedAttackType 은 제외함.   
+ */
 namespace Game.Logic;
 
-public class GameLiving : GameObject
+public partial class GameLiving : GameObject
 {
 	private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 	
     private readonly PropertyCollection m_tempProps = new PropertyCollection();
     internal static readonly IPropertyCalculator[] m_propertyCalc = new IPropertyCalculator[(int)eProperty.MaxProperty+1];
+
 
 	#region ==== ENUM ======================================================================================================
 	public enum eActiveWeaponSlot : byte
@@ -107,8 +114,322 @@ public class GameLiving : GameObject
 		    return chanceToBeMissed;
 	    }
     }
+    #endregion
+
+    #region main/left hand weapon
+    public virtual bool CanUseLefthandedWeapon
+    {
+	    get { return false; }
+	    set { }
+    }
+    public virtual int CalculateLeftHandSwingCount()
+    {
+	    return 0;
+    }
+    public virtual double CalculateLeftHandEffectiveness(InventoryItem mainWeapon, InventoryItem leftWeapon)
+    {
+	    return 1.0;
+    }
+    public virtual double CalculateMainHandEffectiveness(InventoryItem mainWeapon, InventoryItem leftWeapon)
+    {
+	    return 1.0;
+    }
     
-    #region ## Attacker
+	public virtual void SwitchWeapon(eActiveWeaponSlot slot)
+	{
+		if (Inventory == null)
+			return;
+
+		InventoryItem rightHandSlot = Inventory.GetItem(eInventorySlot.RightHandWeapon);
+		InventoryItem leftHandSlot = Inventory.GetItem(eInventorySlot.LeftHandWeapon);
+		InventoryItem twoHandSlot = Inventory.GetItem(eInventorySlot.TwoHandWeapon);
+		InventoryItem distanceSlot = Inventory.GetItem(eInventorySlot.DistanceWeapon);
+
+		// simple active slot logic:
+		// 0=right hand, 1=left hand, 2=two-hand, 3=range, F=none
+		int rightHand = (VisibleActiveWeaponSlots & 0x0F);
+		int leftHand = (VisibleActiveWeaponSlots & 0xF0) >> 4;
+
+
+		// set new active weapon slot
+		switch (slot)
+		{
+			case eActiveWeaponSlot.Standard:
+				{
+					if (rightHandSlot == null)
+						rightHand = 0xFF;
+					else
+						rightHand = 0x00;
+
+					if (leftHandSlot == null)
+						leftHand = 0xFF;
+					else
+						leftHand = 0x01;
+				}
+				break;
+
+			case eActiveWeaponSlot.TwoHanded:
+				{
+					if (twoHandSlot != null && (twoHandSlot.Hand == 1 || this is GameNPC)) // 2h
+					{
+						rightHand = leftHand = 0x02;
+						break;
+					}
+
+					// 1h weapon in 2h slot
+					if (twoHandSlot == null)
+						rightHand = 0xFF;
+					else
+						rightHand = 0x02;
+
+					if (leftHandSlot == null)
+						leftHand = 0xFF;
+					else
+						leftHand = 0x01;
+				}
+				break;
+
+			case eActiveWeaponSlot.Distance:
+				{
+					leftHand = 0xFF; // cannot use left-handed weapons if ranged slot active
+
+					if (distanceSlot == null)
+						rightHand = 0xFF;
+					else if (distanceSlot.Hand == 1 || this is GameNPC) // NPC equipment does not have hand so always assume 2 handed bow
+						rightHand = leftHand = 0x03; // bows use 2 hands, throwing axes 1h
+					else
+						rightHand = 0x03;
+				}
+				break;
+		}
+
+		m_activeWeaponSlot = slot;
+
+		// pack active weapon slots value back
+		m_visibleActiveWeaponSlots = (byte)(((leftHand & 0x0F) << 4) | (rightHand & 0x0F));
+	}
+	#endregion
+
+	#region interrupt
+	private RegionAction InterruptTimer { get; set; }
+	public virtual void StartInterruptTimer(AttackData attack, int duration)
+	{
+		if(attack != null)
+			StartInterruptTimer(duration, attack.AttackType, attack.Attacker);
+	}
+
+	public virtual void StartInterruptTimer(int duration, AttackData.eAttackType attackType, GameLiving attacker)
+	{
+		if (!IsAlive || ObjectState != eObjectState.Active)
+		{
+			InterruptTime = 0;
+			InterruptAction = 0;
+			return;
+		}
+		if (InterruptTime < CurrentRegion.Time + duration)
+			InterruptTime = CurrentRegion.Time + duration;
+
+		if (CurrentSpellHandler != null)
+			CurrentSpellHandler.CasterIsAttacked(attacker);
+		
+		if (AttackState && ActiveWeaponSlot == eActiveWeaponSlot.Distance)
+			OnInterruptTick(attacker, attackType);
+	}
+
+	protected long m_interruptTime = 0;
+	public virtual long InterruptTime
+	{
+		get { return m_interruptTime; }
+		set
+		{
+			if (CurrentRegion != null)
+				InterruptAction = CurrentRegion.Time;
+			m_interruptTime = value;
+		}
+	}
+
+	protected long m_interruptAction = 0;
+	public virtual long InterruptAction
+	{
+		get { return m_interruptAction; }
+		set { m_interruptAction = value; }
+	}
+
+	/// <summary>
+	/// Yields true if interrupt action is running on this living.
+	/// </summary>
+	public virtual bool IsBeingInterrupted
+	{
+		get { return (m_interruptTime > CurrentRegion.Time); }
+	}
+
+	/// <summary>
+	/// Base chance this living can be interrupted
+	/// </summary>
+	public virtual int BaseInterruptChance
+	{
+		get { return 65; }
+	}
+
+	/// <summary>
+	/// How long does an interrupt last?
+	/// </summary>
+	public virtual int SpellInterruptDuration
+	{
+		get { return ServerProperties.Properties.SPELL_INTERRUPT_DURATION; }
+	}
+
+	/// <summary>
+	/// The amount of time the caster has to wait before being able to cast again
+	/// </summary>
+	public virtual int SpellInterruptRecastTime
+	{
+		get { return ServerProperties.Properties.SPELL_INTERRUPT_RECAST; }
+	}
+
+	/// <summary>
+	/// Additional interrupt time if interrupted again
+	/// </summary>
+	public virtual int SpellInterruptRecastAgain
+	{
+		get { return ServerProperties.Properties.SPELL_INTERRUPT_AGAIN; }
+	}
+
+	public virtual bool ChanceSpellInterrupt(GameLiving attacker)
+	{
+		double mod = GetConLevel(attacker);
+		double chance = BaseInterruptChance;
+		chance += mod * 10;
+		chance = Math.Max(1, chance);
+		chance = Math.Min(99, chance);
+		if (attacker is GamePlayer) chance = 99;
+		return RandomUtil.Chance((int)chance);
+	}	
+	protected virtual bool OnInterruptTick(GameLiving attacker, AttackData.eAttackType attackType)
+	{
+		return false;
+	}	
+    #endregion
+	#region Abilities
+	protected readonly Dictionary<string, Ability> m_abilities = new Dictionary<string, Ability>();
+	protected readonly Object m_lockAbilities = new Object();
+
+	public virtual bool HasAbility(string keyName)
+	{
+		bool hasit = false;
+		
+		lock (m_lockAbilities)
+		{
+			hasit = m_abilities.ContainsKey(keyName);
+		}
+		
+		return hasit;
+	}
+	public virtual void AddAbility(Ability ability)
+	{
+		AddAbility(ability, true);
+	}
+	public virtual void AddAbility(Ability ability, bool sendUpdates)
+	{
+		bool isNewAbility = false;
+		lock (m_lockAbilities)
+		{
+			Ability oldAbility = null;
+			m_abilities.TryGetValue(ability.KeyName, out oldAbility);
+			
+			if (oldAbility == null)
+			{
+				isNewAbility = true;
+				m_abilities.Add(ability.KeyName, ability);
+				ability.Activate(this, sendUpdates);
+			}
+			else
+			{
+				int oldLevel = oldAbility.Level;
+				oldAbility.Level = ability.Level;
+				
+				isNewAbility |= oldAbility.Level > oldLevel;
+			}
+			
+			if (sendUpdates && (isNewAbility && (this is GamePlayer)))
+			{
+				(this as GamePlayer).Out.SendMessage(LanguageMgr.GetTranslation((this as GamePlayer).Network.Account.Language, "GamePlayer.AddAbility.YouLearn", ability.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+			}
+		}
+	}
+	public virtual bool RemoveAbility(string abilityKeyName)
+	{
+		Ability ability = null;
+		lock (m_lockAbilities)
+		{
+			m_abilities.TryGetValue(abilityKeyName, out ability);
+			
+			if (ability == null)
+				return false;
+			
+			ability.Deactivate(this, true);
+			m_abilities.Remove(ability.KeyName);
+		}
+		
+		if (this is GamePlayer)
+			(this as GamePlayer).Out.SendMessage(LanguageMgr.GetTranslation((this as GamePlayer).Network.Account.Language, "GamePlayer.RemoveAbility.YouLose", ability.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+		return true;
+	}
+
+	public Ability GetAbility(string abilityKey)
+	{
+		Ability ab = null;
+		lock (m_lockAbilities)
+		{
+			m_abilities.TryGetValue(abilityKey, out ab);
+		}
+		
+		return ab;
+	}
+
+	public T GetAbility<T>() where T : Ability
+	{
+		T tmp;
+		lock (m_lockAbilities)
+		{
+			tmp = (T)m_abilities.Values.FirstOrDefault(a => a.GetType().Equals(typeof(T)));
+		}
+		
+		return tmp;
+	}
+	
+	public int GetAbilityLevel(string keyName)
+	{
+		Ability ab = null;
+		
+		lock (m_lockAbilities)
+		{
+			m_abilities.TryGetValue(keyName, out ab);
+		}
+		
+		if (ab == null)
+			return 0;
+
+		return Math.Max(1, ab.Level);
+	}
+
+	public IList GetAllAbilities()
+	{
+		List<Ability> list = new List<Ability>();
+		lock (m_lockAbilities)
+		{
+			list = new List<Ability>(m_abilities.Values);
+		}
+		
+		return list;
+	}
+
+	public virtual bool HasAbilityToUseItem(ItemTemplate item)
+	{
+		return GameServer.ServerRules.CheckAbilityToUseItem(this, item);
+	}
+	#endregion
+    #region Attacker
     protected AttackAction m_attackAction;
     protected readonly List<GameObject> m_attackers;
     public List<GameObject> Attackers => m_attackers;
@@ -427,6 +748,85 @@ public class GameLiving : GameObject
 	}
 
 	#endregion
+	#region Skills
+	private readonly Dictionary<KeyValuePair<int, Type>, KeyValuePair<long, Skill>> m_disabledSkills = new Dictionary<KeyValuePair<int, Type>, KeyValuePair<long, Skill>>();
+	public virtual int GetSkillDisabledDuration(Skill skill)
+	{
+		lock ((m_disabledSkills as ICollection).SyncRoot)
+		{
+			KeyValuePair<int, Type> key = new KeyValuePair<int, Type>(skill.ID, skill.GetType());
+			if (m_disabledSkills.ContainsKey(key))
+			{
+				long timeout = m_disabledSkills[key].Key;
+				long left = timeout - CurrentRegion.Time;
+				if (left <= 0)
+				{
+					left = 0;
+					m_disabledSkills.Remove(key);
+				}
+				return (int)left;
+			}
+		}
+		return 0;
+	}
+	public virtual ICollection<Skill> GetAllDisabledSkills()
+	{
+		lock ((m_disabledSkills as ICollection).SyncRoot)
+		{
+			List<Skill> skillList = new List<Skill>();
+			
+			foreach(KeyValuePair<long, Skill> disabled in m_disabledSkills.Values)
+				skillList.Add(disabled.Value);
+			
+			return skillList;
+		}
+	}
+	public virtual void DisableSkill(Skill skill, int duration)
+	{
+		lock ((m_disabledSkills as ICollection).SyncRoot)
+		{
+			KeyValuePair<int, Type> key = new KeyValuePair<int, Type>(skill.ID, skill.GetType());
+			if (duration > 0)
+			{
+				m_disabledSkills[key] = new KeyValuePair<long, Skill>(CurrentRegion.Time + duration, skill);
+			}
+			else
+			{
+				m_disabledSkills.Remove(key);
+			}
+		}
+	}
+	public virtual void DisableSkill(ICollection<Tuple<Skill, int>> skills)
+	{
+		lock ((m_disabledSkills as ICollection).SyncRoot)
+		{
+			foreach (Tuple<Skill, int> tuple in skills)
+			{
+				Skill skill = tuple.Item1;
+				int duration = tuple.Item2;
+				
+				KeyValuePair<int, Type> key = new KeyValuePair<int, Type>(skill.ID, skill.GetType());
+				if (duration > 0)
+				{
+					m_disabledSkills[key] = new KeyValuePair<long, Skill>(CurrentRegion.Time + duration, skill);
+				}
+				else
+				{
+					m_disabledSkills.Remove(key);
+				}
+			}
+		}
+	}
+	public virtual void RemoveDisabledSkill(Skill skill)
+	{
+		lock ((m_disabledSkills as ICollection).SyncRoot)
+		{
+			KeyValuePair<int, Type> key = new KeyValuePair<int, Type>(skill.ID, skill.GetType());
+			if(m_disabledSkills.ContainsKey(key))
+				m_disabledSkills.Remove(key);
+		}
+	}
+	#endregion
     #region Attack action
     public virtual void EnemyKilled(GameLiving enemy)
     {
@@ -459,24 +859,26 @@ public class GameLiving : GameObject
     
 
     #endregion
-    
+    #region Inventory
+
+    protected IGameInventory m_inventory;
+    public IGameInventory Inventory
+    {
+	    get
+	    {
+		    return m_inventory;
+	    }
+	    set
+	    {
+		    m_inventory = value;
+	    }
+    }
+    #endregion
+    #region Effects
     protected readonly GameEffectList m_effects;
     public GameEffectList EffectList => m_effects;
     protected virtual GameEffectList CreateEffectsList() => new GameEffectList(this);
     #endregion
-    
-    public PropertyCollection TempProperties
-    {
-        get { return m_tempProps; }
-    }
-    
-    protected short m_race;
-    public virtual short Race
-    {
-        get { return m_race; }
-        set { m_race = value; }
-    }    
-
     #region Stealth
     public virtual bool CanStealth
     { get; set; }
@@ -492,7 +894,6 @@ public class GameLiving : GameObject
 		    log.Warn($"Stealth(): {GetType().FullName} cannot be stealthed.  You probably need to override Stealth() for this class");
     }
     #endregion
-    
     #region ControlledNpc
     private byte m_petCount = 0;
 
@@ -579,8 +980,24 @@ public class GameLiving : GameObject
     {
     }
     #endregion
+    
+    public PropertyCollection TempProperties
+    {
+        get { return m_tempProps; }
+    }
+    
+    protected short m_race;
+    public virtual short Race
+    {
+        get { return m_race; }
+        set { m_race = value; }
+    }    
 
     #region GetModifieds
+    public virtual int GetModifiedSpecLevel(string keyName)
+    {
+	    return Level;
+    }    
     public virtual int GetModified(eProperty property)
     {
 	    if (m_propertyCalc != null && m_propertyCalc[(int)property] != null)
@@ -671,6 +1088,7 @@ public class GameLiving : GameObject
 			m_healthRegenerationTimer.Start(HealthRegenerationPeriod);
 		}
 	}
+	
 	public virtual void StartPowerRegeneration()
 	{
 		if (ObjectState != eObjectState.Active)
@@ -690,6 +1108,7 @@ public class GameLiving : GameObject
 			m_powerRegenerationTimer.Start(PowerRegenerationPeriod);
 		}
 	}
+	
 	public virtual void StartEnduranceRegeneration()
 	{
 		if (ObjectState != eObjectState.Active)
@@ -708,6 +1127,7 @@ public class GameLiving : GameObject
 			m_enduRegenerationTimer.Start(EnduranceRegenerationPeriod);
 		}
 	}
+	
 	public virtual void StopHealthRegeneration()
 	{
 		lock (m_regenTimerLock)
@@ -718,6 +1138,7 @@ public class GameLiving : GameObject
 			m_healthRegenerationTimer = null;
 		}
 	}
+	
 	public virtual void StopPowerRegeneration()
 	{
 		lock (m_regenTimerLock)
@@ -728,6 +1149,7 @@ public class GameLiving : GameObject
 			m_powerRegenerationTimer = null;
 		}
 	}
+	
 	public virtual void StopEnduranceRegeneration()
 	{
 		lock (m_regenTimerLock)
@@ -738,6 +1160,7 @@ public class GameLiving : GameObject
 			m_enduRegenerationTimer = null;
 		}
 	}
+	
 	protected virtual int HealthRegenerationTimerCallback(RegionTimer callingTimer)
 	{
 		if (Health < MaxHealth)
@@ -760,10 +1183,7 @@ public class GameLiving : GameObject
 		//Heal at standard rate
 		return HealthRegenerationPeriod;
 	}
-	/// <summary>
-	/// Callback for the power regenerationTimer
-	/// </summary>
-	/// <param name="selfRegenerationTimer">timer calling this function</param>
+	
 	protected virtual int PowerRegenerationTimerCallback(RegionTimer selfRegenerationTimer)
 	{
 		if (this is GamePlayer )
@@ -810,10 +1230,7 @@ public class GameLiving : GameObject
 		//regen at standard rate
 		return PowerRegenerationPeriod;
 	}
-	/// <summary>
-	/// Callback for the endurance regenerationTimer
-	/// </summary>
-	/// <param name="selfRegenerationTimer">timer calling this function</param>
+
 	protected virtual int EnduranceRegenerationTimerCallback(RegionTimer selfRegenerationTimer)
 	{
 		if (Endurance < MaxEndurance)
@@ -1268,11 +1685,26 @@ public class GameLiving : GameObject
 	}	
 	#endregion
 
+	public override void Notify(GameEvent e, object sender, EventArgs args)
+	{
+		if (e == GameLivingEvent.Interrupted && args != null)
+		{
+			if (CurrentSpellHandler != null)
+				CurrentSpellHandler.CasterIsAttacked((args as InterruptedEventArgs).Attacker);
+
+			return;
+		}
+
+		base.Notify(e, sender, args);
+	}	
+	
     /// <summary>
     /// 생성 초기화
     /// </summary>
     public GameLiving() : base()
     {
+	    m_guildName = string.Empty;
+	    
         for (eBuffBonusType i = 0; i < eBuffBonusType.MaxBonusType; i++)
         {
             m_PropertyIndexers[(int)i] = i switch
@@ -1285,11 +1717,15 @@ public class GameLiving : GameObject
         m_activeWeaponSlot = eActiveWeaponSlot.Standard;
         m_attackers = new List<GameObject>();
         m_effects = CreateEffectsList();
+        m_concEffects = new ConcentrationList(this);
+        m_attackers = new List<GameObject>();
         
         m_health = 1;
         m_mana = 1;
         m_endurance = 1;
         m_maxEndurance = 1;
         m_lastAttackedTick = 0;
+        
+        CanStealth = false;
     }
 }

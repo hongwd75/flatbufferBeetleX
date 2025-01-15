@@ -1,6 +1,9 @@
-﻿using Game.Logic.AI.Brain;
+﻿using System.Collections;
+using Game.Logic.AI.Brain;
+using Game.Logic.Inventory;
 using Game.Logic.network;
 using Game.Logic.World;
+using Logic.database.table;
 
 namespace Game.Logic.ServerRules;
 
@@ -90,9 +93,9 @@ public class NormalServerRules : AbstractServerRules
 			return true;
 
 		// clients with priv level > 1 are considered friendly by anyone
-		if(target is GamePlayer && ((GamePlayer)target).Client.Account.PrivLevel > 1) return true;
+		if(target is GamePlayer && ((GamePlayer)target).Network.Account.PrivLevel > 1) return true;
 		// checking as a gm, targets are considered friendly
-		if (source is GamePlayer && ((GamePlayer)source).Client.Account.PrivLevel > 1) return true;
+		if (source is GamePlayer && ((GamePlayer)source).Network.Account.PrivLevel > 1) return true;
 
 		//Peace flag NPCs are same realm
 		if (target is GameNPC)
@@ -115,8 +118,6 @@ public class NormalServerRules : AbstractServerRules
 	{
 		if (client.Account.PrivLevel > 1)
 			return true;
-		if (ServerProperties.Properties.ALLOW_ALL_REALMS)
-			return true;
 		return false;
 	}
 
@@ -133,7 +134,7 @@ public class NormalServerRules : AbstractServerRules
 	}
 
 
-	public override bool IsAllowedToJoinGuild(GamePlayer source, Guild guild)
+	public override bool IsAllowedToJoinGuild(GamePlayer source, Guild.Guild guild)
 	{
 		if (source == null) 
 			return false;
@@ -153,7 +154,7 @@ public class NormalServerRules : AbstractServerRules
 		// clients with priv level > 1 are allowed to trade with anyone
 		if(source is GamePlayer && target is GamePlayer)
 		{
-			if ((source as GamePlayer).Client.Account.PrivLevel > 1 ||(target as GamePlayer).Client.Account.PrivLevel > 1)
+			if ((source as GamePlayer).Network.Account.PrivLevel > 1 ||(target as GamePlayer).Network.Account.PrivLevel > 1)
 				return true;
 		}
 
@@ -178,11 +179,8 @@ public class NormalServerRules : AbstractServerRules
 	{
 		if(source == null || target == null) return false;
 
-		// clients with priv level > 1 are allowed to talk and hear anyone
-		if(source is GamePlayer && ((GamePlayer)source).Client.Account.PrivLevel > 1) return true;
-		if(target.Client.Account.PrivLevel > 1) return true;
-
-		//Peace flag NPCs can be understood by everyone
+		if(source is GamePlayer && ((GamePlayer)source).Network.Account.PrivLevel > 1) return true;
+		if(target.Network.Account.PrivLevel > 1) return true;
 
 		if (source is GameNPC)
 			if (((GameNPC)source).IsPeaceful)
@@ -192,34 +190,12 @@ public class NormalServerRules : AbstractServerRules
 		return true;
 	}
 
-	/// <summary>
-	/// Is player allowed to bind
-	/// </summary>
-	/// <param name="player"></param>
-	/// <param name="point"></param>
-	/// <returns></returns>
 	public override bool IsAllowedToBind(GamePlayer player, BindPoint point)
 	{
 		if (point.Realm == 0) return true;
 		return player.Realm == (eRealm)point.Realm;
 	}
 
-	/// <summary>
-	/// Is player allowed to make the item
-	/// </summary>
-	/// <param name="player"></param>
-	/// <param name="item"></param>
-	/// <returns></returns>
-	public override bool IsAllowedToCraft(GamePlayer player, ItemTemplate item)
-	{
-		return player.Realm == (eRealm)item.Realm || (item.Realm == 0 && ServerProperties.Properties.ALLOW_CRAFT_NOREALM_ITEMS);
-	}
-
-	/// <summary>
-	/// Translates object type to compatible object types based on server type
-	/// </summary>
-	/// <param name="objectType">The object type</param>
-	/// <returns>An array of compatible object types</returns>
 	protected override eObjectType[] GetCompatibleObjectTypes(eObjectType objectType)
 	{
 		if(m_compatibleObjectTypes == null)
@@ -270,69 +246,21 @@ public class NormalServerRules : AbstractServerRules
 			return Array.Empty<eObjectType>();
 		return res;
 	}
-
-	/// <summary>
-	/// Gets the player name based on server type
-	/// </summary>
-	/// <param name="source">The "looking" player</param>
-	/// <param name="target">The considered player</param>
-	/// <returns>The name of the target</returns>
+	
 	public override string GetPlayerName(GamePlayer source, GamePlayer target)
 	{
-		if (IsSameRealm(source, target, true))
-			return target.Name;
-		return source.RaceToTranslatedName(target.Race, target.Gender);
+		return target.Name;
 	}
-
-	/// <summary>
-	/// Gets the player last name based on server type
-	/// </summary>
-	/// <param name="source">The "looking" player</param>
-	/// <param name="target">The considered player</param>
-	/// <returns>The last name of the target</returns>
+	
 	public override string GetPlayerLastName(GamePlayer source, GamePlayer target)
 	{
-		if (IsSameRealm(source, target, true))
-			return target.LastName;
-
-		return target.RealmRankTitle(source.Client.Account.Language);
+		return target.LastName;
 	}
 
-	/// <summary>
-	/// Gets the player guild name based on server type
-	/// </summary>
-	/// <param name="source">The "looking" player</param>
-	/// <param name="target">The considered player</param>
-	/// <returns>The guild name of the target</returns>
 	public override string GetPlayerGuildName(GamePlayer source, GamePlayer target)
 	{
 		if (IsSameRealm(source, target, true))
 			return target.GuildName;
 		return string.Empty;
-	}
-
-	/// <summary>
-	/// Gets the player's custom title based on server type
-	/// </summary>
-	/// <param name="source">The "looking" player</param>
-	/// <param name="target">The considered player</param>
-	/// <returns>The custom title of the target</returns>
-	public override string GetPlayerTitle(GamePlayer source, GamePlayer target)
-	{
-		if (IsSameRealm(source, target, true))
-			return target.CurrentTitle.GetValue(source, target);
-		
-		return string.Empty;
-	}
-
-	/// <summary>
-	/// Reset the keep with special server rules handling
-	/// </summary>
-	/// <param name="lord">The lord that was killed</param>
-	/// <param name="killer">The lord's killer</param>
-	public override void ResetKeep(GuardLord lord, GameObject killer)
-	{
-		base.ResetKeep(lord, killer);
-		lord.Component.Keep.Reset((eRealm)killer.Realm);
 	}
 }

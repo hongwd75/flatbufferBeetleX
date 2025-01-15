@@ -1,12 +1,16 @@
 ﻿using System.Collections;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Game.Logic.Effects;
 using Game.Logic.Events;
 using Game.Logic.Geometry;
+using Game.Logic.Language;
+using Game.Logic.ServerProperties;
 using Game.Logic.Skills;
 using Game.Logic.Utils;
 using Game.Logic.World;
 using log4net;
+using NetworkMessage;
 
 namespace Game.Logic.AI.Brain
 {
@@ -55,41 +59,16 @@ public class StandardMobBrain : APlayerVicinityBrain, IOldAggressiveBrain
 		}
 
 		#region AI
-
-		/// <summary>
-		/// Do the mob AI
-		/// </summary>
 		public override void Think()
 		{
-			//Satyr:
-			//This is a general information. When i review this Think-Procedure and the interaction between it and some
-			//code of GameNPC.cs i have the feeling this is a mixture of much ideas of diffeent people, much unfinished
-			//features like random-walk which does not actually fit to the rest of this Brain-logic.
-			//In other words:
-			//If somebody feeling like redoing this stuff completly i would appreciate it. It might be worth redoing
-			//instead of trying desperately to make something work that is simply chaoticly moded by too much
-			//diffeent inputs.
-			//For NOW i made the aggro working the following way (close to live but not yet 100% equal):
-			//Mobs will not aggro on their way back home (in fact they should even under some special circumstances)
-			//They will completly forget all Aggro when respawned and returned Home.
-
-
-			// If the NPC is tethered and has been pulled too far it will
-			// de-aggro and return to its spawn point.
 			if (Body.IsOutOfTetherRange && !Body.InCombat)
 			{
 				Body.WalkToSpawn();
 				return;
 			}
-			// If the NPC is Moving on path, it can detect closed doors and open them
-			if(Body.IsMovingOnPath) DetectDoor();
-			//Instead - lets just let CheckSpells() make all the checks for us
-			//Check for just positive spells
+
 			CheckSpells(eCheckSpellType.Defensive);
 
-			// Note: Offensive spells are checked in GameNPC:SpellAction timer
-
-			// check for returning to home if to far away
 			if (Body.MaxDistance != 0 && !Body.IsReturningHome)
 			{
 				int distance = (int)Body.Coordinate.DistanceTo(Body.SpawnPosition);
@@ -102,7 +81,7 @@ public class StandardMobBrain : APlayerVicinityBrain, IOldAggressiveBrain
 			}
 
 			//If this NPC can randomly walk around, we allow it to walk around
-			if (!Body.AttackState && CanRandomWalk && !Body.IsRoaming && RandomUtil.Chance(DOL.GS.ServerProperties.Properties.GAMENPC_RANDOMWALK_CHANCE))
+			if (!Body.AttackState && CanRandomWalk && !Body.IsRoaming && RandomUtil.Chance(Properties.GAMENPC_RANDOMWALK_CHANCE))
 			{
                 var target = GetRandomWalkTarget();
                 if (target.DistanceTo(Body.Coordinate) <= GameNPC.CONST_WALKTOTOLERANCE)
@@ -116,6 +95,7 @@ public class StandardMobBrain : APlayerVicinityBrain, IOldAggressiveBrain
 
                 Body.FireAmbientSentence(GameNPC.eAmbientTrigger.roaming);
 			}
+			
 			//If the npc can move, and the npc is not casting, not moving, and not attacking or in combat
 			else if (Body.MaxSpeedBase > 0 && Body.CurrentSpellHandler == null && !Body.IsMoving && !Body.AttackState && !Body.InCombat && !Body.IsMovingOnPath)
 			{
@@ -219,8 +199,6 @@ public class StandardMobBrain : APlayerVicinityBrain, IOldAggressiveBrain
 					continue; // add only new NPCs
 				if (!npc.IsAlive || npc.ObjectState != GameObject.eObjectState.Active)
 					continue;
-				if (npc is GameTaxi)
-					continue; //do not attack horses
 
 				if (CalculateAggroLevelToTarget(npc) > 0)
 				{
@@ -244,9 +222,6 @@ public class StandardMobBrain : APlayerVicinityBrain, IOldAggressiveBrain
 				if (!GameServer.ServerRules.IsAllowedToAttack(Body, player, true)) continue;
 				// Don't aggro on immune players.
 
-				if (player.EffectList.GetOfType<NecromancerShadeEffect>() != null)
-					continue;
-
 				int aggrolevel = 0;
 
 				if (Body.Faction != null)
@@ -263,8 +238,6 @@ public class StandardMobBrain : APlayerVicinityBrain, IOldAggressiveBrain
 					continue; // add only new players
 				if (!player.IsAlive || player.ObjectState != GameObject.eObjectState.Active || player.IsStealthed)
 					continue;
-				if (player.Steed != null)
-					continue; //do not attack players on steed
 
 				if (CalculateAggroLevelToTarget(player) > 0)
 				{
@@ -427,7 +400,7 @@ public class StandardMobBrain : APlayerVicinityBrain, IOldAggressiveBrain
 
 			// Check LOS (walls, pits, etc...) before  attacking, player + pet
 			// Be sure the aggrocheck is triggered by the brain on Think() method
-			if (DOL.GS.ServerProperties.Properties.ALWAYS_CHECK_LOS && CheckLOS)
+			if (Properties.ALWAYS_CHECK_LOS && CheckLOS)
 			{
 				GamePlayer thisLiving = null;
 				if (living is GamePlayer)
@@ -454,22 +427,7 @@ public class StandardMobBrain : APlayerVicinityBrain, IOldAggressiveBrain
 			if (living is GamePlayer && aggroamount > 0)
 			{
 				GamePlayer player = (GamePlayer)living;
-				
-				if (player.Group != null)
-				{ // player is in group, add whole group to aggro list
-					lock ((m_aggroTable as ICollection).SyncRoot)
-					{
-						foreach (GamePlayer p in player.Group.GetPlayersInTheGroup())
-						{
-							if (!m_aggroTable.ContainsKey(p))
-							{
-								m_aggroTable[p] = 1L;	// add the missing group member on aggro table
-							}
-						}
-					}
-				}
 
-				//ProtectEffect protect = (ProtectEffect) player.EffectList.GetOfType(typeof(ProtectEffect));
 				foreach (ProtectEffect protect in player.EffectList.GetAllOfType<ProtectEffect>())
 				{
 					// if no aggro left => break
@@ -496,8 +454,10 @@ public class StandardMobBrain : APlayerVicinityBrain, IOldAggressiveBrain
 					if (protectAmount > 0)
 					{
 						aggroamount -= protectAmount;
-						protect.ProtectSource.Out.SendMessage(LanguageMgr.GetTranslation(protect.ProtectSource.Client.Account.Language, "AI.Brain.StandardMobBrain.YouProtDist", player.GetName(0, false),
-						                                                                 Body.GetName(0, false, protect.ProtectSource.Client.Account.Language, Body)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+						protect.ProtectSource.Out.SendMessage(LanguageMgr.GetTranslation(protect.ProtectSource.Client.Account.Language, 
+																						 "AI.Brain.StandardMobBrain.YouProtDist", player.GetName(0, false),
+						                                                                 Body.GetName(0, false, protect.ProtectSource.Client.Account.Language, Body)), 
+																						 eChatType.CT_System, eChatLoc.CL_SystemWindow);
 						//player.Out.SendMessage("You are protected by " + protect.ProtectSource.GetName(0, false) + " from " + Body.GetName(0, false) + ".", eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
 						lock ((m_aggroTable as ICollection).SyncRoot)
@@ -638,10 +598,6 @@ public class StandardMobBrain : APlayerVicinityBrain, IOldAggressiveBrain
 						removable.Add(living);
 						continue;
 					}
-
-					// Don't bother about necro shade, can't attack it anyway.
-					if (living.EffectList.GetOfType<NecromancerShadeEffect>() != null)
-						continue;
 					
 					long amount = aggros.Current.Value;
 
@@ -733,7 +689,7 @@ public class StandardMobBrain : APlayerVicinityBrain, IOldAggressiveBrain
 		/// <param name="e">The event received</param>
 		/// <param name="sender">The event sender</param>
 		/// <param name="args">The event arguments</param>
-		public override void Notify(DOLEvent e, object sender, EventArgs args)
+		public override void Notify(GameEvent e, object sender, EventArgs args)
 		{
 			base.Notify(e, sender, args);
 
@@ -925,65 +881,7 @@ public class StandardMobBrain : APlayerVicinityBrain, IOldAggressiveBrain
 			// These are only used if we have to check for duplicates
 			HashSet<String> countedVictims = null;
 			HashSet<String> countedAttackers = null;
-
-			BattleGroup bg = puller.TempProperties.getProperty<object>(BattleGroup.BATTLEGROUP_PROPERTY, null) as BattleGroup;
-
-			// Check group first to minimize the number of HashSet.Add() calls
-			if (puller.Group is Group group)
-			{
-				if (DOL.GS.ServerProperties.Properties.BAF_MOBS_COUNT_BG_MEMBERS && bg != null)
-					countedAttackers = new HashSet<String>(); // We have to check for duplicates when counting attackers
-
-				if (!DOL.GS.ServerProperties.Properties.BAF_MOBS_ATTACK_PULLER)
-				{
-					if (DOL.GS.ServerProperties.Properties.BAF_MOBS_ATTACK_BG_MEMBERS && bg != null)
-					{
-						// We need a large enough victims list for group and BG, and also need to check for duplicate victims
-						victims = new List<GamePlayer>(group.MemberCount + bg.PlayerCount - 1);
-						countedVictims = new HashSet<String>();
-					}
-					else
-						victims = new List<GamePlayer>(group.MemberCount);
-				}
-
-				foreach (GamePlayer player in group.GetPlayersInTheGroup())
-					if (player != null && (player.InternalID == puller.InternalID || player.IsWithinRadius(puller, BAFPlayerRange, true)))
-					{
-						numAttackers++;
-
-						if (countedAttackers != null)
-							countedAttackers.Add(player.InternalID);
-
-						if (victims != null)
-						{
-							victims.Add(player);
-
-							if (countedVictims != null)
-								countedVictims.Add(player.InternalID);
-						}
-					}
-			} // if (puller.Group is Group group)
-
-			// Do we have to count BG members, or add them to victims list?
-			if ((bg != null) && (DOL.GS.ServerProperties.Properties.BAF_MOBS_COUNT_BG_MEMBERS
-				|| (DOL.GS.ServerProperties.Properties.BAF_MOBS_ATTACK_BG_MEMBERS && !DOL.GS.ServerProperties.Properties.BAF_MOBS_ATTACK_PULLER)))
-			{
-				if (victims == null && DOL.GS.ServerProperties.Properties.BAF_MOBS_ATTACK_BG_MEMBERS && !DOL.GS.ServerProperties.Properties.BAF_MOBS_ATTACK_PULLER)
-					// Puller isn't in a group, so we have to create the victims list for the BG
-					victims = new List<GamePlayer>(bg.PlayerCount);
-
-				foreach (GamePlayer player in bg.GetPlayersInTheBattleGroup())
-					if (player != null && (player.InternalID == puller.InternalID || player.IsWithinRadius(puller, BAFPlayerRange, true)))
-					{
-						if (DOL.GS.ServerProperties.Properties.BAF_MOBS_COUNT_BG_MEMBERS
-							&& (countedAttackers == null || !countedAttackers.Contains(player.InternalID)))
-								numAttackers++;
-
-						if (victims != null && (countedVictims == null || !countedVictims.Contains(player.InternalID)))
-							victims.Add(player);
-					}
-			} // if ((bg != null) ...
-
+			
 			if (numAttackers == 0)
 				// Player is alone
 				numAttackers = 1;
@@ -1082,8 +980,7 @@ public class StandardMobBrain : APlayerVicinityBrain, IOldAggressiveBrain
 						{
 							if (RandomUtil.Chance(30) && Body.ControlledBrain != null && spell.SpellType.ToLower() == "heal" &&
 							    Body.GetDistanceTo(Body.ControlledBrain.Body) <= spell.Range &&
-							    Body.ControlledBrain.Body.HealthPercent < DOL.GS.ServerProperties.Properties.NPC_HEAL_THRESHOLD
-							    && spell.Target.ToLower() != "self")
+							    Body.ControlledBrain.Body.HealthPercent < Properties.NPC_HEAL_THRESHOLD && spell.Target.ToLower() != "self")
 							{
 								spell_rec.Add(spell);
 								needheal = true;
@@ -1549,30 +1446,6 @@ public class StandardMobBrain : APlayerVicinityBrain, IOldAggressiveBrain
             return Coordinate.Create(x: (int)targetX, y: (int)targetY, z: Body.SpawnPosition.Z);
         }
 
-		#endregion
-		#region DetectDoor
-		public virtual void DetectDoor()
-		{
-			ushort range= (ushort)((ThinkInterval/800)*Body.CurrentWayPoint.MaxSpeed);
-			
-			foreach (IDoor door in Body.CurrentRegion.GetDoorsInRadius(Body.Coordinate, range, false))
-			{
-				if (door is GameKeepDoor)
-				{
-					if (Body.Realm != door.Realm) return;
-					door.Open();
-					//Body.Say("GameKeep Door is near by");
-					//somebody can insert here another action for GameKeep Doors
-					return;
-				}
-				else
-				{
-					door.Open();
-					return ;
-				}
-			}
-			return;
-		}
 		#endregion
 	}
 }

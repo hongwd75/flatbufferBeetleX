@@ -63,6 +63,27 @@ namespace Game.Logic.ServerProperties
 		[ServerProperty("pvp", "Timer_PvP_Teleport", "Immunity Timer when player teleports within the same region, in seconds", 30)] //30 seconds default
 		public static int TIMER_PVP_TELEPORT;
 		
+		[ServerProperty("spells", "spell_interrupt_duration", "공격 받은 후 주문 방해 지속 시간 (밀리초 단위), 기본값: 4500", 4500)]
+		public static int SPELL_INTERRUPT_DURATION;
+
+		[ServerProperty("spells", "spell_interrupt_recast", "주문 방해 후 재시전 대기 시간 (밀리초 단위), 기본값: 2000", 2000)]
+		public static int SPELL_INTERRUPT_RECAST;
+
+		[ServerProperty("spells", "spell_interrupt_again", "주문 방해 재적용 딜레이 (밀리초 단위), 기본값: 100", 100)]
+		public static int SPELL_INTERRUPT_AGAIN;
+
+		[ServerProperty( "spells", "spell_interrupt_maxstagelength", "1단계 및 3단계의 최대 지속 시간 (밀리초 단위), 1000 = 1초, 기본값: 1500", 1500 )]
+		public static int SPELL_INTERRUPT_MAXSTAGELENGTH;
+
+		[ServerProperty( "spells", "spell_interrupt_max_intermediate_stagelength", "2단계의 최대 지속 시간 (밀리초 단위), 1000 = 1초. 999999를 설정하면 비활성화됨, 기본값: 3000", 3000 )]
+		public static int SPELL_INTERRUPT_MAX_INTERMEDIATE_STAGELENGTH;
+
+		[ServerProperty("spells", "spell_charm_named_check", "네임드 몬스터에 매혹 주문이 적용되지 않도록 설정, 0 = 비활성화, 1 = 활성화, 기본값: 1", 1)]
+		public static int SPELL_CHARM_NAMED_CHECK;
+		
+		[ServerProperty("classes", "allow_cross_realm_items", "다른 랠름의 아이템 장착 허용", false)]
+		public static bool ALLOW_CROSS_REALM_ITEMS;		
+		
 		//----------------------------------------------------------------------------------------------
 		#region #### 설정 함수 ####
 		public static void InitProperties()

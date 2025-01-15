@@ -202,7 +202,7 @@ public class ScriptMgr
 				{
 					if (!type.IsClass)
 						continue;
-					if (type.GetInterface("DOL.GS.IAbilityActionHandler") == null)
+					if (type.GetInterface("Game.Logic.Skills.IAbilityActionHandler") == null)
 						continue;
 					if (type.IsAbstract)
 						continue;

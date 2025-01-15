@@ -8,6 +8,7 @@ enum eChatType : byte {
 	CT_Chat,
 	CT_Guild,
 	CT_Merchant,
+	CT_Spell,
 	CT_Loot,
 	CT_Broadcast,
 	CT_Help,
@@ -47,6 +48,7 @@ enum ServerPackets : ushort {
 	SC_ConcentrationList,
 	SC_StringMessage,
 	SC_DialogBoxMessage,
+	SC_MaxSpeed,
 	SC_Quit
 }
 

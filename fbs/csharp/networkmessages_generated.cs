@@ -1611,6 +1611,84 @@ static public class SC_DialogBoxMessageVerify
       && verifier.VerifyTableEnd(tablePos);
   }
 }
+public struct SC_MaxSpeed : IFlatbufferObject
+{
+  private Table __p;
+  public ByteBuffer ByteBuffer { get { return __p.bb; } }
+  public static void ValidateVersion() { FlatBufferConstants.FLATBUFFERS_24_3_25(); }
+  public static SC_MaxSpeed GetRootAsSC_MaxSpeed(ByteBuffer _bb) { return GetRootAsSC_MaxSpeed(_bb, new SC_MaxSpeed()); }
+  public static SC_MaxSpeed GetRootAsSC_MaxSpeed(ByteBuffer _bb, SC_MaxSpeed obj) { return (obj.__assign(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
+  public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
+  public SC_MaxSpeed __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
+
+  public ushort Speed { get { int o = __p.__offset(4); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public bool Turningdisabled { get { int o = __p.__offset(6); return o != 0 ? 0!=__p.bb.Get(o + __p.bb_pos) : (bool)false; } }
+  public byte Waterspeed { get { int o = __p.__offset(8); return o != 0 ? __p.bb.Get(o + __p.bb_pos) : (byte)0; } }
+
+  public static Offset<NetworkMessage.SC_MaxSpeed> CreateSC_MaxSpeed(FlatBufferBuilder builder,
+      ushort speed = 0,
+      bool turningdisabled = false,
+      byte waterspeed = 0) {
+    builder.StartTable(3);
+    SC_MaxSpeed.AddSpeed(builder, speed);
+    SC_MaxSpeed.AddWaterspeed(builder, waterspeed);
+    SC_MaxSpeed.AddTurningdisabled(builder, turningdisabled);
+    return SC_MaxSpeed.EndSC_MaxSpeed(builder);
+  }
+
+  public static void StartSC_MaxSpeed(FlatBufferBuilder builder) { builder.StartTable(3); }
+  public static void AddSpeed(FlatBufferBuilder builder, ushort speed) { builder.AddUshort(0, speed, 0); }
+  public static void AddTurningdisabled(FlatBufferBuilder builder, bool turningdisabled) { builder.AddBool(1, turningdisabled, false); }
+  public static void AddWaterspeed(FlatBufferBuilder builder, byte waterspeed) { builder.AddByte(2, waterspeed, 0); }
+  public static Offset<NetworkMessage.SC_MaxSpeed> EndSC_MaxSpeed(FlatBufferBuilder builder) {
+    int o = builder.EndTable();
+    return new Offset<NetworkMessage.SC_MaxSpeed>(o);
+  }
+  public SC_MaxSpeed_FBS UnPack() {
+    var _o = new SC_MaxSpeed_FBS();
+    this.UnPackTo(_o);
+    return _o;
+  }
+  public void UnPackTo(SC_MaxSpeed_FBS _o) {
+    _o.Speed = this.Speed;
+    _o.Turningdisabled = this.Turningdisabled;
+    _o.Waterspeed = this.Waterspeed;
+  }
+  public static Offset<NetworkMessage.SC_MaxSpeed> Pack(FlatBufferBuilder builder, SC_MaxSpeed_FBS _o) {
+    if (_o == null) return default(Offset<NetworkMessage.SC_MaxSpeed>);
+    return CreateSC_MaxSpeed(
+      builder,
+      _o.Speed,
+      _o.Turningdisabled,
+      _o.Waterspeed);
+  }
+}
+
+public class SC_MaxSpeed_FBS
+{
+  public ushort Speed { get; set; }
+  public bool Turningdisabled { get; set; }
+  public byte Waterspeed { get; set; }
+
+  public SC_MaxSpeed_FBS() {
+    this.Speed = 0;
+    this.Turningdisabled = false;
+    this.Waterspeed = 0;
+  }
+}
+
+
+static public class SC_MaxSpeedVerify
+{
+  static public bool Verify(Google.FlatBuffers.Verifier verifier, uint tablePos)
+  {
+    return verifier.VerifyTableStart(tablePos)
+      && verifier.VerifyField(tablePos, 4 /*Speed*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 6 /*Turningdisabled*/, 1 /*bool*/, 1, false)
+      && verifier.VerifyField(tablePos, 8 /*Waterspeed*/, 1 /*byte*/, 1, false)
+      && verifier.VerifyTableEnd(tablePos);
+  }
+}
 public struct SC_Quit : IFlatbufferObject
 {
   private Table __p;

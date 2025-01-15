@@ -23,16 +23,17 @@ enum eChatType : int8_t {
   eChatType_CT_Chat = 3,
   eChatType_CT_Guild = 4,
   eChatType_CT_Merchant = 5,
-  eChatType_CT_Loot = 6,
-  eChatType_CT_Broadcast = 7,
-  eChatType_CT_Help = 8,
-  eChatType_CT_Staff = 9,
-  eChatType_CT_Important = 10,
+  eChatType_CT_Spell = 6,
+  eChatType_CT_Loot = 7,
+  eChatType_CT_Broadcast = 8,
+  eChatType_CT_Help = 9,
+  eChatType_CT_Staff = 10,
+  eChatType_CT_Important = 11,
   eChatType_MIN = eChatType_CT_System,
   eChatType_MAX = eChatType_CT_Important
 };
 
-inline const eChatType (&EnumValueseChatType())[11] {
+inline const eChatType (&EnumValueseChatType())[12] {
   static const eChatType values[] = {
     eChatType_CT_System,
     eChatType_CT_Say,
@@ -40,6 +41,7 @@ inline const eChatType (&EnumValueseChatType())[11] {
     eChatType_CT_Chat,
     eChatType_CT_Guild,
     eChatType_CT_Merchant,
+    eChatType_CT_Spell,
     eChatType_CT_Loot,
     eChatType_CT_Broadcast,
     eChatType_CT_Help,
@@ -50,13 +52,14 @@ inline const eChatType (&EnumValueseChatType())[11] {
 }
 
 inline const char * const *EnumNameseChatType() {
-  static const char * const names[12] = {
+  static const char * const names[13] = {
     "CT_System",
     "CT_Say",
     "CT_Send",
     "CT_Chat",
     "CT_Guild",
     "CT_Merchant",
+    "CT_Spell",
     "CT_Loot",
     "CT_Broadcast",
     "CT_Help",
@@ -192,12 +195,13 @@ enum ServerPackets : uint16_t {
   ServerPackets_SC_ConcentrationList = 7,
   ServerPackets_SC_StringMessage = 8,
   ServerPackets_SC_DialogBoxMessage = 9,
-  ServerPackets_SC_Quit = 10,
+  ServerPackets_SC_MaxSpeed = 10,
+  ServerPackets_SC_Quit = 11,
   ServerPackets_MIN = ServerPackets_SC_LoginAns,
   ServerPackets_MAX = ServerPackets_SC_Quit
 };
 
-inline const ServerPackets (&EnumValuesServerPackets())[10] {
+inline const ServerPackets (&EnumValuesServerPackets())[11] {
   static const ServerPackets values[] = {
     ServerPackets_SC_LoginAns,
     ServerPackets_SC_AccountInfo,
@@ -208,13 +212,14 @@ inline const ServerPackets (&EnumValuesServerPackets())[10] {
     ServerPackets_SC_ConcentrationList,
     ServerPackets_SC_StringMessage,
     ServerPackets_SC_DialogBoxMessage,
+    ServerPackets_SC_MaxSpeed,
     ServerPackets_SC_Quit
   };
   return values;
 }
 
 inline const char * const *EnumNamesServerPackets() {
-  static const char * const names[11] = {
+  static const char * const names[12] = {
     "SC_LoginAns",
     "SC_AccountInfo",
     "SC_VariousUpdate",
@@ -224,6 +229,7 @@ inline const char * const *EnumNamesServerPackets() {
     "SC_ConcentrationList",
     "SC_StringMessage",
     "SC_DialogBoxMessage",
+    "SC_MaxSpeed",
     "SC_Quit",
     nullptr
   };

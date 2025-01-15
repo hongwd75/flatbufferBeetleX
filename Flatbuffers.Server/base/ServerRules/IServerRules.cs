@@ -1,5 +1,6 @@
 ﻿using Game.Logic.network;
 using Game.Logic.Skills;
+using Logic.database.table;
 
 namespace Game.Logic.ServerRules;
 
@@ -17,11 +18,11 @@ public interface IServerRules
     bool IsSameRealm(GameLiving source, GameLiving target, bool quiet);
     string RulesDescription();
     
-    
-    string GetPlayerTitle(GamePlayer source, GamePlayer target);
     byte GetLivingRealm(GamePlayer player, GameLiving target);
     string GetPlayerName(GamePlayer source, GamePlayer target);
     string GetPlayerLastName(GamePlayer source, GamePlayer target);
     string GetPlayerGuildName(GamePlayer source, GamePlayer target);
     string GetPlayerPrefixName(GamePlayer source, GamePlayer target);
+    
+    bool CheckAbilityToUseItem(GameLiving living, ItemTemplate item);
 }

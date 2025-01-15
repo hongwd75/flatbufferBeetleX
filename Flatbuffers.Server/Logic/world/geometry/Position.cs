@@ -1,4 +1,5 @@
 ﻿using Game.Logic.World;
+using NetworkMessage;
 
 namespace Game.Logic.Geometry
 {
@@ -18,6 +19,8 @@ namespace Game.Logic.Geometry
         {
         }
 
+        public NetworkMessage.Vector3Int_FBS vector3pos => new Vector3Int_FBS() { X = X, Y = Y, Z = Z };
+        
         public static Position Create(ushort regionID, int x, int y, int z, ushort heading)
             => new()
             {

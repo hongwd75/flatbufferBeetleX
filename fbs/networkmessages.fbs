@@ -138,6 +138,13 @@ table SC_DialogBoxMessage
 	message		: string;
 }
 
+table SC_MaxSpeed
+{
+	speed			: ushort;
+	turningdisabled	: bool;
+	waterspeed		: ubyte;
+}
+
 table SC_Quit
 {
 	totalout : bool;
