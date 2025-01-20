@@ -74,9 +74,45 @@ struct SC_PlayerCreate;
 struct SC_PlayerCreateBuilder;
 struct SC_PlayerCreate_FBS;
 
+struct SC_ModelChange;
+struct SC_ModelChangeBuilder;
+struct SC_ModelChange_FBS;
+
+struct SC_ObjectCreate;
+struct SC_ObjectCreateBuilder;
+struct SC_ObjectCreate_FBS;
+
+struct SC_MovingObjectCreate;
+struct SC_MovingObjectCreateBuilder;
+struct SC_MovingObjectCreate_FBS;
+
+struct SC_NPCCreate;
+struct SC_NPCCreateBuilder;
+struct SC_NPCCreate_FBS;
+
+struct SC_CharacterStatusUpdate;
+struct SC_CharacterStatusUpdateBuilder;
+struct SC_CharacterStatusUpdate_FBS;
+
 struct SC_ObjectUpdate;
 struct SC_ObjectUpdateBuilder;
 struct SC_ObjectUpdate_FBS;
+
+struct SC_CombatAnimation;
+struct SC_CombatAnimationBuilder;
+struct SC_CombatAnimation_FBS;
+
+struct SC_SpellCastAnimation;
+struct SC_SpellCastAnimationBuilder;
+struct SC_SpellCastAnimation_FBS;
+
+struct SC_SpellEffectAnimation;
+struct SC_SpellEffectAnimationBuilder;
+struct SC_SpellEffectAnimation_FBS;
+
+struct SC_EmoteAnimation;
+struct SC_EmoteAnimationBuilder;
+struct SC_EmoteAnimation_FBS;
 
 struct SC_ConcentrationList;
 struct SC_ConcentrationListBuilder;
@@ -126,8 +162,26 @@ bool operator==(const SC_RemoveObject_FBS &lhs, const SC_RemoveObject_FBS &rhs);
 bool operator!=(const SC_RemoveObject_FBS &lhs, const SC_RemoveObject_FBS &rhs);
 bool operator==(const SC_PlayerCreate_FBS &lhs, const SC_PlayerCreate_FBS &rhs);
 bool operator!=(const SC_PlayerCreate_FBS &lhs, const SC_PlayerCreate_FBS &rhs);
+bool operator==(const SC_ModelChange_FBS &lhs, const SC_ModelChange_FBS &rhs);
+bool operator!=(const SC_ModelChange_FBS &lhs, const SC_ModelChange_FBS &rhs);
+bool operator==(const SC_ObjectCreate_FBS &lhs, const SC_ObjectCreate_FBS &rhs);
+bool operator!=(const SC_ObjectCreate_FBS &lhs, const SC_ObjectCreate_FBS &rhs);
+bool operator==(const SC_MovingObjectCreate_FBS &lhs, const SC_MovingObjectCreate_FBS &rhs);
+bool operator!=(const SC_MovingObjectCreate_FBS &lhs, const SC_MovingObjectCreate_FBS &rhs);
+bool operator==(const SC_NPCCreate_FBS &lhs, const SC_NPCCreate_FBS &rhs);
+bool operator!=(const SC_NPCCreate_FBS &lhs, const SC_NPCCreate_FBS &rhs);
+bool operator==(const SC_CharacterStatusUpdate_FBS &lhs, const SC_CharacterStatusUpdate_FBS &rhs);
+bool operator!=(const SC_CharacterStatusUpdate_FBS &lhs, const SC_CharacterStatusUpdate_FBS &rhs);
 bool operator==(const SC_ObjectUpdate_FBS &lhs, const SC_ObjectUpdate_FBS &rhs);
 bool operator!=(const SC_ObjectUpdate_FBS &lhs, const SC_ObjectUpdate_FBS &rhs);
+bool operator==(const SC_CombatAnimation_FBS &lhs, const SC_CombatAnimation_FBS &rhs);
+bool operator!=(const SC_CombatAnimation_FBS &lhs, const SC_CombatAnimation_FBS &rhs);
+bool operator==(const SC_SpellCastAnimation_FBS &lhs, const SC_SpellCastAnimation_FBS &rhs);
+bool operator!=(const SC_SpellCastAnimation_FBS &lhs, const SC_SpellCastAnimation_FBS &rhs);
+bool operator==(const SC_SpellEffectAnimation_FBS &lhs, const SC_SpellEffectAnimation_FBS &rhs);
+bool operator!=(const SC_SpellEffectAnimation_FBS &lhs, const SC_SpellEffectAnimation_FBS &rhs);
+bool operator==(const SC_EmoteAnimation_FBS &lhs, const SC_EmoteAnimation_FBS &rhs);
+bool operator!=(const SC_EmoteAnimation_FBS &lhs, const SC_EmoteAnimation_FBS &rhs);
 bool operator==(const SC_ConcentrationList_FBS &lhs, const SC_ConcentrationList_FBS &rhs);
 bool operator!=(const SC_ConcentrationList_FBS &lhs, const SC_ConcentrationList_FBS &rhs);
 bool operator==(const SC_StringMessage_FBS &lhs, const SC_StringMessage_FBS &rhs);
@@ -1181,7 +1235,7 @@ struct SC_PlayerCreate_FBS : public ::flatbuffers::NativeTable {
   uint16_t objectid = 0;
   uint16_t heading = 0;
   uint16_t model = 0;
-  uint16_t level = 0;
+  uint8_t level = 0;
   uint8_t flags = 0;
   std::string name{};
   std::string guildname{};
@@ -1225,8 +1279,8 @@ struct SC_PlayerCreate FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   uint16_t model() const {
     return GetField<uint16_t>(VT_MODEL, 0);
   }
-  uint16_t level() const {
-    return GetField<uint16_t>(VT_LEVEL, 0);
+  uint8_t level() const {
+    return GetField<uint8_t>(VT_LEVEL, 0);
   }
   uint8_t flags() const {
     return GetField<uint8_t>(VT_FLAGS, 0);
@@ -1247,7 +1301,7 @@ struct SC_PlayerCreate FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyField<uint16_t>(verifier, VT_OBJECTID, 2) &&
            VerifyField<uint16_t>(verifier, VT_HEADING, 2) &&
            VerifyField<uint16_t>(verifier, VT_MODEL, 2) &&
-           VerifyField<uint16_t>(verifier, VT_LEVEL, 2) &&
+           VerifyField<uint8_t>(verifier, VT_LEVEL, 1) &&
            VerifyField<uint8_t>(verifier, VT_FLAGS, 1) &&
            VerifyOffset(verifier, VT_NAME) &&
            verifier.VerifyString(name()) &&
@@ -1281,8 +1335,8 @@ struct SC_PlayerCreateBuilder {
   void add_model(uint16_t model) {
     fbb_.AddElement<uint16_t>(SC_PlayerCreate::VT_MODEL, model, 0);
   }
-  void add_level(uint16_t level) {
-    fbb_.AddElement<uint16_t>(SC_PlayerCreate::VT_LEVEL, level, 0);
+  void add_level(uint8_t level) {
+    fbb_.AddElement<uint8_t>(SC_PlayerCreate::VT_LEVEL, level, 0);
   }
   void add_flags(uint8_t flags) {
     fbb_.AddElement<uint8_t>(SC_PlayerCreate::VT_FLAGS, flags, 0);
@@ -1314,7 +1368,7 @@ inline ::flatbuffers::Offset<SC_PlayerCreate> CreateSC_PlayerCreate(
     uint16_t objectid = 0,
     uint16_t heading = 0,
     uint16_t model = 0,
-    uint16_t level = 0,
+    uint8_t level = 0,
     uint8_t flags = 0,
     ::flatbuffers::Offset<::flatbuffers::String> name = 0,
     ::flatbuffers::Offset<::flatbuffers::String> guildname = 0,
@@ -1325,11 +1379,11 @@ inline ::flatbuffers::Offset<SC_PlayerCreate> CreateSC_PlayerCreate(
   builder_.add_name(name);
   builder_.add_sessionid(sessionid);
   builder_.add_position(position);
-  builder_.add_level(level);
   builder_.add_model(model);
   builder_.add_heading(heading);
   builder_.add_objectid(objectid);
   builder_.add_flags(flags);
+  builder_.add_level(level);
   return builder_.Finish();
 }
 
@@ -1340,7 +1394,7 @@ inline ::flatbuffers::Offset<SC_PlayerCreate> CreateSC_PlayerCreateDirect(
     uint16_t objectid = 0,
     uint16_t heading = 0,
     uint16_t model = 0,
-    uint16_t level = 0,
+    uint8_t level = 0,
     uint8_t flags = 0,
     const char *name = nullptr,
     const char *guildname = nullptr,
@@ -1363,6 +1417,806 @@ inline ::flatbuffers::Offset<SC_PlayerCreate> CreateSC_PlayerCreateDirect(
 }
 
 ::flatbuffers::Offset<SC_PlayerCreate> CreateSC_PlayerCreate(::flatbuffers::FlatBufferBuilder &_fbb, const SC_PlayerCreate_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct SC_ModelChange_FBS : public ::flatbuffers::NativeTable {
+  typedef SC_ModelChange TableType;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_ModelChange_FBS";
+  }
+  uint16_t objectid = 0;
+  uint16_t model = 0;
+  int32_t newsize = 0;
+};
+
+struct SC_ModelChange FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SC_ModelChange_FBS NativeTableType;
+  typedef SC_ModelChangeBuilder Builder;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_ModelChange";
+  }
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_OBJECTID = 4,
+    VT_MODEL = 6,
+    VT_NEWSIZE = 8
+  };
+  uint16_t objectid() const {
+    return GetField<uint16_t>(VT_OBJECTID, 0);
+  }
+  uint16_t model() const {
+    return GetField<uint16_t>(VT_MODEL, 0);
+  }
+  int32_t newsize() const {
+    return GetField<int32_t>(VT_NEWSIZE, 0);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint16_t>(verifier, VT_OBJECTID, 2) &&
+           VerifyField<uint16_t>(verifier, VT_MODEL, 2) &&
+           VerifyField<int32_t>(verifier, VT_NEWSIZE, 4) &&
+           verifier.EndTable();
+  }
+  SC_ModelChange_FBS *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(SC_ModelChange_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<SC_ModelChange> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_ModelChange_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct SC_ModelChangeBuilder {
+  typedef SC_ModelChange Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_objectid(uint16_t objectid) {
+    fbb_.AddElement<uint16_t>(SC_ModelChange::VT_OBJECTID, objectid, 0);
+  }
+  void add_model(uint16_t model) {
+    fbb_.AddElement<uint16_t>(SC_ModelChange::VT_MODEL, model, 0);
+  }
+  void add_newsize(int32_t newsize) {
+    fbb_.AddElement<int32_t>(SC_ModelChange::VT_NEWSIZE, newsize, 0);
+  }
+  explicit SC_ModelChangeBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<SC_ModelChange> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<SC_ModelChange>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<SC_ModelChange> CreateSC_ModelChange(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint16_t objectid = 0,
+    uint16_t model = 0,
+    int32_t newsize = 0) {
+  SC_ModelChangeBuilder builder_(_fbb);
+  builder_.add_newsize(newsize);
+  builder_.add_model(model);
+  builder_.add_objectid(objectid);
+  return builder_.Finish();
+}
+
+::flatbuffers::Offset<SC_ModelChange> CreateSC_ModelChange(::flatbuffers::FlatBufferBuilder &_fbb, const SC_ModelChange_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct SC_ObjectCreate_FBS : public ::flatbuffers::NativeTable {
+  typedef SC_ObjectCreate TableType;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_ObjectCreate_FBS";
+  }
+  uint16_t objectid = 0;
+  uint16_t heading = 0;
+  uint16_t emblem = 0;
+  uint16_t model = 0;
+  std::shared_ptr<NetworkMessage::Vector3Int> position{};
+  int32_t flags = 0;
+  std::string name{};
+  SC_ObjectCreate_FBS() = default;
+  SC_ObjectCreate_FBS(const SC_ObjectCreate_FBS &o);
+  SC_ObjectCreate_FBS(SC_ObjectCreate_FBS&&) FLATBUFFERS_NOEXCEPT = default;
+  SC_ObjectCreate_FBS &operator=(SC_ObjectCreate_FBS o) FLATBUFFERS_NOEXCEPT;
+};
+
+struct SC_ObjectCreate FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SC_ObjectCreate_FBS NativeTableType;
+  typedef SC_ObjectCreateBuilder Builder;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_ObjectCreate";
+  }
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_OBJECTID = 4,
+    VT_HEADING = 6,
+    VT_EMBLEM = 8,
+    VT_MODEL = 10,
+    VT_POSITION = 12,
+    VT_FLAGS = 14,
+    VT_NAME = 16
+  };
+  uint16_t objectid() const {
+    return GetField<uint16_t>(VT_OBJECTID, 0);
+  }
+  uint16_t heading() const {
+    return GetField<uint16_t>(VT_HEADING, 0);
+  }
+  uint16_t emblem() const {
+    return GetField<uint16_t>(VT_EMBLEM, 0);
+  }
+  uint16_t model() const {
+    return GetField<uint16_t>(VT_MODEL, 0);
+  }
+  const NetworkMessage::Vector3Int *position() const {
+    return GetStruct<const NetworkMessage::Vector3Int *>(VT_POSITION);
+  }
+  int32_t flags() const {
+    return GetField<int32_t>(VT_FLAGS, 0);
+  }
+  const ::flatbuffers::String *name() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_NAME);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint16_t>(verifier, VT_OBJECTID, 2) &&
+           VerifyField<uint16_t>(verifier, VT_HEADING, 2) &&
+           VerifyField<uint16_t>(verifier, VT_EMBLEM, 2) &&
+           VerifyField<uint16_t>(verifier, VT_MODEL, 2) &&
+           VerifyField<NetworkMessage::Vector3Int>(verifier, VT_POSITION, 4) &&
+           VerifyField<int32_t>(verifier, VT_FLAGS, 4) &&
+           VerifyOffset(verifier, VT_NAME) &&
+           verifier.VerifyString(name()) &&
+           verifier.EndTable();
+  }
+  SC_ObjectCreate_FBS *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(SC_ObjectCreate_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<SC_ObjectCreate> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_ObjectCreate_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct SC_ObjectCreateBuilder {
+  typedef SC_ObjectCreate Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_objectid(uint16_t objectid) {
+    fbb_.AddElement<uint16_t>(SC_ObjectCreate::VT_OBJECTID, objectid, 0);
+  }
+  void add_heading(uint16_t heading) {
+    fbb_.AddElement<uint16_t>(SC_ObjectCreate::VT_HEADING, heading, 0);
+  }
+  void add_emblem(uint16_t emblem) {
+    fbb_.AddElement<uint16_t>(SC_ObjectCreate::VT_EMBLEM, emblem, 0);
+  }
+  void add_model(uint16_t model) {
+    fbb_.AddElement<uint16_t>(SC_ObjectCreate::VT_MODEL, model, 0);
+  }
+  void add_position(const NetworkMessage::Vector3Int *position) {
+    fbb_.AddStruct(SC_ObjectCreate::VT_POSITION, position);
+  }
+  void add_flags(int32_t flags) {
+    fbb_.AddElement<int32_t>(SC_ObjectCreate::VT_FLAGS, flags, 0);
+  }
+  void add_name(::flatbuffers::Offset<::flatbuffers::String> name) {
+    fbb_.AddOffset(SC_ObjectCreate::VT_NAME, name);
+  }
+  explicit SC_ObjectCreateBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<SC_ObjectCreate> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<SC_ObjectCreate>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<SC_ObjectCreate> CreateSC_ObjectCreate(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint16_t objectid = 0,
+    uint16_t heading = 0,
+    uint16_t emblem = 0,
+    uint16_t model = 0,
+    const NetworkMessage::Vector3Int *position = nullptr,
+    int32_t flags = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> name = 0) {
+  SC_ObjectCreateBuilder builder_(_fbb);
+  builder_.add_name(name);
+  builder_.add_flags(flags);
+  builder_.add_position(position);
+  builder_.add_model(model);
+  builder_.add_emblem(emblem);
+  builder_.add_heading(heading);
+  builder_.add_objectid(objectid);
+  return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<SC_ObjectCreate> CreateSC_ObjectCreateDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint16_t objectid = 0,
+    uint16_t heading = 0,
+    uint16_t emblem = 0,
+    uint16_t model = 0,
+    const NetworkMessage::Vector3Int *position = nullptr,
+    int32_t flags = 0,
+    const char *name = nullptr) {
+  auto name__ = name ? _fbb.CreateString(name) : 0;
+  return NetworkMessage::CreateSC_ObjectCreate(
+      _fbb,
+      objectid,
+      heading,
+      emblem,
+      model,
+      position,
+      flags,
+      name__);
+}
+
+::flatbuffers::Offset<SC_ObjectCreate> CreateSC_ObjectCreate(::flatbuffers::FlatBufferBuilder &_fbb, const SC_ObjectCreate_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct SC_MovingObjectCreate_FBS : public ::flatbuffers::NativeTable {
+  typedef SC_MovingObjectCreate TableType;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_MovingObjectCreate_FBS";
+  }
+  uint16_t objectid = 0;
+  uint16_t heading = 0;
+  std::shared_ptr<NetworkMessage::Vector3Int> position{};
+  uint16_t model = 0;
+  int32_t flags = 0;
+  uint16_t emblem = 0;
+  std::string name{};
+  SC_MovingObjectCreate_FBS() = default;
+  SC_MovingObjectCreate_FBS(const SC_MovingObjectCreate_FBS &o);
+  SC_MovingObjectCreate_FBS(SC_MovingObjectCreate_FBS&&) FLATBUFFERS_NOEXCEPT = default;
+  SC_MovingObjectCreate_FBS &operator=(SC_MovingObjectCreate_FBS o) FLATBUFFERS_NOEXCEPT;
+};
+
+struct SC_MovingObjectCreate FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SC_MovingObjectCreate_FBS NativeTableType;
+  typedef SC_MovingObjectCreateBuilder Builder;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_MovingObjectCreate";
+  }
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_OBJECTID = 4,
+    VT_HEADING = 6,
+    VT_POSITION = 8,
+    VT_MODEL = 10,
+    VT_FLAGS = 12,
+    VT_EMBLEM = 14,
+    VT_NAME = 16
+  };
+  uint16_t objectid() const {
+    return GetField<uint16_t>(VT_OBJECTID, 0);
+  }
+  uint16_t heading() const {
+    return GetField<uint16_t>(VT_HEADING, 0);
+  }
+  const NetworkMessage::Vector3Int *position() const {
+    return GetStruct<const NetworkMessage::Vector3Int *>(VT_POSITION);
+  }
+  uint16_t model() const {
+    return GetField<uint16_t>(VT_MODEL, 0);
+  }
+  int32_t flags() const {
+    return GetField<int32_t>(VT_FLAGS, 0);
+  }
+  uint16_t emblem() const {
+    return GetField<uint16_t>(VT_EMBLEM, 0);
+  }
+  const ::flatbuffers::String *name() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_NAME);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint16_t>(verifier, VT_OBJECTID, 2) &&
+           VerifyField<uint16_t>(verifier, VT_HEADING, 2) &&
+           VerifyField<NetworkMessage::Vector3Int>(verifier, VT_POSITION, 4) &&
+           VerifyField<uint16_t>(verifier, VT_MODEL, 2) &&
+           VerifyField<int32_t>(verifier, VT_FLAGS, 4) &&
+           VerifyField<uint16_t>(verifier, VT_EMBLEM, 2) &&
+           VerifyOffset(verifier, VT_NAME) &&
+           verifier.VerifyString(name()) &&
+           verifier.EndTable();
+  }
+  SC_MovingObjectCreate_FBS *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(SC_MovingObjectCreate_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<SC_MovingObjectCreate> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_MovingObjectCreate_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct SC_MovingObjectCreateBuilder {
+  typedef SC_MovingObjectCreate Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_objectid(uint16_t objectid) {
+    fbb_.AddElement<uint16_t>(SC_MovingObjectCreate::VT_OBJECTID, objectid, 0);
+  }
+  void add_heading(uint16_t heading) {
+    fbb_.AddElement<uint16_t>(SC_MovingObjectCreate::VT_HEADING, heading, 0);
+  }
+  void add_position(const NetworkMessage::Vector3Int *position) {
+    fbb_.AddStruct(SC_MovingObjectCreate::VT_POSITION, position);
+  }
+  void add_model(uint16_t model) {
+    fbb_.AddElement<uint16_t>(SC_MovingObjectCreate::VT_MODEL, model, 0);
+  }
+  void add_flags(int32_t flags) {
+    fbb_.AddElement<int32_t>(SC_MovingObjectCreate::VT_FLAGS, flags, 0);
+  }
+  void add_emblem(uint16_t emblem) {
+    fbb_.AddElement<uint16_t>(SC_MovingObjectCreate::VT_EMBLEM, emblem, 0);
+  }
+  void add_name(::flatbuffers::Offset<::flatbuffers::String> name) {
+    fbb_.AddOffset(SC_MovingObjectCreate::VT_NAME, name);
+  }
+  explicit SC_MovingObjectCreateBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<SC_MovingObjectCreate> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<SC_MovingObjectCreate>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<SC_MovingObjectCreate> CreateSC_MovingObjectCreate(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint16_t objectid = 0,
+    uint16_t heading = 0,
+    const NetworkMessage::Vector3Int *position = nullptr,
+    uint16_t model = 0,
+    int32_t flags = 0,
+    uint16_t emblem = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> name = 0) {
+  SC_MovingObjectCreateBuilder builder_(_fbb);
+  builder_.add_name(name);
+  builder_.add_flags(flags);
+  builder_.add_position(position);
+  builder_.add_emblem(emblem);
+  builder_.add_model(model);
+  builder_.add_heading(heading);
+  builder_.add_objectid(objectid);
+  return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<SC_MovingObjectCreate> CreateSC_MovingObjectCreateDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint16_t objectid = 0,
+    uint16_t heading = 0,
+    const NetworkMessage::Vector3Int *position = nullptr,
+    uint16_t model = 0,
+    int32_t flags = 0,
+    uint16_t emblem = 0,
+    const char *name = nullptr) {
+  auto name__ = name ? _fbb.CreateString(name) : 0;
+  return NetworkMessage::CreateSC_MovingObjectCreate(
+      _fbb,
+      objectid,
+      heading,
+      position,
+      model,
+      flags,
+      emblem,
+      name__);
+}
+
+::flatbuffers::Offset<SC_MovingObjectCreate> CreateSC_MovingObjectCreate(::flatbuffers::FlatBufferBuilder &_fbb, const SC_MovingObjectCreate_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct SC_NPCCreate_FBS : public ::flatbuffers::NativeTable {
+  typedef SC_NPCCreate TableType;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_NPCCreate_FBS";
+  }
+  uint16_t objectid = 0;
+  uint16_t heading = 0;
+  std::shared_ptr<NetworkMessage::Vector3Int> position{};
+  uint16_t speed = 0;
+  uint16_t speedz = 0;
+  uint16_t model = 0;
+  uint8_t size = 0;
+  uint8_t level = 0;
+  uint8_t flags = 0;
+  uint8_t flags2 = 0;
+  uint8_t flags3 = 0;
+  std::string name{};
+  std::string guildname{};
+  SC_NPCCreate_FBS() = default;
+  SC_NPCCreate_FBS(const SC_NPCCreate_FBS &o);
+  SC_NPCCreate_FBS(SC_NPCCreate_FBS&&) FLATBUFFERS_NOEXCEPT = default;
+  SC_NPCCreate_FBS &operator=(SC_NPCCreate_FBS o) FLATBUFFERS_NOEXCEPT;
+};
+
+struct SC_NPCCreate FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SC_NPCCreate_FBS NativeTableType;
+  typedef SC_NPCCreateBuilder Builder;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_NPCCreate";
+  }
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_OBJECTID = 4,
+    VT_HEADING = 6,
+    VT_POSITION = 8,
+    VT_SPEED = 10,
+    VT_SPEEDZ = 12,
+    VT_MODEL = 14,
+    VT_SIZE = 16,
+    VT_LEVEL = 18,
+    VT_FLAGS = 20,
+    VT_FLAGS2 = 22,
+    VT_FLAGS3 = 24,
+    VT_NAME = 26,
+    VT_GUILDNAME = 28
+  };
+  uint16_t objectid() const {
+    return GetField<uint16_t>(VT_OBJECTID, 0);
+  }
+  uint16_t heading() const {
+    return GetField<uint16_t>(VT_HEADING, 0);
+  }
+  const NetworkMessage::Vector3Int *position() const {
+    return GetStruct<const NetworkMessage::Vector3Int *>(VT_POSITION);
+  }
+  uint16_t speed() const {
+    return GetField<uint16_t>(VT_SPEED, 0);
+  }
+  uint16_t speedz() const {
+    return GetField<uint16_t>(VT_SPEEDZ, 0);
+  }
+  uint16_t model() const {
+    return GetField<uint16_t>(VT_MODEL, 0);
+  }
+  uint8_t size() const {
+    return GetField<uint8_t>(VT_SIZE, 0);
+  }
+  uint8_t level() const {
+    return GetField<uint8_t>(VT_LEVEL, 0);
+  }
+  uint8_t flags() const {
+    return GetField<uint8_t>(VT_FLAGS, 0);
+  }
+  uint8_t flags2() const {
+    return GetField<uint8_t>(VT_FLAGS2, 0);
+  }
+  uint8_t flags3() const {
+    return GetField<uint8_t>(VT_FLAGS3, 0);
+  }
+  const ::flatbuffers::String *name() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_NAME);
+  }
+  const ::flatbuffers::String *guildname() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_GUILDNAME);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint16_t>(verifier, VT_OBJECTID, 2) &&
+           VerifyField<uint16_t>(verifier, VT_HEADING, 2) &&
+           VerifyField<NetworkMessage::Vector3Int>(verifier, VT_POSITION, 4) &&
+           VerifyField<uint16_t>(verifier, VT_SPEED, 2) &&
+           VerifyField<uint16_t>(verifier, VT_SPEEDZ, 2) &&
+           VerifyField<uint16_t>(verifier, VT_MODEL, 2) &&
+           VerifyField<uint8_t>(verifier, VT_SIZE, 1) &&
+           VerifyField<uint8_t>(verifier, VT_LEVEL, 1) &&
+           VerifyField<uint8_t>(verifier, VT_FLAGS, 1) &&
+           VerifyField<uint8_t>(verifier, VT_FLAGS2, 1) &&
+           VerifyField<uint8_t>(verifier, VT_FLAGS3, 1) &&
+           VerifyOffset(verifier, VT_NAME) &&
+           verifier.VerifyString(name()) &&
+           VerifyOffset(verifier, VT_GUILDNAME) &&
+           verifier.VerifyString(guildname()) &&
+           verifier.EndTable();
+  }
+  SC_NPCCreate_FBS *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(SC_NPCCreate_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<SC_NPCCreate> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_NPCCreate_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct SC_NPCCreateBuilder {
+  typedef SC_NPCCreate Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_objectid(uint16_t objectid) {
+    fbb_.AddElement<uint16_t>(SC_NPCCreate::VT_OBJECTID, objectid, 0);
+  }
+  void add_heading(uint16_t heading) {
+    fbb_.AddElement<uint16_t>(SC_NPCCreate::VT_HEADING, heading, 0);
+  }
+  void add_position(const NetworkMessage::Vector3Int *position) {
+    fbb_.AddStruct(SC_NPCCreate::VT_POSITION, position);
+  }
+  void add_speed(uint16_t speed) {
+    fbb_.AddElement<uint16_t>(SC_NPCCreate::VT_SPEED, speed, 0);
+  }
+  void add_speedz(uint16_t speedz) {
+    fbb_.AddElement<uint16_t>(SC_NPCCreate::VT_SPEEDZ, speedz, 0);
+  }
+  void add_model(uint16_t model) {
+    fbb_.AddElement<uint16_t>(SC_NPCCreate::VT_MODEL, model, 0);
+  }
+  void add_size(uint8_t size) {
+    fbb_.AddElement<uint8_t>(SC_NPCCreate::VT_SIZE, size, 0);
+  }
+  void add_level(uint8_t level) {
+    fbb_.AddElement<uint8_t>(SC_NPCCreate::VT_LEVEL, level, 0);
+  }
+  void add_flags(uint8_t flags) {
+    fbb_.AddElement<uint8_t>(SC_NPCCreate::VT_FLAGS, flags, 0);
+  }
+  void add_flags2(uint8_t flags2) {
+    fbb_.AddElement<uint8_t>(SC_NPCCreate::VT_FLAGS2, flags2, 0);
+  }
+  void add_flags3(uint8_t flags3) {
+    fbb_.AddElement<uint8_t>(SC_NPCCreate::VT_FLAGS3, flags3, 0);
+  }
+  void add_name(::flatbuffers::Offset<::flatbuffers::String> name) {
+    fbb_.AddOffset(SC_NPCCreate::VT_NAME, name);
+  }
+  void add_guildname(::flatbuffers::Offset<::flatbuffers::String> guildname) {
+    fbb_.AddOffset(SC_NPCCreate::VT_GUILDNAME, guildname);
+  }
+  explicit SC_NPCCreateBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<SC_NPCCreate> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<SC_NPCCreate>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<SC_NPCCreate> CreateSC_NPCCreate(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint16_t objectid = 0,
+    uint16_t heading = 0,
+    const NetworkMessage::Vector3Int *position = nullptr,
+    uint16_t speed = 0,
+    uint16_t speedz = 0,
+    uint16_t model = 0,
+    uint8_t size = 0,
+    uint8_t level = 0,
+    uint8_t flags = 0,
+    uint8_t flags2 = 0,
+    uint8_t flags3 = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> name = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> guildname = 0) {
+  SC_NPCCreateBuilder builder_(_fbb);
+  builder_.add_guildname(guildname);
+  builder_.add_name(name);
+  builder_.add_position(position);
+  builder_.add_model(model);
+  builder_.add_speedz(speedz);
+  builder_.add_speed(speed);
+  builder_.add_heading(heading);
+  builder_.add_objectid(objectid);
+  builder_.add_flags3(flags3);
+  builder_.add_flags2(flags2);
+  builder_.add_flags(flags);
+  builder_.add_level(level);
+  builder_.add_size(size);
+  return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<SC_NPCCreate> CreateSC_NPCCreateDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint16_t objectid = 0,
+    uint16_t heading = 0,
+    const NetworkMessage::Vector3Int *position = nullptr,
+    uint16_t speed = 0,
+    uint16_t speedz = 0,
+    uint16_t model = 0,
+    uint8_t size = 0,
+    uint8_t level = 0,
+    uint8_t flags = 0,
+    uint8_t flags2 = 0,
+    uint8_t flags3 = 0,
+    const char *name = nullptr,
+    const char *guildname = nullptr) {
+  auto name__ = name ? _fbb.CreateString(name) : 0;
+  auto guildname__ = guildname ? _fbb.CreateString(guildname) : 0;
+  return NetworkMessage::CreateSC_NPCCreate(
+      _fbb,
+      objectid,
+      heading,
+      position,
+      speed,
+      speedz,
+      model,
+      size,
+      level,
+      flags,
+      flags2,
+      flags3,
+      name__,
+      guildname__);
+}
+
+::flatbuffers::Offset<SC_NPCCreate> CreateSC_NPCCreate(::flatbuffers::FlatBufferBuilder &_fbb, const SC_NPCCreate_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct SC_CharacterStatusUpdate_FBS : public ::flatbuffers::NativeTable {
+  typedef SC_CharacterStatusUpdate TableType;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_CharacterStatusUpdate_FBS";
+  }
+  bool sittingflag = false;
+  uint8_t healthpercent = 0;
+  uint8_t manapercent = 0;
+  uint8_t endurancepercent = 0;
+  uint8_t conpercent = 0;
+  int32_t maxmana = 0;
+  int32_t maxendurance = 0;
+  int32_t maxconcetration = 0;
+  int32_t maxhealth = 0;
+  int32_t endurance = 0;
+  int32_t mana = 0;
+  int32_t concentration = 0;
+  int32_t health = 0;
+};
+
+struct SC_CharacterStatusUpdate FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SC_CharacterStatusUpdate_FBS NativeTableType;
+  typedef SC_CharacterStatusUpdateBuilder Builder;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_CharacterStatusUpdate";
+  }
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_SITTINGFLAG = 4,
+    VT_HEALTHPERCENT = 6,
+    VT_MANAPERCENT = 8,
+    VT_ENDURANCEPERCENT = 10,
+    VT_CONPERCENT = 12,
+    VT_MAXMANA = 14,
+    VT_MAXENDURANCE = 16,
+    VT_MAXCONCETRATION = 18,
+    VT_MAXHEALTH = 20,
+    VT_ENDURANCE = 22,
+    VT_MANA = 24,
+    VT_CONCENTRATION = 26,
+    VT_HEALTH = 28
+  };
+  bool sittingflag() const {
+    return GetField<uint8_t>(VT_SITTINGFLAG, 0) != 0;
+  }
+  uint8_t healthpercent() const {
+    return GetField<uint8_t>(VT_HEALTHPERCENT, 0);
+  }
+  uint8_t manapercent() const {
+    return GetField<uint8_t>(VT_MANAPERCENT, 0);
+  }
+  uint8_t endurancepercent() const {
+    return GetField<uint8_t>(VT_ENDURANCEPERCENT, 0);
+  }
+  uint8_t conpercent() const {
+    return GetField<uint8_t>(VT_CONPERCENT, 0);
+  }
+  int32_t maxmana() const {
+    return GetField<int32_t>(VT_MAXMANA, 0);
+  }
+  int32_t maxendurance() const {
+    return GetField<int32_t>(VT_MAXENDURANCE, 0);
+  }
+  int32_t maxconcetration() const {
+    return GetField<int32_t>(VT_MAXCONCETRATION, 0);
+  }
+  int32_t maxhealth() const {
+    return GetField<int32_t>(VT_MAXHEALTH, 0);
+  }
+  int32_t endurance() const {
+    return GetField<int32_t>(VT_ENDURANCE, 0);
+  }
+  int32_t mana() const {
+    return GetField<int32_t>(VT_MANA, 0);
+  }
+  int32_t concentration() const {
+    return GetField<int32_t>(VT_CONCENTRATION, 0);
+  }
+  int32_t health() const {
+    return GetField<int32_t>(VT_HEALTH, 0);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint8_t>(verifier, VT_SITTINGFLAG, 1) &&
+           VerifyField<uint8_t>(verifier, VT_HEALTHPERCENT, 1) &&
+           VerifyField<uint8_t>(verifier, VT_MANAPERCENT, 1) &&
+           VerifyField<uint8_t>(verifier, VT_ENDURANCEPERCENT, 1) &&
+           VerifyField<uint8_t>(verifier, VT_CONPERCENT, 1) &&
+           VerifyField<int32_t>(verifier, VT_MAXMANA, 4) &&
+           VerifyField<int32_t>(verifier, VT_MAXENDURANCE, 4) &&
+           VerifyField<int32_t>(verifier, VT_MAXCONCETRATION, 4) &&
+           VerifyField<int32_t>(verifier, VT_MAXHEALTH, 4) &&
+           VerifyField<int32_t>(verifier, VT_ENDURANCE, 4) &&
+           VerifyField<int32_t>(verifier, VT_MANA, 4) &&
+           VerifyField<int32_t>(verifier, VT_CONCENTRATION, 4) &&
+           VerifyField<int32_t>(verifier, VT_HEALTH, 4) &&
+           verifier.EndTable();
+  }
+  SC_CharacterStatusUpdate_FBS *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(SC_CharacterStatusUpdate_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<SC_CharacterStatusUpdate> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_CharacterStatusUpdate_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct SC_CharacterStatusUpdateBuilder {
+  typedef SC_CharacterStatusUpdate Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_sittingflag(bool sittingflag) {
+    fbb_.AddElement<uint8_t>(SC_CharacterStatusUpdate::VT_SITTINGFLAG, static_cast<uint8_t>(sittingflag), 0);
+  }
+  void add_healthpercent(uint8_t healthpercent) {
+    fbb_.AddElement<uint8_t>(SC_CharacterStatusUpdate::VT_HEALTHPERCENT, healthpercent, 0);
+  }
+  void add_manapercent(uint8_t manapercent) {
+    fbb_.AddElement<uint8_t>(SC_CharacterStatusUpdate::VT_MANAPERCENT, manapercent, 0);
+  }
+  void add_endurancepercent(uint8_t endurancepercent) {
+    fbb_.AddElement<uint8_t>(SC_CharacterStatusUpdate::VT_ENDURANCEPERCENT, endurancepercent, 0);
+  }
+  void add_conpercent(uint8_t conpercent) {
+    fbb_.AddElement<uint8_t>(SC_CharacterStatusUpdate::VT_CONPERCENT, conpercent, 0);
+  }
+  void add_maxmana(int32_t maxmana) {
+    fbb_.AddElement<int32_t>(SC_CharacterStatusUpdate::VT_MAXMANA, maxmana, 0);
+  }
+  void add_maxendurance(int32_t maxendurance) {
+    fbb_.AddElement<int32_t>(SC_CharacterStatusUpdate::VT_MAXENDURANCE, maxendurance, 0);
+  }
+  void add_maxconcetration(int32_t maxconcetration) {
+    fbb_.AddElement<int32_t>(SC_CharacterStatusUpdate::VT_MAXCONCETRATION, maxconcetration, 0);
+  }
+  void add_maxhealth(int32_t maxhealth) {
+    fbb_.AddElement<int32_t>(SC_CharacterStatusUpdate::VT_MAXHEALTH, maxhealth, 0);
+  }
+  void add_endurance(int32_t endurance) {
+    fbb_.AddElement<int32_t>(SC_CharacterStatusUpdate::VT_ENDURANCE, endurance, 0);
+  }
+  void add_mana(int32_t mana) {
+    fbb_.AddElement<int32_t>(SC_CharacterStatusUpdate::VT_MANA, mana, 0);
+  }
+  void add_concentration(int32_t concentration) {
+    fbb_.AddElement<int32_t>(SC_CharacterStatusUpdate::VT_CONCENTRATION, concentration, 0);
+  }
+  void add_health(int32_t health) {
+    fbb_.AddElement<int32_t>(SC_CharacterStatusUpdate::VT_HEALTH, health, 0);
+  }
+  explicit SC_CharacterStatusUpdateBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<SC_CharacterStatusUpdate> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<SC_CharacterStatusUpdate>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<SC_CharacterStatusUpdate> CreateSC_CharacterStatusUpdate(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    bool sittingflag = false,
+    uint8_t healthpercent = 0,
+    uint8_t manapercent = 0,
+    uint8_t endurancepercent = 0,
+    uint8_t conpercent = 0,
+    int32_t maxmana = 0,
+    int32_t maxendurance = 0,
+    int32_t maxconcetration = 0,
+    int32_t maxhealth = 0,
+    int32_t endurance = 0,
+    int32_t mana = 0,
+    int32_t concentration = 0,
+    int32_t health = 0) {
+  SC_CharacterStatusUpdateBuilder builder_(_fbb);
+  builder_.add_health(health);
+  builder_.add_concentration(concentration);
+  builder_.add_mana(mana);
+  builder_.add_endurance(endurance);
+  builder_.add_maxhealth(maxhealth);
+  builder_.add_maxconcetration(maxconcetration);
+  builder_.add_maxendurance(maxendurance);
+  builder_.add_maxmana(maxmana);
+  builder_.add_conpercent(conpercent);
+  builder_.add_endurancepercent(endurancepercent);
+  builder_.add_manapercent(manapercent);
+  builder_.add_healthpercent(healthpercent);
+  builder_.add_sittingflag(sittingflag);
+  return builder_.Finish();
+}
+
+::flatbuffers::Offset<SC_CharacterStatusUpdate> CreateSC_CharacterStatusUpdate(::flatbuffers::FlatBufferBuilder &_fbb, const SC_CharacterStatusUpdate_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 struct SC_ObjectUpdate_FBS : public ::flatbuffers::NativeTable {
   typedef SC_ObjectUpdate TableType;
@@ -1514,6 +2368,403 @@ inline ::flatbuffers::Offset<SC_ObjectUpdate> CreateSC_ObjectUpdate(
 
 ::flatbuffers::Offset<SC_ObjectUpdate> CreateSC_ObjectUpdate(::flatbuffers::FlatBufferBuilder &_fbb, const SC_ObjectUpdate_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct SC_CombatAnimation_FBS : public ::flatbuffers::NativeTable {
+  typedef SC_CombatAnimation TableType;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_CombatAnimation_FBS";
+  }
+  uint16_t attackobjectid = 0;
+  uint16_t defenderobjectid = 0;
+  uint16_t weaponid = 0;
+  uint16_t shieldid = 0;
+  uint16_t style = 0;
+  uint8_t stance = 0;
+  uint8_t result = 0;
+  uint8_t healthpercent = 0;
+};
+
+struct SC_CombatAnimation FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SC_CombatAnimation_FBS NativeTableType;
+  typedef SC_CombatAnimationBuilder Builder;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_CombatAnimation";
+  }
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_ATTACKOBJECTID = 4,
+    VT_DEFENDEROBJECTID = 6,
+    VT_WEAPONID = 8,
+    VT_SHIELDID = 10,
+    VT_STYLE = 12,
+    VT_STANCE = 14,
+    VT_RESULT = 16,
+    VT_HEALTHPERCENT = 18
+  };
+  uint16_t attackobjectid() const {
+    return GetField<uint16_t>(VT_ATTACKOBJECTID, 0);
+  }
+  uint16_t defenderobjectid() const {
+    return GetField<uint16_t>(VT_DEFENDEROBJECTID, 0);
+  }
+  uint16_t weaponid() const {
+    return GetField<uint16_t>(VT_WEAPONID, 0);
+  }
+  uint16_t shieldid() const {
+    return GetField<uint16_t>(VT_SHIELDID, 0);
+  }
+  uint16_t style() const {
+    return GetField<uint16_t>(VT_STYLE, 0);
+  }
+  uint8_t stance() const {
+    return GetField<uint8_t>(VT_STANCE, 0);
+  }
+  uint8_t result() const {
+    return GetField<uint8_t>(VT_RESULT, 0);
+  }
+  uint8_t healthpercent() const {
+    return GetField<uint8_t>(VT_HEALTHPERCENT, 0);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint16_t>(verifier, VT_ATTACKOBJECTID, 2) &&
+           VerifyField<uint16_t>(verifier, VT_DEFENDEROBJECTID, 2) &&
+           VerifyField<uint16_t>(verifier, VT_WEAPONID, 2) &&
+           VerifyField<uint16_t>(verifier, VT_SHIELDID, 2) &&
+           VerifyField<uint16_t>(verifier, VT_STYLE, 2) &&
+           VerifyField<uint8_t>(verifier, VT_STANCE, 1) &&
+           VerifyField<uint8_t>(verifier, VT_RESULT, 1) &&
+           VerifyField<uint8_t>(verifier, VT_HEALTHPERCENT, 1) &&
+           verifier.EndTable();
+  }
+  SC_CombatAnimation_FBS *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(SC_CombatAnimation_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<SC_CombatAnimation> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_CombatAnimation_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct SC_CombatAnimationBuilder {
+  typedef SC_CombatAnimation Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_attackobjectid(uint16_t attackobjectid) {
+    fbb_.AddElement<uint16_t>(SC_CombatAnimation::VT_ATTACKOBJECTID, attackobjectid, 0);
+  }
+  void add_defenderobjectid(uint16_t defenderobjectid) {
+    fbb_.AddElement<uint16_t>(SC_CombatAnimation::VT_DEFENDEROBJECTID, defenderobjectid, 0);
+  }
+  void add_weaponid(uint16_t weaponid) {
+    fbb_.AddElement<uint16_t>(SC_CombatAnimation::VT_WEAPONID, weaponid, 0);
+  }
+  void add_shieldid(uint16_t shieldid) {
+    fbb_.AddElement<uint16_t>(SC_CombatAnimation::VT_SHIELDID, shieldid, 0);
+  }
+  void add_style(uint16_t style) {
+    fbb_.AddElement<uint16_t>(SC_CombatAnimation::VT_STYLE, style, 0);
+  }
+  void add_stance(uint8_t stance) {
+    fbb_.AddElement<uint8_t>(SC_CombatAnimation::VT_STANCE, stance, 0);
+  }
+  void add_result(uint8_t result) {
+    fbb_.AddElement<uint8_t>(SC_CombatAnimation::VT_RESULT, result, 0);
+  }
+  void add_healthpercent(uint8_t healthpercent) {
+    fbb_.AddElement<uint8_t>(SC_CombatAnimation::VT_HEALTHPERCENT, healthpercent, 0);
+  }
+  explicit SC_CombatAnimationBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<SC_CombatAnimation> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<SC_CombatAnimation>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<SC_CombatAnimation> CreateSC_CombatAnimation(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint16_t attackobjectid = 0,
+    uint16_t defenderobjectid = 0,
+    uint16_t weaponid = 0,
+    uint16_t shieldid = 0,
+    uint16_t style = 0,
+    uint8_t stance = 0,
+    uint8_t result = 0,
+    uint8_t healthpercent = 0) {
+  SC_CombatAnimationBuilder builder_(_fbb);
+  builder_.add_style(style);
+  builder_.add_shieldid(shieldid);
+  builder_.add_weaponid(weaponid);
+  builder_.add_defenderobjectid(defenderobjectid);
+  builder_.add_attackobjectid(attackobjectid);
+  builder_.add_healthpercent(healthpercent);
+  builder_.add_result(result);
+  builder_.add_stance(stance);
+  return builder_.Finish();
+}
+
+::flatbuffers::Offset<SC_CombatAnimation> CreateSC_CombatAnimation(::flatbuffers::FlatBufferBuilder &_fbb, const SC_CombatAnimation_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct SC_SpellCastAnimation_FBS : public ::flatbuffers::NativeTable {
+  typedef SC_SpellCastAnimation TableType;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_SpellCastAnimation_FBS";
+  }
+  uint16_t objectid = 0;
+  uint16_t spellid = 0;
+  uint16_t castingtime = 0;
+};
+
+struct SC_SpellCastAnimation FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SC_SpellCastAnimation_FBS NativeTableType;
+  typedef SC_SpellCastAnimationBuilder Builder;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_SpellCastAnimation";
+  }
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_OBJECTID = 4,
+    VT_SPELLID = 6,
+    VT_CASTINGTIME = 8
+  };
+  uint16_t objectid() const {
+    return GetField<uint16_t>(VT_OBJECTID, 0);
+  }
+  uint16_t spellid() const {
+    return GetField<uint16_t>(VT_SPELLID, 0);
+  }
+  uint16_t castingtime() const {
+    return GetField<uint16_t>(VT_CASTINGTIME, 0);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint16_t>(verifier, VT_OBJECTID, 2) &&
+           VerifyField<uint16_t>(verifier, VT_SPELLID, 2) &&
+           VerifyField<uint16_t>(verifier, VT_CASTINGTIME, 2) &&
+           verifier.EndTable();
+  }
+  SC_SpellCastAnimation_FBS *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(SC_SpellCastAnimation_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<SC_SpellCastAnimation> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_SpellCastAnimation_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct SC_SpellCastAnimationBuilder {
+  typedef SC_SpellCastAnimation Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_objectid(uint16_t objectid) {
+    fbb_.AddElement<uint16_t>(SC_SpellCastAnimation::VT_OBJECTID, objectid, 0);
+  }
+  void add_spellid(uint16_t spellid) {
+    fbb_.AddElement<uint16_t>(SC_SpellCastAnimation::VT_SPELLID, spellid, 0);
+  }
+  void add_castingtime(uint16_t castingtime) {
+    fbb_.AddElement<uint16_t>(SC_SpellCastAnimation::VT_CASTINGTIME, castingtime, 0);
+  }
+  explicit SC_SpellCastAnimationBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<SC_SpellCastAnimation> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<SC_SpellCastAnimation>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<SC_SpellCastAnimation> CreateSC_SpellCastAnimation(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint16_t objectid = 0,
+    uint16_t spellid = 0,
+    uint16_t castingtime = 0) {
+  SC_SpellCastAnimationBuilder builder_(_fbb);
+  builder_.add_castingtime(castingtime);
+  builder_.add_spellid(spellid);
+  builder_.add_objectid(objectid);
+  return builder_.Finish();
+}
+
+::flatbuffers::Offset<SC_SpellCastAnimation> CreateSC_SpellCastAnimation(::flatbuffers::FlatBufferBuilder &_fbb, const SC_SpellCastAnimation_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct SC_SpellEffectAnimation_FBS : public ::flatbuffers::NativeTable {
+  typedef SC_SpellEffectAnimation TableType;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_SpellEffectAnimation_FBS";
+  }
+  uint16_t casterobjectid = 0;
+  uint16_t spellid = 0;
+  uint16_t spelltarget = 0;
+  uint16_t bolttime = 0;
+  bool nosound = false;
+  bool success = false;
+};
+
+struct SC_SpellEffectAnimation FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SC_SpellEffectAnimation_FBS NativeTableType;
+  typedef SC_SpellEffectAnimationBuilder Builder;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_SpellEffectAnimation";
+  }
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_CASTEROBJECTID = 4,
+    VT_SPELLID = 6,
+    VT_SPELLTARGET = 8,
+    VT_BOLTTIME = 10,
+    VT_NOSOUND = 12,
+    VT_SUCCESS = 14
+  };
+  uint16_t casterobjectid() const {
+    return GetField<uint16_t>(VT_CASTEROBJECTID, 0);
+  }
+  uint16_t spellid() const {
+    return GetField<uint16_t>(VT_SPELLID, 0);
+  }
+  uint16_t spelltarget() const {
+    return GetField<uint16_t>(VT_SPELLTARGET, 0);
+  }
+  uint16_t bolttime() const {
+    return GetField<uint16_t>(VT_BOLTTIME, 0);
+  }
+  bool nosound() const {
+    return GetField<uint8_t>(VT_NOSOUND, 0) != 0;
+  }
+  bool success() const {
+    return GetField<uint8_t>(VT_SUCCESS, 0) != 0;
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint16_t>(verifier, VT_CASTEROBJECTID, 2) &&
+           VerifyField<uint16_t>(verifier, VT_SPELLID, 2) &&
+           VerifyField<uint16_t>(verifier, VT_SPELLTARGET, 2) &&
+           VerifyField<uint16_t>(verifier, VT_BOLTTIME, 2) &&
+           VerifyField<uint8_t>(verifier, VT_NOSOUND, 1) &&
+           VerifyField<uint8_t>(verifier, VT_SUCCESS, 1) &&
+           verifier.EndTable();
+  }
+  SC_SpellEffectAnimation_FBS *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(SC_SpellEffectAnimation_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<SC_SpellEffectAnimation> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_SpellEffectAnimation_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct SC_SpellEffectAnimationBuilder {
+  typedef SC_SpellEffectAnimation Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_casterobjectid(uint16_t casterobjectid) {
+    fbb_.AddElement<uint16_t>(SC_SpellEffectAnimation::VT_CASTEROBJECTID, casterobjectid, 0);
+  }
+  void add_spellid(uint16_t spellid) {
+    fbb_.AddElement<uint16_t>(SC_SpellEffectAnimation::VT_SPELLID, spellid, 0);
+  }
+  void add_spelltarget(uint16_t spelltarget) {
+    fbb_.AddElement<uint16_t>(SC_SpellEffectAnimation::VT_SPELLTARGET, spelltarget, 0);
+  }
+  void add_bolttime(uint16_t bolttime) {
+    fbb_.AddElement<uint16_t>(SC_SpellEffectAnimation::VT_BOLTTIME, bolttime, 0);
+  }
+  void add_nosound(bool nosound) {
+    fbb_.AddElement<uint8_t>(SC_SpellEffectAnimation::VT_NOSOUND, static_cast<uint8_t>(nosound), 0);
+  }
+  void add_success(bool success) {
+    fbb_.AddElement<uint8_t>(SC_SpellEffectAnimation::VT_SUCCESS, static_cast<uint8_t>(success), 0);
+  }
+  explicit SC_SpellEffectAnimationBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<SC_SpellEffectAnimation> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<SC_SpellEffectAnimation>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<SC_SpellEffectAnimation> CreateSC_SpellEffectAnimation(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint16_t casterobjectid = 0,
+    uint16_t spellid = 0,
+    uint16_t spelltarget = 0,
+    uint16_t bolttime = 0,
+    bool nosound = false,
+    bool success = false) {
+  SC_SpellEffectAnimationBuilder builder_(_fbb);
+  builder_.add_bolttime(bolttime);
+  builder_.add_spelltarget(spelltarget);
+  builder_.add_spellid(spellid);
+  builder_.add_casterobjectid(casterobjectid);
+  builder_.add_success(success);
+  builder_.add_nosound(nosound);
+  return builder_.Finish();
+}
+
+::flatbuffers::Offset<SC_SpellEffectAnimation> CreateSC_SpellEffectAnimation(::flatbuffers::FlatBufferBuilder &_fbb, const SC_SpellEffectAnimation_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct SC_EmoteAnimation_FBS : public ::flatbuffers::NativeTable {
+  typedef SC_EmoteAnimation TableType;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_EmoteAnimation_FBS";
+  }
+  uint16_t objectid = 0;
+  uint8_t emote = 0;
+};
+
+struct SC_EmoteAnimation FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SC_EmoteAnimation_FBS NativeTableType;
+  typedef SC_EmoteAnimationBuilder Builder;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_EmoteAnimation";
+  }
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_OBJECTID = 4,
+    VT_EMOTE = 6
+  };
+  uint16_t objectid() const {
+    return GetField<uint16_t>(VT_OBJECTID, 0);
+  }
+  uint8_t emote() const {
+    return GetField<uint8_t>(VT_EMOTE, 0);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint16_t>(verifier, VT_OBJECTID, 2) &&
+           VerifyField<uint8_t>(verifier, VT_EMOTE, 1) &&
+           verifier.EndTable();
+  }
+  SC_EmoteAnimation_FBS *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(SC_EmoteAnimation_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<SC_EmoteAnimation> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_EmoteAnimation_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct SC_EmoteAnimationBuilder {
+  typedef SC_EmoteAnimation Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_objectid(uint16_t objectid) {
+    fbb_.AddElement<uint16_t>(SC_EmoteAnimation::VT_OBJECTID, objectid, 0);
+  }
+  void add_emote(uint8_t emote) {
+    fbb_.AddElement<uint8_t>(SC_EmoteAnimation::VT_EMOTE, emote, 0);
+  }
+  explicit SC_EmoteAnimationBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<SC_EmoteAnimation> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<SC_EmoteAnimation>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<SC_EmoteAnimation> CreateSC_EmoteAnimation(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint16_t objectid = 0,
+    uint8_t emote = 0) {
+  SC_EmoteAnimationBuilder builder_(_fbb);
+  builder_.add_objectid(objectid);
+  builder_.add_emote(emote);
+  return builder_.Finish();
+}
+
+::flatbuffers::Offset<SC_EmoteAnimation> CreateSC_EmoteAnimation(::flatbuffers::FlatBufferBuilder &_fbb, const SC_EmoteAnimation_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 struct SC_ConcentrationList_FBS : public ::flatbuffers::NativeTable {
   typedef SC_ConcentrationList TableType;
   static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
@@ -1614,10 +2865,10 @@ struct SC_StringMessage FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     return GetField<int32_t>(VT_SEESIONID, 0);
   }
   NetworkMessage::eChatType chattype() const {
-    return static_cast<NetworkMessage::eChatType>(GetField<int8_t>(VT_CHATTYPE, 0));
+    return static_cast<NetworkMessage::eChatType>(GetField<uint8_t>(VT_CHATTYPE, 0));
   }
   NetworkMessage::eChatLoc chatloc() const {
-    return static_cast<NetworkMessage::eChatLoc>(GetField<int8_t>(VT_CHATLOC, 0));
+    return static_cast<NetworkMessage::eChatLoc>(GetField<uint8_t>(VT_CHATLOC, 0));
   }
   const ::flatbuffers::String *message() const {
     return GetPointer<const ::flatbuffers::String *>(VT_MESSAGE);
@@ -1625,8 +2876,8 @@ struct SC_StringMessage FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_SEESIONID, 4) &&
-           VerifyField<int8_t>(verifier, VT_CHATTYPE, 1) &&
-           VerifyField<int8_t>(verifier, VT_CHATLOC, 1) &&
+           VerifyField<uint8_t>(verifier, VT_CHATTYPE, 1) &&
+           VerifyField<uint8_t>(verifier, VT_CHATLOC, 1) &&
            VerifyOffset(verifier, VT_MESSAGE) &&
            verifier.VerifyString(message()) &&
            verifier.EndTable();
@@ -1644,10 +2895,10 @@ struct SC_StringMessageBuilder {
     fbb_.AddElement<int32_t>(SC_StringMessage::VT_SEESIONID, seesionid, 0);
   }
   void add_chattype(NetworkMessage::eChatType chattype) {
-    fbb_.AddElement<int8_t>(SC_StringMessage::VT_CHATTYPE, static_cast<int8_t>(chattype), 0);
+    fbb_.AddElement<uint8_t>(SC_StringMessage::VT_CHATTYPE, static_cast<uint8_t>(chattype), 0);
   }
   void add_chatloc(NetworkMessage::eChatLoc chatloc) {
-    fbb_.AddElement<int8_t>(SC_StringMessage::VT_CHATLOC, static_cast<int8_t>(chatloc), 0);
+    fbb_.AddElement<uint8_t>(SC_StringMessage::VT_CHATLOC, static_cast<uint8_t>(chatloc), 0);
   }
   void add_message(::flatbuffers::Offset<::flatbuffers::String> message) {
     fbb_.AddOffset(SC_StringMessage::VT_MESSAGE, message);
@@ -1726,10 +2977,10 @@ struct SC_DialogBoxMessage FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Tabl
     VT_MESSAGE = 18
   };
   NetworkMessage::eDialogCode code() const {
-    return static_cast<NetworkMessage::eDialogCode>(GetField<int8_t>(VT_CODE, 0));
+    return static_cast<NetworkMessage::eDialogCode>(GetField<uint8_t>(VT_CODE, 0));
   }
   NetworkMessage::eDialogType type() const {
-    return static_cast<NetworkMessage::eDialogType>(GetField<int8_t>(VT_TYPE, 0));
+    return static_cast<NetworkMessage::eDialogType>(GetField<uint8_t>(VT_TYPE, 0));
   }
   bool autowraptext() const {
     return GetField<uint8_t>(VT_AUTOWRAPTEXT, 0) != 0;
@@ -1751,8 +3002,8 @@ struct SC_DialogBoxMessage FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Tabl
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int8_t>(verifier, VT_CODE, 1) &&
-           VerifyField<int8_t>(verifier, VT_TYPE, 1) &&
+           VerifyField<uint8_t>(verifier, VT_CODE, 1) &&
+           VerifyField<uint8_t>(verifier, VT_TYPE, 1) &&
            VerifyField<uint8_t>(verifier, VT_AUTOWRAPTEXT, 1) &&
            VerifyField<uint16_t>(verifier, VT_DATA1, 2) &&
            VerifyField<uint16_t>(verifier, VT_DATA2, 2) &&
@@ -1772,10 +3023,10 @@ struct SC_DialogBoxMessageBuilder {
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_code(NetworkMessage::eDialogCode code) {
-    fbb_.AddElement<int8_t>(SC_DialogBoxMessage::VT_CODE, static_cast<int8_t>(code), 0);
+    fbb_.AddElement<uint8_t>(SC_DialogBoxMessage::VT_CODE, static_cast<uint8_t>(code), 0);
   }
   void add_type(NetworkMessage::eDialogType type) {
-    fbb_.AddElement<int8_t>(SC_DialogBoxMessage::VT_TYPE, static_cast<int8_t>(type), 0);
+    fbb_.AddElement<uint8_t>(SC_DialogBoxMessage::VT_TYPE, static_cast<uint8_t>(type), 0);
   }
   void add_autowraptext(bool autowraptext) {
     fbb_.AddElement<uint8_t>(SC_DialogBoxMessage::VT_AUTOWRAPTEXT, static_cast<uint8_t>(autowraptext), 0);
@@ -2697,6 +3948,418 @@ inline ::flatbuffers::Offset<SC_PlayerCreate> CreateSC_PlayerCreate(::flatbuffer
 }
 
 
+inline bool operator==(const SC_ModelChange_FBS &lhs, const SC_ModelChange_FBS &rhs) {
+  return
+      (lhs.objectid == rhs.objectid) &&
+      (lhs.model == rhs.model) &&
+      (lhs.newsize == rhs.newsize);
+}
+
+inline bool operator!=(const SC_ModelChange_FBS &lhs, const SC_ModelChange_FBS &rhs) {
+    return !(lhs == rhs);
+}
+
+
+inline SC_ModelChange_FBS *SC_ModelChange::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<SC_ModelChange_FBS>(new SC_ModelChange_FBS());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void SC_ModelChange::UnPackTo(SC_ModelChange_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = objectid(); _o->objectid = _e; }
+  { auto _e = model(); _o->model = _e; }
+  { auto _e = newsize(); _o->newsize = _e; }
+}
+
+inline ::flatbuffers::Offset<SC_ModelChange> SC_ModelChange::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_ModelChange_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateSC_ModelChange(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<SC_ModelChange> CreateSC_ModelChange(::flatbuffers::FlatBufferBuilder &_fbb, const SC_ModelChange_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const SC_ModelChange_FBS* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _objectid = _o->objectid;
+  auto _model = _o->model;
+  auto _newsize = _o->newsize;
+  return NetworkMessage::CreateSC_ModelChange(
+      _fbb,
+      _objectid,
+      _model,
+      _newsize);
+}
+
+
+inline bool operator==(const SC_ObjectCreate_FBS &lhs, const SC_ObjectCreate_FBS &rhs) {
+  return
+      (lhs.objectid == rhs.objectid) &&
+      (lhs.heading == rhs.heading) &&
+      (lhs.emblem == rhs.emblem) &&
+      (lhs.model == rhs.model) &&
+      ((lhs.position == rhs.position) || (lhs.position && rhs.position && *lhs.position == *rhs.position)) &&
+      (lhs.flags == rhs.flags) &&
+      (lhs.name == rhs.name);
+}
+
+inline bool operator!=(const SC_ObjectCreate_FBS &lhs, const SC_ObjectCreate_FBS &rhs) {
+    return !(lhs == rhs);
+}
+
+
+inline SC_ObjectCreate_FBS::SC_ObjectCreate_FBS(const SC_ObjectCreate_FBS &o)
+      : objectid(o.objectid),
+        heading(o.heading),
+        emblem(o.emblem),
+        model(o.model),
+        position((o.position) ? new NetworkMessage::Vector3Int(*o.position) : nullptr),
+        flags(o.flags),
+        name(o.name) {
+}
+
+inline SC_ObjectCreate_FBS &SC_ObjectCreate_FBS::operator=(SC_ObjectCreate_FBS o) FLATBUFFERS_NOEXCEPT {
+  std::swap(objectid, o.objectid);
+  std::swap(heading, o.heading);
+  std::swap(emblem, o.emblem);
+  std::swap(model, o.model);
+  std::swap(position, o.position);
+  std::swap(flags, o.flags);
+  std::swap(name, o.name);
+  return *this;
+}
+
+inline SC_ObjectCreate_FBS *SC_ObjectCreate::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<SC_ObjectCreate_FBS>(new SC_ObjectCreate_FBS());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void SC_ObjectCreate::UnPackTo(SC_ObjectCreate_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = objectid(); _o->objectid = _e; }
+  { auto _e = heading(); _o->heading = _e; }
+  { auto _e = emblem(); _o->emblem = _e; }
+  { auto _e = model(); _o->model = _e; }
+  { auto _e = position(); if (_e) _o->position = std::shared_ptr<NetworkMessage::Vector3Int>(new NetworkMessage::Vector3Int(*_e)); }
+  { auto _e = flags(); _o->flags = _e; }
+  { auto _e = name(); if (_e) _o->name = _e->str(); }
+}
+
+inline ::flatbuffers::Offset<SC_ObjectCreate> SC_ObjectCreate::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_ObjectCreate_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateSC_ObjectCreate(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<SC_ObjectCreate> CreateSC_ObjectCreate(::flatbuffers::FlatBufferBuilder &_fbb, const SC_ObjectCreate_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const SC_ObjectCreate_FBS* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _objectid = _o->objectid;
+  auto _heading = _o->heading;
+  auto _emblem = _o->emblem;
+  auto _model = _o->model;
+  auto _position = _o->position ? _o->position.get() : nullptr;
+  auto _flags = _o->flags;
+  auto _name = _o->name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->name);
+  return NetworkMessage::CreateSC_ObjectCreate(
+      _fbb,
+      _objectid,
+      _heading,
+      _emblem,
+      _model,
+      _position,
+      _flags,
+      _name);
+}
+
+
+inline bool operator==(const SC_MovingObjectCreate_FBS &lhs, const SC_MovingObjectCreate_FBS &rhs) {
+  return
+      (lhs.objectid == rhs.objectid) &&
+      (lhs.heading == rhs.heading) &&
+      ((lhs.position == rhs.position) || (lhs.position && rhs.position && *lhs.position == *rhs.position)) &&
+      (lhs.model == rhs.model) &&
+      (lhs.flags == rhs.flags) &&
+      (lhs.emblem == rhs.emblem) &&
+      (lhs.name == rhs.name);
+}
+
+inline bool operator!=(const SC_MovingObjectCreate_FBS &lhs, const SC_MovingObjectCreate_FBS &rhs) {
+    return !(lhs == rhs);
+}
+
+
+inline SC_MovingObjectCreate_FBS::SC_MovingObjectCreate_FBS(const SC_MovingObjectCreate_FBS &o)
+      : objectid(o.objectid),
+        heading(o.heading),
+        position((o.position) ? new NetworkMessage::Vector3Int(*o.position) : nullptr),
+        model(o.model),
+        flags(o.flags),
+        emblem(o.emblem),
+        name(o.name) {
+}
+
+inline SC_MovingObjectCreate_FBS &SC_MovingObjectCreate_FBS::operator=(SC_MovingObjectCreate_FBS o) FLATBUFFERS_NOEXCEPT {
+  std::swap(objectid, o.objectid);
+  std::swap(heading, o.heading);
+  std::swap(position, o.position);
+  std::swap(model, o.model);
+  std::swap(flags, o.flags);
+  std::swap(emblem, o.emblem);
+  std::swap(name, o.name);
+  return *this;
+}
+
+inline SC_MovingObjectCreate_FBS *SC_MovingObjectCreate::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<SC_MovingObjectCreate_FBS>(new SC_MovingObjectCreate_FBS());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void SC_MovingObjectCreate::UnPackTo(SC_MovingObjectCreate_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = objectid(); _o->objectid = _e; }
+  { auto _e = heading(); _o->heading = _e; }
+  { auto _e = position(); if (_e) _o->position = std::shared_ptr<NetworkMessage::Vector3Int>(new NetworkMessage::Vector3Int(*_e)); }
+  { auto _e = model(); _o->model = _e; }
+  { auto _e = flags(); _o->flags = _e; }
+  { auto _e = emblem(); _o->emblem = _e; }
+  { auto _e = name(); if (_e) _o->name = _e->str(); }
+}
+
+inline ::flatbuffers::Offset<SC_MovingObjectCreate> SC_MovingObjectCreate::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_MovingObjectCreate_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateSC_MovingObjectCreate(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<SC_MovingObjectCreate> CreateSC_MovingObjectCreate(::flatbuffers::FlatBufferBuilder &_fbb, const SC_MovingObjectCreate_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const SC_MovingObjectCreate_FBS* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _objectid = _o->objectid;
+  auto _heading = _o->heading;
+  auto _position = _o->position ? _o->position.get() : nullptr;
+  auto _model = _o->model;
+  auto _flags = _o->flags;
+  auto _emblem = _o->emblem;
+  auto _name = _o->name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->name);
+  return NetworkMessage::CreateSC_MovingObjectCreate(
+      _fbb,
+      _objectid,
+      _heading,
+      _position,
+      _model,
+      _flags,
+      _emblem,
+      _name);
+}
+
+
+inline bool operator==(const SC_NPCCreate_FBS &lhs, const SC_NPCCreate_FBS &rhs) {
+  return
+      (lhs.objectid == rhs.objectid) &&
+      (lhs.heading == rhs.heading) &&
+      ((lhs.position == rhs.position) || (lhs.position && rhs.position && *lhs.position == *rhs.position)) &&
+      (lhs.speed == rhs.speed) &&
+      (lhs.speedz == rhs.speedz) &&
+      (lhs.model == rhs.model) &&
+      (lhs.size == rhs.size) &&
+      (lhs.level == rhs.level) &&
+      (lhs.flags == rhs.flags) &&
+      (lhs.flags2 == rhs.flags2) &&
+      (lhs.flags3 == rhs.flags3) &&
+      (lhs.name == rhs.name) &&
+      (lhs.guildname == rhs.guildname);
+}
+
+inline bool operator!=(const SC_NPCCreate_FBS &lhs, const SC_NPCCreate_FBS &rhs) {
+    return !(lhs == rhs);
+}
+
+
+inline SC_NPCCreate_FBS::SC_NPCCreate_FBS(const SC_NPCCreate_FBS &o)
+      : objectid(o.objectid),
+        heading(o.heading),
+        position((o.position) ? new NetworkMessage::Vector3Int(*o.position) : nullptr),
+        speed(o.speed),
+        speedz(o.speedz),
+        model(o.model),
+        size(o.size),
+        level(o.level),
+        flags(o.flags),
+        flags2(o.flags2),
+        flags3(o.flags3),
+        name(o.name),
+        guildname(o.guildname) {
+}
+
+inline SC_NPCCreate_FBS &SC_NPCCreate_FBS::operator=(SC_NPCCreate_FBS o) FLATBUFFERS_NOEXCEPT {
+  std::swap(objectid, o.objectid);
+  std::swap(heading, o.heading);
+  std::swap(position, o.position);
+  std::swap(speed, o.speed);
+  std::swap(speedz, o.speedz);
+  std::swap(model, o.model);
+  std::swap(size, o.size);
+  std::swap(level, o.level);
+  std::swap(flags, o.flags);
+  std::swap(flags2, o.flags2);
+  std::swap(flags3, o.flags3);
+  std::swap(name, o.name);
+  std::swap(guildname, o.guildname);
+  return *this;
+}
+
+inline SC_NPCCreate_FBS *SC_NPCCreate::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<SC_NPCCreate_FBS>(new SC_NPCCreate_FBS());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void SC_NPCCreate::UnPackTo(SC_NPCCreate_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = objectid(); _o->objectid = _e; }
+  { auto _e = heading(); _o->heading = _e; }
+  { auto _e = position(); if (_e) _o->position = std::shared_ptr<NetworkMessage::Vector3Int>(new NetworkMessage::Vector3Int(*_e)); }
+  { auto _e = speed(); _o->speed = _e; }
+  { auto _e = speedz(); _o->speedz = _e; }
+  { auto _e = model(); _o->model = _e; }
+  { auto _e = size(); _o->size = _e; }
+  { auto _e = level(); _o->level = _e; }
+  { auto _e = flags(); _o->flags = _e; }
+  { auto _e = flags2(); _o->flags2 = _e; }
+  { auto _e = flags3(); _o->flags3 = _e; }
+  { auto _e = name(); if (_e) _o->name = _e->str(); }
+  { auto _e = guildname(); if (_e) _o->guildname = _e->str(); }
+}
+
+inline ::flatbuffers::Offset<SC_NPCCreate> SC_NPCCreate::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_NPCCreate_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateSC_NPCCreate(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<SC_NPCCreate> CreateSC_NPCCreate(::flatbuffers::FlatBufferBuilder &_fbb, const SC_NPCCreate_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const SC_NPCCreate_FBS* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _objectid = _o->objectid;
+  auto _heading = _o->heading;
+  auto _position = _o->position ? _o->position.get() : nullptr;
+  auto _speed = _o->speed;
+  auto _speedz = _o->speedz;
+  auto _model = _o->model;
+  auto _size = _o->size;
+  auto _level = _o->level;
+  auto _flags = _o->flags;
+  auto _flags2 = _o->flags2;
+  auto _flags3 = _o->flags3;
+  auto _name = _o->name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->name);
+  auto _guildname = _o->guildname.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->guildname);
+  return NetworkMessage::CreateSC_NPCCreate(
+      _fbb,
+      _objectid,
+      _heading,
+      _position,
+      _speed,
+      _speedz,
+      _model,
+      _size,
+      _level,
+      _flags,
+      _flags2,
+      _flags3,
+      _name,
+      _guildname);
+}
+
+
+inline bool operator==(const SC_CharacterStatusUpdate_FBS &lhs, const SC_CharacterStatusUpdate_FBS &rhs) {
+  return
+      (lhs.sittingflag == rhs.sittingflag) &&
+      (lhs.healthpercent == rhs.healthpercent) &&
+      (lhs.manapercent == rhs.manapercent) &&
+      (lhs.endurancepercent == rhs.endurancepercent) &&
+      (lhs.conpercent == rhs.conpercent) &&
+      (lhs.maxmana == rhs.maxmana) &&
+      (lhs.maxendurance == rhs.maxendurance) &&
+      (lhs.maxconcetration == rhs.maxconcetration) &&
+      (lhs.maxhealth == rhs.maxhealth) &&
+      (lhs.endurance == rhs.endurance) &&
+      (lhs.mana == rhs.mana) &&
+      (lhs.concentration == rhs.concentration) &&
+      (lhs.health == rhs.health);
+}
+
+inline bool operator!=(const SC_CharacterStatusUpdate_FBS &lhs, const SC_CharacterStatusUpdate_FBS &rhs) {
+    return !(lhs == rhs);
+}
+
+
+inline SC_CharacterStatusUpdate_FBS *SC_CharacterStatusUpdate::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<SC_CharacterStatusUpdate_FBS>(new SC_CharacterStatusUpdate_FBS());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void SC_CharacterStatusUpdate::UnPackTo(SC_CharacterStatusUpdate_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = sittingflag(); _o->sittingflag = _e; }
+  { auto _e = healthpercent(); _o->healthpercent = _e; }
+  { auto _e = manapercent(); _o->manapercent = _e; }
+  { auto _e = endurancepercent(); _o->endurancepercent = _e; }
+  { auto _e = conpercent(); _o->conpercent = _e; }
+  { auto _e = maxmana(); _o->maxmana = _e; }
+  { auto _e = maxendurance(); _o->maxendurance = _e; }
+  { auto _e = maxconcetration(); _o->maxconcetration = _e; }
+  { auto _e = maxhealth(); _o->maxhealth = _e; }
+  { auto _e = endurance(); _o->endurance = _e; }
+  { auto _e = mana(); _o->mana = _e; }
+  { auto _e = concentration(); _o->concentration = _e; }
+  { auto _e = health(); _o->health = _e; }
+}
+
+inline ::flatbuffers::Offset<SC_CharacterStatusUpdate> SC_CharacterStatusUpdate::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_CharacterStatusUpdate_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateSC_CharacterStatusUpdate(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<SC_CharacterStatusUpdate> CreateSC_CharacterStatusUpdate(::flatbuffers::FlatBufferBuilder &_fbb, const SC_CharacterStatusUpdate_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const SC_CharacterStatusUpdate_FBS* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _sittingflag = _o->sittingflag;
+  auto _healthpercent = _o->healthpercent;
+  auto _manapercent = _o->manapercent;
+  auto _endurancepercent = _o->endurancepercent;
+  auto _conpercent = _o->conpercent;
+  auto _maxmana = _o->maxmana;
+  auto _maxendurance = _o->maxendurance;
+  auto _maxconcetration = _o->maxconcetration;
+  auto _maxhealth = _o->maxhealth;
+  auto _endurance = _o->endurance;
+  auto _mana = _o->mana;
+  auto _concentration = _o->concentration;
+  auto _health = _o->health;
+  return NetworkMessage::CreateSC_CharacterStatusUpdate(
+      _fbb,
+      _sittingflag,
+      _healthpercent,
+      _manapercent,
+      _endurancepercent,
+      _conpercent,
+      _maxmana,
+      _maxendurance,
+      _maxconcetration,
+      _maxhealth,
+      _endurance,
+      _mana,
+      _concentration,
+      _health);
+}
+
+
 inline bool operator==(const SC_ObjectUpdate_FBS &lhs, const SC_ObjectUpdate_FBS &rhs) {
   return
       (lhs.heading == rhs.heading) &&
@@ -2788,6 +4451,214 @@ inline ::flatbuffers::Offset<SC_ObjectUpdate> CreateSC_ObjectUpdate(::flatbuffer
       _flags,
       _zoneskinid,
       _targetzone);
+}
+
+
+inline bool operator==(const SC_CombatAnimation_FBS &lhs, const SC_CombatAnimation_FBS &rhs) {
+  return
+      (lhs.attackobjectid == rhs.attackobjectid) &&
+      (lhs.defenderobjectid == rhs.defenderobjectid) &&
+      (lhs.weaponid == rhs.weaponid) &&
+      (lhs.shieldid == rhs.shieldid) &&
+      (lhs.style == rhs.style) &&
+      (lhs.stance == rhs.stance) &&
+      (lhs.result == rhs.result) &&
+      (lhs.healthpercent == rhs.healthpercent);
+}
+
+inline bool operator!=(const SC_CombatAnimation_FBS &lhs, const SC_CombatAnimation_FBS &rhs) {
+    return !(lhs == rhs);
+}
+
+
+inline SC_CombatAnimation_FBS *SC_CombatAnimation::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<SC_CombatAnimation_FBS>(new SC_CombatAnimation_FBS());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void SC_CombatAnimation::UnPackTo(SC_CombatAnimation_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = attackobjectid(); _o->attackobjectid = _e; }
+  { auto _e = defenderobjectid(); _o->defenderobjectid = _e; }
+  { auto _e = weaponid(); _o->weaponid = _e; }
+  { auto _e = shieldid(); _o->shieldid = _e; }
+  { auto _e = style(); _o->style = _e; }
+  { auto _e = stance(); _o->stance = _e; }
+  { auto _e = result(); _o->result = _e; }
+  { auto _e = healthpercent(); _o->healthpercent = _e; }
+}
+
+inline ::flatbuffers::Offset<SC_CombatAnimation> SC_CombatAnimation::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_CombatAnimation_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateSC_CombatAnimation(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<SC_CombatAnimation> CreateSC_CombatAnimation(::flatbuffers::FlatBufferBuilder &_fbb, const SC_CombatAnimation_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const SC_CombatAnimation_FBS* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _attackobjectid = _o->attackobjectid;
+  auto _defenderobjectid = _o->defenderobjectid;
+  auto _weaponid = _o->weaponid;
+  auto _shieldid = _o->shieldid;
+  auto _style = _o->style;
+  auto _stance = _o->stance;
+  auto _result = _o->result;
+  auto _healthpercent = _o->healthpercent;
+  return NetworkMessage::CreateSC_CombatAnimation(
+      _fbb,
+      _attackobjectid,
+      _defenderobjectid,
+      _weaponid,
+      _shieldid,
+      _style,
+      _stance,
+      _result,
+      _healthpercent);
+}
+
+
+inline bool operator==(const SC_SpellCastAnimation_FBS &lhs, const SC_SpellCastAnimation_FBS &rhs) {
+  return
+      (lhs.objectid == rhs.objectid) &&
+      (lhs.spellid == rhs.spellid) &&
+      (lhs.castingtime == rhs.castingtime);
+}
+
+inline bool operator!=(const SC_SpellCastAnimation_FBS &lhs, const SC_SpellCastAnimation_FBS &rhs) {
+    return !(lhs == rhs);
+}
+
+
+inline SC_SpellCastAnimation_FBS *SC_SpellCastAnimation::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<SC_SpellCastAnimation_FBS>(new SC_SpellCastAnimation_FBS());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void SC_SpellCastAnimation::UnPackTo(SC_SpellCastAnimation_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = objectid(); _o->objectid = _e; }
+  { auto _e = spellid(); _o->spellid = _e; }
+  { auto _e = castingtime(); _o->castingtime = _e; }
+}
+
+inline ::flatbuffers::Offset<SC_SpellCastAnimation> SC_SpellCastAnimation::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_SpellCastAnimation_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateSC_SpellCastAnimation(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<SC_SpellCastAnimation> CreateSC_SpellCastAnimation(::flatbuffers::FlatBufferBuilder &_fbb, const SC_SpellCastAnimation_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const SC_SpellCastAnimation_FBS* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _objectid = _o->objectid;
+  auto _spellid = _o->spellid;
+  auto _castingtime = _o->castingtime;
+  return NetworkMessage::CreateSC_SpellCastAnimation(
+      _fbb,
+      _objectid,
+      _spellid,
+      _castingtime);
+}
+
+
+inline bool operator==(const SC_SpellEffectAnimation_FBS &lhs, const SC_SpellEffectAnimation_FBS &rhs) {
+  return
+      (lhs.casterobjectid == rhs.casterobjectid) &&
+      (lhs.spellid == rhs.spellid) &&
+      (lhs.spelltarget == rhs.spelltarget) &&
+      (lhs.bolttime == rhs.bolttime) &&
+      (lhs.nosound == rhs.nosound) &&
+      (lhs.success == rhs.success);
+}
+
+inline bool operator!=(const SC_SpellEffectAnimation_FBS &lhs, const SC_SpellEffectAnimation_FBS &rhs) {
+    return !(lhs == rhs);
+}
+
+
+inline SC_SpellEffectAnimation_FBS *SC_SpellEffectAnimation::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<SC_SpellEffectAnimation_FBS>(new SC_SpellEffectAnimation_FBS());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void SC_SpellEffectAnimation::UnPackTo(SC_SpellEffectAnimation_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = casterobjectid(); _o->casterobjectid = _e; }
+  { auto _e = spellid(); _o->spellid = _e; }
+  { auto _e = spelltarget(); _o->spelltarget = _e; }
+  { auto _e = bolttime(); _o->bolttime = _e; }
+  { auto _e = nosound(); _o->nosound = _e; }
+  { auto _e = success(); _o->success = _e; }
+}
+
+inline ::flatbuffers::Offset<SC_SpellEffectAnimation> SC_SpellEffectAnimation::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_SpellEffectAnimation_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateSC_SpellEffectAnimation(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<SC_SpellEffectAnimation> CreateSC_SpellEffectAnimation(::flatbuffers::FlatBufferBuilder &_fbb, const SC_SpellEffectAnimation_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const SC_SpellEffectAnimation_FBS* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _casterobjectid = _o->casterobjectid;
+  auto _spellid = _o->spellid;
+  auto _spelltarget = _o->spelltarget;
+  auto _bolttime = _o->bolttime;
+  auto _nosound = _o->nosound;
+  auto _success = _o->success;
+  return NetworkMessage::CreateSC_SpellEffectAnimation(
+      _fbb,
+      _casterobjectid,
+      _spellid,
+      _spelltarget,
+      _bolttime,
+      _nosound,
+      _success);
+}
+
+
+inline bool operator==(const SC_EmoteAnimation_FBS &lhs, const SC_EmoteAnimation_FBS &rhs) {
+  return
+      (lhs.objectid == rhs.objectid) &&
+      (lhs.emote == rhs.emote);
+}
+
+inline bool operator!=(const SC_EmoteAnimation_FBS &lhs, const SC_EmoteAnimation_FBS &rhs) {
+    return !(lhs == rhs);
+}
+
+
+inline SC_EmoteAnimation_FBS *SC_EmoteAnimation::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<SC_EmoteAnimation_FBS>(new SC_EmoteAnimation_FBS());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void SC_EmoteAnimation::UnPackTo(SC_EmoteAnimation_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = objectid(); _o->objectid = _e; }
+  { auto _e = emote(); _o->emote = _e; }
+}
+
+inline ::flatbuffers::Offset<SC_EmoteAnimation> SC_EmoteAnimation::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_EmoteAnimation_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateSC_EmoteAnimation(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<SC_EmoteAnimation> CreateSC_EmoteAnimation(::flatbuffers::FlatBufferBuilder &_fbb, const SC_EmoteAnimation_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const SC_EmoteAnimation_FBS* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _objectid = _o->objectid;
+  auto _emote = _o->emote;
+  return NetworkMessage::CreateSC_EmoteAnimation(
+      _fbb,
+      _objectid,
+      _emote);
 }
 
 

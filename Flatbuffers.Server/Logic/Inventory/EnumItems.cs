@@ -24,6 +24,38 @@ public enum eEquipmentItems : byte
     MYTHICAL = 0x25
 };
 
+public class Slot
+{
+    public const int HORSEARMOR = 7;
+    public const int HORSEBARDING = 8;
+    public const int HORSE = 9;
+    public const int RIGHTHAND = 10;
+    public const int LEFTHAND = 11;
+    public const int TWOHAND = 12;
+    public const int RANGED = 13;
+    public const int FIRSTQUIVER = 14;
+    public const int SECONDQUIVER = 15;
+    public const int THIRDQUIVER = 16;
+    public const int FOURTHQUIVER = 17;
+    public const int HELM = 21;
+    public const int HANDS = 22;
+    public const int FEET = 23;
+    public const int JEWELRY = 24;
+    public const int TORSO = 25;
+    public const int CLOAK = 26;
+    public const int LEGS = 27;
+    public const int ARMS = 28;
+    public const int NECK = 29;
+    public const int FOREARMS = 30;
+    public const int SHIELD = 31;
+    public const int WAIST = 32;
+    public const int LEFTWRIST = 33;
+    public const int RIGHTWRIST = 34;
+    public const int LEFTRING = 35;
+    public const int RIGHTRING = 36;
+    public const int MYTHICAL = 37;
+};
+
 public enum eObjectType : byte
 {
     GenericItem = 0,

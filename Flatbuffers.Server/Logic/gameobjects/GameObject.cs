@@ -189,9 +189,7 @@ namespace Game.Logic
 	        set => Position = Position.With(regionID: value);
         }
         
-
-        
-        public string Name
+        public virtual string Name
         {
             get => mName;
             set
@@ -199,6 +197,13 @@ namespace Game.Logic
                 mName = value;
             }
         }
+        
+        public virtual IList GetExamineMessages(GamePlayer player)
+        {
+	        IList list = new ArrayList(4);
+	        list.Add(LanguageMgr.GetTranslation(player.Network.Account.Language, "GameObject.GetExamineMessages.YouTarget", GetName(0, false)));
+	        return list;
+        }        
         #endregion
 
         #region ========= Health =======================================================================================
@@ -444,7 +449,6 @@ namespace Game.Logic
         #endregion
         
         #region ConLevel/DurLevel
-
         /// <summary>
         /// Calculate con-level against other object
         /// &lt;=-3 = grey
@@ -492,7 +496,6 @@ namespace Game.Logic
 	        int constep = Math.Max(1, (level + 10) / 10);
 	        return Math.Max((int)0, (int)(level + constep * con));
         }
-
         #endregion
         #region Spell Cast
         public virtual bool HasEffect(Spell spell)
@@ -520,6 +523,17 @@ namespace Game.Logic
 	        }
         }
         
+        #endregion
+        #region Combat
+        public virtual void TakeDamage(AttackData ad)
+        {
+	        TakeDamage(ad.Attacker, ad.DamageType, ad.Damage, ad.CriticalDamage);
+        }
+        
+        public virtual void TakeDamage(GameObject source, eDamageType damageType, int damageAmount, int criticalAmount)
+        {
+	        Notify(GameObjectEvent.TakeDamage, this, new TakeDamageEventArgs(source, damageType, damageAmount, criticalAmount));
+        }
         #endregion        
         #region ==== Get Name ==========================================================================================
         public virtual string GetName(int article, bool firstLetterUppercase, string lang, ITranslatableObject obj)

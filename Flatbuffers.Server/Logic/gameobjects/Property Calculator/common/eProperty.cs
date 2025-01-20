@@ -120,6 +120,25 @@ public enum eProperty : byte
     SpellLevel = 81,
     MissHit = 82,
     DPS = 83,
+    #region TOA
+    //TOA
+    ToABonus_First = 84,
+    BuffEffectiveness = 85,
+    CastingSpeed = 86,
+    DebuffEffectivness = 87,
+    HealingEffectiveness = 88,
+    PowerPool = 89,
+    ResistPierce = 90,
+    SpellDamage = 91,
+    SpellDuration = 92,
+    StyleDamage = 93,
+    ToABonus_Last = 94,
+    #endregion    
+    StyleAbsorb = 95,
+
+    #region === SKILLS ===
+    Skill_Stealth = 100,
+    #endregion
     
     MaxProperty = 255
 }

@@ -122,6 +122,38 @@ namespace Logic.database.table
         {
             get => m_realm;
             set => SetProperty(ref m_realm, value);            
-        }        
+        }      
+        
+        [Relation(LocalField = nameof( Name ), RemoteField = nameof( DOLCharacters.AccountName ), AutoLoad = true, AutoDelete=true)]
+        public DOLCharacters[] Characters;       
+        
+        [Relation(LocalField = nameof( Name ), RemoteField = nameof( DBBannedAccount.Account ), AutoLoad = true, AutoDelete = true)]
+        public DBBannedAccount[] BannedAccount;
+		
+        /// <summary>
+        /// List of Custom Params for this account
+        /// </summary>
+        [Relation(LocalField = nameof( Name ), RemoteField = nameof( AccountXCustomParam.Name ), AutoLoad = true, AutoDelete = true)]
+        public AccountXCustomParam[] CustomParams;        
     }
+    
+    [DataTable(TableName = "AccountXCustomParam")]
+    public class AccountXCustomParam : CustomParam
+    {
+        private string m_name;
+        [DataElement(AllowDbNull = false, Index = true, Varchar = 255)]
+        public string Name {
+            get { return m_name; }
+            set { Dirty = true; m_name = value; }
+        }
+        public AccountXCustomParam(string Name, string KeyName, string Value)
+            : base(KeyName, Value)
+        {
+            this.Name = Name;
+        }
+		
+        public AccountXCustomParam()
+        {
+        }
+    }    
 }

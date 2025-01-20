@@ -91,7 +91,7 @@ table SC_PlayerCreate
 	objectid		: ushort;
 	heading			: ushort;
 	model			: ushort;
-	level			: ushort;
+	level			: ubyte;
 	flags			: ubyte;
 	// 케릭터 꾸밈 데이터 추가
 	name			: string;
@@ -99,7 +99,68 @@ table SC_PlayerCreate
 	lastname		: string;
 }
 
-// SendLivingEquipmentUpdate
+table SC_ModelChange
+{
+	objectid		: ushort;
+	model			: ushort;
+	newsize			: int;
+}
+
+table SC_ObjectCreate
+{
+	objectid		: ushort;
+	heading			: ushort;
+	emblem			: ushort;
+	model			: ushort;
+	position		: Vector3Int;
+	flags			: int;
+	name			: string;
+}
+
+table SC_MovingObjectCreate
+{
+	objectid		: ushort;
+	heading			: ushort;
+	position		: Vector3Int;
+	model			: ushort;
+	flags			: int;
+	emblem			: ushort;
+	name			: string;
+}
+
+table SC_NPCCreate
+{
+	objectid		: ushort;
+	heading			: ushort;
+	position		: Vector3Int;
+	speed			: ushort;
+	speedz			: ushort;
+	model			: ushort;
+	size			: ubyte;
+	level			: ubyte;
+	flags			: ubyte;
+	flags2			: ubyte;
+	flags3			: ubyte;
+	name			: string;
+	guildname		: string;
+}
+
+table SC_CharacterStatusUpdate
+{
+	sittingflag		: bool;
+	healthpercent	: ubyte;
+	manapercent		: ubyte;
+	endurancepercent: ubyte;
+	conpercent		: ubyte;
+	maxmana			: int;
+	maxendurance	: int;
+	maxconcetration : int;
+	maxhealth		: int;
+	endurance 		: int;
+	mana 			: int;
+	concentration	: int;
+	health			: int;
+}
 
 table SC_ObjectUpdate
 {
@@ -112,6 +173,41 @@ table SC_ObjectUpdate
 	flags			: ubyte;
 	zoneskinid		: ubyte;
 	targetzone		: ubyte;
+}
+
+table SC_CombatAnimation
+{
+	attackobjectid	: ushort;
+	defenderobjectid: ushort;
+	weaponid		: ushort;
+	shieldid		: ushort;
+	style			: ushort;
+	stance			: ubyte;
+	result			: ubyte;
+	healthpercent	: ubyte;
+}
+
+table SC_SpellCastAnimation
+{
+	objectid		: ushort;
+	spellid			: ushort;
+	castingtime		: ushort;
+}
+
+table SC_SpellEffectAnimation
+{
+	casterobjectid	: ushort;
+	spellid			: ushort;
+	spelltarget		: ushort;
+	bolttime		: ushort;
+	nosound			: bool;
+	success			: bool;
+}
+
+table SC_EmoteAnimation
+{
+	objectid		: ushort;
+	emote			: ubyte;
 }
 
 table SC_ConcentrationList {

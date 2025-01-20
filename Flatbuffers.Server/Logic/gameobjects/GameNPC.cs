@@ -109,8 +109,9 @@ namespace Game.Logic
 				if (ObjectState == eObjectState.Active)
 				{
 					foreach (GamePlayer player in GetPlayersInRadius(WorldManager.VISIBILITY_DISTANCE))
+					{
 						player.Out.SendModelAndSizeChange(this, Model, value);
-					//					BroadcastUpdate();
+					}
 				}
 			}
 		}
@@ -145,7 +146,7 @@ namespace Game.Logic
 				base.Model = value;
 				if (ObjectState == eObjectState.Active)
 				{
-					foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+					foreach (GamePlayer player in GetPlayersInRadius(WorldManager.VISIBILITY_DISTANCE))
 						player.Out.SendModelChange(this, Model);
 				}
 			}
@@ -177,7 +178,7 @@ namespace Game.Logic
 					if (Level < 1 && ObjectState == eObjectState.Active)
 					{
 						// This is a newly created NPC, so notify nearby players of its creation
-						foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+						foreach (GamePlayer player in GetPlayersInRadius(WorldManager.VISIBILITY_DISTANCE))
 						{
 							player.Out.SendNPCCreate(this);
 							if (m_inventory != null)

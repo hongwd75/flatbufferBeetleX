@@ -11,6 +11,19 @@ namespace Game.Logic.network
     {
         private ISession Session = null;
         private GameClient mGameClient = null;
+
+        // 에니메이션 인덱스
+        public virtual int OneDualWeaponHit => 0x1f5;
+        public virtual int BothDualWeaponHit => 0x1f6;
+        
+        protected void SetFlag(ref byte flags, bool condition, byte value)
+        {
+            if (condition)
+            {
+                flags |= value;
+            }
+        }        
+        
         protected void SendFlatBufferPacket<T>(ServerPackets packetType, FlatBufferBuilder builder, T request)
             where T : class
         {
@@ -27,6 +40,7 @@ namespace Game.Logic.network
             SendFlatBufferPacket(packetType, sendBuilder, request);
         }
 
+        protected GamePlayer Player => Client.Player;
         public GameClient Client
         {
             get => mGameClient;
@@ -74,22 +88,47 @@ namespace Game.Logic.network
             }
         }
 
+        public void SendModelAndSizeChange(GameObject obj, ushort newModel, byte newSize)
+        {
+            SendModelAndSizeChange((ushort) obj.ObjectID, newModel, newSize);
+        }
+        
+        public void SendModelChange(GameObject obj, ushort newModel)
+        {
+            if (obj is GameNPC)
+                SendModelAndSizeChange(obj, newModel, (obj as GameNPC).Size);
+            else
+                SendModelAndSizeChange(obj, newModel, 0);
+        }
+        
         //=======================================================================================================
         // 생성 패킷
         public abstract void SendTime();
+        public abstract void SendNPCCreate(GameNPC npc);
+        public abstract void SendObjectCreate(GameObject obj);
+        public abstract void SendMovingObjectCreate(GameMovingObject obj);
         public abstract void SendLoginDenied(eLoginError error);
         public abstract void SendLoginInfo();
         public abstract void SendObjectUpdate(GameObject obj);
-        public abstract void SendLivingDataUpdate(GameLiving living, bool updateStrings);
+        public abstract void SendLivingDataUpdate(GameLiving living, bool updateStrings); // 코드 작업 안함
+        public abstract void SendModelAndSizeChange(ushort objectId, ushort newModel, byte newSize);      
+        public abstract void SendStatusUpdate();
+
+        public abstract void SendCombatAnimation(GameObject attacker, GameObject defender, ushort weaponID,
+            ushort shieldID, int style, byte stance, byte result, byte targetHealthPercent);
+        public abstract void SendSpellCastAnimation(GameLiving spellCaster, ushort spellID, ushort castingTime);
+        public abstract void SendSpellEffectAnimation(GameObject spellCaster, GameObject spellTarget, ushort spellid, ushort boltTime, bool noSound, byte success);
+        public abstract void SendEmoteAnimation(GameObject obj, eEmote emote);
+        public abstract void SendStatusUpdate(bool sittingFlag);
         public abstract void SendPlayerQuit(bool totalOut);
         public abstract void SendMessage(string message, eChatType type, eChatLoc loc);
         public abstract void SendDialogBox(eDialogCode code, ushort data1, ushort data2, ushort data3, ushort data4, eDialogType type, bool autoWrapText, string message);
         public abstract void SendUpdatePlayer();
+        public abstract void SendPlayerForgedPosition(GamePlayer obj);
         public abstract void SendObjectRemove(GameObject obj);
         public abstract void SendPlayerCreate(GamePlayer obj);
         public abstract void SendLivingEquipmentUpdate(GameLiving obj);
         public abstract void SendConcentrationList();
         public abstract void SendUpdateMaxSpeed();
-
     }
 }

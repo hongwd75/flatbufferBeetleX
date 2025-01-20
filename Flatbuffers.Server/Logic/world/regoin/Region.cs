@@ -543,13 +543,13 @@ namespace Game.Logic.World;
         
         public virtual uint GameTime
         {
-            get { return WorldMgr.GetCurrentGameTime(); }
+            get { return WorldManager.GetCurrentGameTime(); }
             set { }
         }
         
         public virtual uint DayIncrement
         {
-            get { return WorldMgr.GetDayIncrement(); }
+            get { return WorldManager.GetDayIncrement(); }
             set { }
         }
         
@@ -737,7 +737,7 @@ namespace Game.Logic.World;
                     }
                     
 
-                    if (Properties.USE_NPCGUILDSCRIPTS && mob.Guild.Length > 0 && mob.Realm >= 0 && mob.Realm <= (int)eRealm._Last)
+                    if ( mob.Guild.Length > 0 && mob.Realm >= 0 && mob.Realm <= (int)eRealm._Last)
                     {
                         Type type = ScriptMgr.FindNPCGuildScriptClass(mob.Guild, (eRealm)mob.Realm);
                         if (type != null)
@@ -1366,9 +1366,6 @@ namespace Game.Logic.World;
                         case Zone.eGameObjectType.PLAYER:
                             tmp = new PlayerDistanceEnumerator(center, res);
                             break;
-                        case Zone.eGameObjectType.DOOR:
-                            tmp = new DoorDistanceEnumerator(center, res);
-                            break;
                         default:
                             tmp = new EmptyEnumerator();
                             break;
@@ -1652,24 +1649,7 @@ namespace Game.Logic.World;
                 }
             }
         }
-
-        public class DoorDistanceEnumerator : DistanceEnumerator
-        {
-            public DoorDistanceEnumerator(int x, int y, int z, ArrayList elements)
-                : base(Coordinate.Create(x, y, z), elements) { }
-
-            public DoorDistanceEnumerator(Coordinate coordinate, ArrayList elements)
-                : base(coordinate,elements) { }
-
-            public override object Current
-            {
-                get
-                {
-                    IDoor obj = (IDoor)m_currentObj;
-                    return new DoorDistEntry(obj, (int)obj.Coordinate.DistanceTo(coordinate));
-                }
-            }
-        }
+        
         #endregion
 
         #endregion
@@ -1737,19 +1717,4 @@ namespace Game.Logic.World;
 		public GameStaticItem Item;
 		public int Distance;
 	}
-
-	/// <summary>
-	/// Holds a Object and it's distance towards the center
-	/// </summary>
-	public class DoorDistEntry
-	{
-		public DoorDistEntry(IDoor d, int distance)
-		{
-			Door = d;
-			Distance = distance;
-		}
-
-		public IDoor Door;
-		public int Distance;
-	}
-    #endregion
+#endregion

@@ -183,69 +183,69 @@ public partial class GameLiving : GameObject
 
 			if (owner.ActiveWeaponSlot == GameLiving.eActiveWeaponSlot.Distance)
 			{
-				//Mobs always shot and reload
-				if (owner is GameNPC)
-				{
-					owner.RangedAttackState = eRangedAttackState.AimFireReload;
-				}
-
-				if (owner.RangedAttackState != eRangedAttackState.AimFireReload)
-				{
-					owner.StopAttack();
-					Stop();
-					return;
-				}
-				else
-				{
-					if (!(owner is GamePlayer) || (owner.RangedAttackType != eRangedAttackType.Long))
-					{
-						owner.RangedAttackType = eRangedAttackType.Normal;
-						lock (owner.EffectList)
-						{
-							foreach (IGameEffect effect in owner.EffectList) // switch to the correct range attack type
-							{
-								if (effect is SureShotEffect)
-								{
-									owner.RangedAttackType = eRangedAttackType.SureShot;
-									break;
-								}
-								else if (effect is RapidFireEffect)
-								{
-									owner.RangedAttackType = eRangedAttackType.RapidFire;
-									break;
-								}
-								else if (effect is TrueshotEffect)
-								{
-									owner.RangedAttackType = eRangedAttackType.Long;
-									break;
-								}
-							}
-						}
-					}
-
-					owner.RangedAttackState = eRangedAttackState.Aim;
-
-					if (owner is GamePlayer)
-					{
-						owner.TempProperties.setProperty(GamePlayer.RANGE_ATTACK_HOLD_START, 0L);
-					}
-
-					int speed = owner.AttackSpeed(attackWeapon);
-					byte attackSpeed = (byte)(speed / 100);
-					int model = (attackWeapon == null ? 0 : attackWeapon.Model);
-					foreach (GamePlayer player in owner.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
-					{
-						player.Out.SendCombatAnimation(owner, null, (ushort)model, 0x00, player.Out.BowPrepare,
-							attackSpeed, 0x00, 0x00);
-					}
-
-					if (owner.RangedAttackType == eRangedAttackType.RapidFire)
-					{
-						speed /= 2; // can start fire at the middle of the normal time
-					}
-
-					Interval = speed;
-				}
+				// //Mobs always shot and reload
+				// if (owner is GameNPC)
+				// {
+				// 	owner.RangedAttackState = eRangedAttackState.AimFireReload;
+				// }
+				//
+				// if (owner.RangedAttackState != eRangedAttackState.AimFireReload)
+				// {
+				// 	owner.StopAttack();
+				// 	Stop();
+				// 	return;
+				// }
+				// else
+				// {
+				// 	if (!(owner is GamePlayer) || (owner.RangedAttackType != eRangedAttackType.Long))
+				// 	{
+				// 		owner.RangedAttackType = eRangedAttackType.Normal;
+				// 		lock (owner.EffectList)
+				// 		{
+				// 			foreach (IGameEffect effect in owner.EffectList) // switch to the correct range attack type
+				// 			{
+				// 				if (effect is SureShotEffect)
+				// 				{
+				// 					owner.RangedAttackType = eRangedAttackType.SureShot;
+				// 					break;
+				// 				}
+				// 				else if (effect is RapidFireEffect)
+				// 				{
+				// 					owner.RangedAttackType = eRangedAttackType.RapidFire;
+				// 					break;
+				// 				}
+				// 				else if (effect is TrueshotEffect)
+				// 				{
+				// 					owner.RangedAttackType = eRangedAttackType.Long;
+				// 					break;
+				// 				}
+				// 			}
+				// 		}
+				// 	}
+				//
+				// 	owner.RangedAttackState = eRangedAttackState.Aim;
+				//
+				// 	if (owner is GamePlayer)
+				// 	{
+				// 		owner.TempProperties.setProperty(GamePlayer.RANGE_ATTACK_HOLD_START, 0L);
+				// 	}
+				//
+				// 	int speed = owner.AttackSpeed(attackWeapon);
+				// 	byte attackSpeed = (byte)(speed / 100);
+				// 	int model = (attackWeapon == null ? 0 : attackWeapon.Model);
+				// 	foreach (GamePlayer player in owner.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+				// 	{
+				// 		player.Out.SendCombatAnimation(owner, null, (ushort)model, 0x00, player.Out.BowPrepare,
+				// 			attackSpeed, 0x00, 0x00);
+				// 	}
+				//
+				// 	if (owner.RangedAttackType == eRangedAttackType.RapidFire)
+				// 	{
+				// 		speed /= 2; // can start fire at the middle of the normal time
+				// 	}
+				//
+				// 	Interval = speed;
+				// }
 			}
 			else
 			{

@@ -28,7 +28,9 @@ namespace Game.Logic.ServerProperties
 		[ServerProperty("server", "update_existing_db_system_sentences_from_files", "DBLanguageSystem 테이블에 있는 내용과 파일이 틀리면 업데이트", false)]
 		public static bool UPDATE_EXISTING_DB_SYSTEM_SENTENCES_FROM_FILES;		
 		[ServerProperty("server", "region_max_objects", "리전에서 허용되는 객체의 최대 개수를 설정합니다. 숫자가 작을수록 성능이 더 좋아집니다. 이 값은 서버가 실행 중일 때 변경할 수 없습니다. (256 - 65535)", (ushort)30000)]
-		public static ushort REGION_MAX_OBJECTS;		
+		public static ushort REGION_MAX_OBJECTS;
+		[ServerProperty("server", "disable_quit_timer", "대기하지 않고 바로 logout", false)]
+		public static bool DISABLE_QUIT_TIMER;		
 		
 		[ServerProperty("account", "allow_auto_account_creation", "자동 계정 생성 허용 - 이 설정은 serverconfig.xml에서도 설정되며, 이 속성이 작동하려면 활성화되어 있어야 합니다.", true)]
 		public static bool ALLOW_AUTO_ACCOUNT_CREATION;
@@ -39,6 +41,8 @@ namespace Game.Logic.ServerProperties
 		public static string DISABLED_REGIONS = "";
 		[ServerProperty("world", "world_day_increment", "일 증가 (0에서 512까지, 기본값은 24). 증가값이 클수록 하루의 길이가 짧아집니다.", (uint)24)]
 		public static uint WORLD_DAY_INCREMENT;
+		[ServerProperty("world", "world_item_decay_time", "드랍된 아이템이 월드에 남아 있는 시간 (단위: ms)", (uint)180000)]
+		public static uint WORLD_ITEM_DECAY_TIME;		
 		[ServerProperty("world", "world_npc_update_interval", "NPC가 클라이언트에 업데이트를 방송하는 주기(밀리초). 최소 허용값 = 1000(1초). 0으로 설정하면 이 업데이트가 비활성화됩니다", (uint)8000)]
 		public static uint WORLD_NPC_UPDATE_INTERVAL;
 		[ServerProperty("world", "world_object_update_interval", "객체(정적 객체, 주택, 문 등)가 클라이언트에 업데이트를 방송하는 주기(밀리초). 최소 허용값 = 10000(10초). 0으로 설정하면 이 업데이트가 비활성화됩니다.", (uint)30000)]
@@ -65,25 +69,36 @@ namespace Game.Logic.ServerProperties
 		
 		[ServerProperty("spells", "spell_interrupt_duration", "공격 받은 후 주문 방해 지속 시간 (밀리초 단위), 기본값: 4500", 4500)]
 		public static int SPELL_INTERRUPT_DURATION;
-
 		[ServerProperty("spells", "spell_interrupt_recast", "주문 방해 후 재시전 대기 시간 (밀리초 단위), 기본값: 2000", 2000)]
 		public static int SPELL_INTERRUPT_RECAST;
-
 		[ServerProperty("spells", "spell_interrupt_again", "주문 방해 재적용 딜레이 (밀리초 단위), 기본값: 100", 100)]
 		public static int SPELL_INTERRUPT_AGAIN;
-
 		[ServerProperty( "spells", "spell_interrupt_maxstagelength", "1단계 및 3단계의 최대 지속 시간 (밀리초 단위), 1000 = 1초, 기본값: 1500", 1500 )]
 		public static int SPELL_INTERRUPT_MAXSTAGELENGTH;
-
 		[ServerProperty( "spells", "spell_interrupt_max_intermediate_stagelength", "2단계의 최대 지속 시간 (밀리초 단위), 1000 = 1초. 999999를 설정하면 비활성화됨, 기본값: 3000", 3000 )]
 		public static int SPELL_INTERRUPT_MAX_INTERMEDIATE_STAGELENGTH;
-
 		[ServerProperty("spells", "spell_charm_named_check", "네임드 몬스터에 매혹 주문이 적용되지 않도록 설정, 0 = 비활성화, 1 = 활성화, 기본값: 1", 1)]
 		public static int SPELL_CHARM_NAMED_CHECK;
+
+		[ServerProperty("npc", "gamenpc_default_classtype", "game npc typeclass 설정.", "Game.Logic.GameNPC")]
+		public static string GAMENPC_DEFAULT_CLASSTYPE;
+		
+		[ServerProperty("rates", "item_sell_ratio", "상인한테 팔 때 아이템 가격할인 비율 %", 50)]
+		public static int ITEM_SELL_RATIO;		
+		[ServerProperty("rates", "cs_opening_effectiveness", "스텔스 스타일 고정 스타일 성장율", 1.0)]
+		public static double CS_OPENING_EFFECTIVENESS;
+		[ServerProperty("rates", "block_cap", "공격 블럭 확률 캡 (0.60 = 60%)", 0.60)]
+		public static double BLOCK_CAP;
+		[ServerProperty("rates", "evade_cap", "공격 회피 확률 캡 (0.50 = 50%)", 0.50)]
+		public static double EVADE_CAP;
+		[ServerProperty("rates", "parry_cap", "공격 무기 막기 확률 캡 (0.50 = 50%)", 0.50)]
+		public static double PARRY_CAP;
 		
 		[ServerProperty("classes", "allow_cross_realm_items", "다른 랠름의 아이템 장착 허용", false)]
 		public static bool ALLOW_CROSS_REALM_ITEMS;		
 		
+		[ServerProperty("server", "autoselect_caster", "현재 대상이 유효하지 않을 경우, 유익한 주문이 시전자에게 자동으로 적용되도록 설정합니다. 이를 통해 대상을 변경하지 않고도 자기 치유가 가능합니다.", false)]
+		public static bool AUTOSELECT_CASTER;		
 		//----------------------------------------------------------------------------------------------
 		#region #### 설정 함수 ####
 		public static void InitProperties()

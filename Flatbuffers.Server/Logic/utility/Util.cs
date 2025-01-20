@@ -54,6 +54,34 @@ namespace Game.Logic.Utils
             return sb.ToString();
         }
         
+        public static string FormatTime(long seconds)
+        {
+            var str = new StringBuilder(10);
+
+            long minutes = seconds/60;
+            if (minutes > 0)
+            {
+                str.Append(minutes)
+                    .Append(":")
+                    .Append((seconds - (minutes*60)).ToString("D2"))
+                    .Append(" min");
+            }
+            else
+                str.Append(seconds)
+                    .Append(" sec");
+
+            return str.ToString();
+        }
+        
+        //-------------------------------------------------------------------------------------------------------------
+        public static void AddRange<T>(IList<T> list, IList<T> addList)
+        {
+            foreach (T item in addList)
+            {
+                list.Add(item);
+            }
+        }
+        
         //-------------------------------------------------------------------------------------------------------------
         const char primarySeparator = ';';
         const char secondarySeparator = '-';        

@@ -9,6 +9,7 @@ using Game.Logic.Language;
 using Game.Logic.PropertyCalc;
 using Game.Logic.Skills;
 using Game.Logic.Spells;
+using Game.Logic.Styles;
 using Game.Logic.Utils;
 using Game.Logic.World;
 using Game.Logic.World.Timer;
@@ -28,13 +29,18 @@ public partial class GameLiving : GameObject
 
 
 	#region ==== ENUM ======================================================================================================
+
 	public enum eActiveWeaponSlot : byte
 	{
-		Standard = 0x00, /// Weapon slot righthand
-		TwoHanded = 0x01, /// Weaponslot twohanded
+		Standard = 0x00,
+
+		/// Weapon slot righthand
+		TwoHanded = 0x01,
+
+		/// Weaponslot twohanded
 		Distance = 0x02 /// Weaponslot distance
-	}
-	
+	};
+
 	public enum eAttackResult : int
 	{
 		Any = 0,
@@ -54,7 +60,21 @@ public partial class GameLiving : GameObject
 		Bodyguarded = 16,
 		Phaseshift = 17,
 		Grappled = 18
-	}	
+	};
+	
+	protected static readonly eProperty[] m_damageTypeToResistBonusConversion = new eProperty[] {
+		eProperty.Resist_Natural, //0,
+		eProperty.Resist_Crush,
+		eProperty.Resist_Slash,
+		eProperty.Resist_Thrust,
+		0, 0, 0, 0, 0, 0,
+		eProperty.Resist_Body,
+		eProperty.Resist_Cold,
+		eProperty.Resist_Energy,
+		eProperty.Resist_Heat,
+		eProperty.Resist_Matter,
+		eProperty.Resist_Spirit
+	};	
 	#endregion
 	
 	
@@ -76,6 +96,31 @@ public partial class GameLiving : GameObject
     public virtual void ChangeBaseStat(eStat stat, short amount)
     {
         m_charStat[stat - eStat._First] += amount;
+    }
+    
+    public virtual eProperty GetResistTypeForDamage(eDamageType damageType)
+    {
+	    if ((int)damageType < m_damageTypeToResistBonusConversion.Length)
+	    {
+		    return m_damageTypeToResistBonusConversion[(int)damageType];
+	    }
+	    else
+	    {
+		    log.ErrorFormat("No resist found for damage type {0} on living {1}!", (int)damageType, Name);
+		    return 0;
+	    }
+    }    
+    public virtual int GetResist(eDamageType damageType)
+    {
+	    return GetModified(GetResistTypeForDamage(damageType));
+    }    
+    public virtual int GetResistBase(eDamageType damageType)
+    {
+	    return GetModifiedBase(GetResistTypeForDamage(damageType));
+    }    
+    public virtual int GetDamageResist(eProperty property)
+    {
+	    return SkillBase.GetRaceResist( m_race, (eResist)property );
     }
     
     protected eActiveWeaponSlot m_activeWeaponSlot;
@@ -114,6 +159,13 @@ public partial class GameLiving : GameObject
 		    return chanceToBeMissed;
 	    }
     }
+    
+    public virtual bool IsStrafing
+    {
+	    get { return false; }
+	    set { }
+    }
+    
     #endregion
 
     #region main/left hand weapon
@@ -310,6 +362,7 @@ public partial class GameLiving : GameObject
 		return false;
 	}	
     #endregion
+    
 	#region Abilities
 	protected readonly Dictionary<string, Ability> m_abilities = new Dictionary<string, Ability>();
 	protected readonly Object m_lockAbilities = new Object();
@@ -429,6 +482,7 @@ public partial class GameLiving : GameObject
 		return GameServer.ServerRules.CheckAbilityToUseItem(this, item);
 	}
 	#endregion
+	
     #region Attacker
     protected AttackAction m_attackAction;
     protected readonly List<GameObject> m_attackers;
@@ -639,6 +693,7 @@ public partial class GameLiving : GameObject
 		Notify(GameLivingEvent.Dying, this, new DyingEventArgs(killer));
 	}    
     #endregion
+    
 	#region Spell Cast
 	public virtual double Effectiveness
 	{
@@ -748,6 +803,7 @@ public partial class GameLiving : GameObject
 	}
 
 	#endregion
+	
 	#region Skills
 	private readonly Dictionary<KeyValuePair<int, Type>, KeyValuePair<long, Skill>> m_disabledSkills = new Dictionary<KeyValuePair<int, Type>, KeyValuePair<long, Skill>>();
 	public virtual int GetSkillDisabledDuration(Skill skill)
@@ -827,14 +883,201 @@ public partial class GameLiving : GameObject
 		}
 	}
 	#endregion
+	
     #region Attack action
+    public virtual double AttackDamage(InventoryItem weapon)
+    {
+	    double effectiveness = 1.00;
+	    //double effectiveness = Effectiveness;
+	    double damage = (1.0 + Level / 3.7 + Level * Level / 175.0) * AttackSpeed(weapon) * 0.001;
+	    if (weapon == null || weapon.Item_Type == Slot.RIGHTHAND || weapon.Item_Type == Slot.LEFTHAND || weapon.Item_Type == Slot.TWOHAND)
+	    {
+		    //Melee damage buff,debuff,RA
+		    effectiveness += GetModified(eProperty.MeleeDamage) * 0.01;
+	    }
+	    else if (weapon.Item_Type == Slot.RANGED && (weapon.Object_Type == (int)eObjectType.Longbow || weapon.Object_Type == (int)eObjectType.RecurvedBow || weapon.Object_Type == (int)eObjectType.CompositeBow))
+	    {
+		    effectiveness += GetModified(eProperty.SpellDamage) * 0.01;
+	    }
+	    else if (weapon.Item_Type == Slot.RANGED)
+	    {
+		    effectiveness += GetModified(eProperty.RangedDamage) * 0.01;
+	    }
+	    damage *= effectiveness;
+	    return damage;
+    }    
+	public virtual double UnstyledDamageCap(InventoryItem weapon)
+	{
+		return AttackDamage(weapon) * (2.82 + 0.00009 * AttackSpeed(weapon));
+	}
+	public virtual double CastingSpeedReductionCap
+	{
+		get { return 0.4f; }
+	}
+	public virtual int MinimumCastingSpeed
+	{
+		get { return 500; }
+	}
+	public virtual bool CanCastInCombat(Spell spell)
+	{
+		return true;
+	}
+	public virtual double DexterityCastTimeReduction
+	{
+		get
+		{
+			int dex = GetModified(eProperty.Dexterity);
+			if (dex < 60) return 1.0;
+			else if (dex < 250) return 1.0 - (dex - 60) * 0.15 * 0.01;
+			else return 1.0 - ((dex - 60) * 0.15 + (dex - 250) * 0.05) * 0.01;
+		}
+	}
+	public virtual int AttackRange
+	{
+		get
+		{
+			if (ActiveWeaponSlot == eActiveWeaponSlot.Distance)
+			{
+				return Math.Max(32, (int)(2000.0 * GetModified(eProperty.ArcheryRange) * 0.01));
+			}
+			return 200;
+		}
+		set { }
+	}
+	public virtual int GetWeaponStat(InventoryItem weapon)
+	{
+		return GetModified(eProperty.Strength);
+	}
+
+	public virtual double GetArmorAF(eArmorSlot slot)
+	{
+		return GetModified(eProperty.ArmorFactor);
+	}
+
+	public virtual double GetArmorAbsorb(eArmorSlot slot)
+	{
+		double absorbBonus = GetModified(eProperty.ArmorAbsorption) / 100.0;
+
+		double debuffBuffRatio = 2;
+
+		double constitutionPerAbsorptionPercent = 4;
+		double baseConstitutionPerAbsorptionPercent = 12; //kept for DB legacy reasons
+
+		var basebuff = GetBuffBonus(eBuffBonusType.BaseBuff);
+		var specbuff = GetBuffBonus(eBuffBonusType.SpecBuff);
+		var debuff = GetBuffBonus(eBuffBonusType.Debuff);
+		var specdebuff = GetBuffBonus(eBuffBonusType.SpecDebuff);
+
+		var constitutionBuffBonus = basebuff[eProperty.Constitution] + specbuff[eProperty.Constitution];
+		var constitutionDebuffMalus = Math.Abs(debuff[eProperty.Constitution] + specdebuff[eProperty.Constitution]);
+		double constitutionAbsorb = 0;
+		
+		double baseConstitutionAbsorb = (GetBaseStat((eStat)eProperty.Constitution) - 60) / baseConstitutionPerAbsorptionPercent / 100.0;
+		double consitutionBuffAbsorb = (constitutionBuffBonus - constitutionDebuffMalus * debuffBuffRatio) / constitutionPerAbsorptionPercent / 100;
+		constitutionAbsorb += baseConstitutionAbsorb + consitutionBuffAbsorb;
+
+		double afPerAbsorptionPercent = 6;
+		double liveBaseAFcap = 150 * 1.25 * 1.25;
+		double afBuffBonus = Math.Min(liveBaseAFcap, basebuff[eProperty.ArmorFactor] + specbuff[eProperty.ArmorFactor]);
+		double afDebuffMalus = Math.Abs(debuff[eProperty.ArmorFactor] + specdebuff[eProperty.ArmorFactor]);
+		double afBuffAbsorb = (afBuffBonus - afDebuffMalus * debuffBuffRatio) / afPerAbsorptionPercent / 100;
+
+		double baseAbsorb = 0;
+		if (Level >= 30) baseAbsorb = 0.27;
+		else if (Level >= 20) baseAbsorb = 0.19;
+		else if (Level >= 10) baseAbsorb = 0.10;
+
+		double absorb = 1 - (1 - absorbBonus) * (1 - baseAbsorb) * (1 - constitutionAbsorb) * (1 - afBuffAbsorb);
+		return absorb;
+	}
+
+	public virtual double GetWeaponSkill(InventoryItem weapon)
+	{
+		const double bs = 128.0 / 50.0;	
+		return (int)((Level + 1) * bs * (1 + (GetWeaponStat(weapon) - 50) * 0.005) * Level * 2 / 50);
+	}
+		
+    public virtual InventoryItem AttackWeapon
+    {
+	    get
+	    {
+		    if (Inventory != null)
+		    {
+			    switch (ActiveWeaponSlot)
+			    {
+				    case eActiveWeaponSlot.Standard: return Inventory.GetItem(eInventorySlot.RightHandWeapon);
+				    case eActiveWeaponSlot.TwoHanded: return Inventory.GetItem(eInventorySlot.TwoHandWeapon);
+				    case eActiveWeaponSlot.Distance: return Inventory.GetItem(eInventorySlot.DistanceWeapon);
+			    }
+		    }
+		    return null;
+	    }
+    }
+    
+    protected virtual Style GetStyleToUse()
+    {
+	    InventoryItem weapon;
+	    if (NextCombatStyle == null) return null;
+	    if (NextCombatStyle.WeaponTypeRequirement == (int)eObjectType.Shield)
+		    weapon = Inventory.GetItem(eInventorySlot.LeftHandWeapon);
+	    else weapon = AttackWeapon;
+
+	    if (StyleProcessor.CanUseStyle(this, NextCombatStyle, weapon))
+		    return NextCombatStyle;
+
+	    if (NextCombatBackupStyle == null) return NextCombatStyle;
+
+	    return NextCombatBackupStyle;
+    }
+
+    protected Style m_nextCombatStyle;
+    protected Style m_nextCombatBackupStyle;
+    public Style NextCombatStyle
+    {
+	    get { return m_nextCombatStyle; }
+	    set { m_nextCombatStyle = value; }
+    }
+    public Style NextCombatBackupStyle
+    {
+	    get { return m_nextCombatBackupStyle; }
+	    set { m_nextCombatBackupStyle = value; }
+    }
+    public virtual int AttackSpeed(params InventoryItem[] weapon)
+    {
+	    double speed = 3000 * (1.0 - (GetModified(eProperty.Quickness) - 60) / 500.0);
+	    if (ActiveWeaponSlot == eActiveWeaponSlot.Distance)
+	    {
+		    speed *= 1.5; // mob archer speed too fast
+		    speed *= 1.0 - GetModified(eProperty.CastingSpeed) * 0.01;
+	    }
+	    else
+	    {
+		    speed *= GetModified(eProperty.MeleeSpeed) * 0.01;
+	    }
+	    return (int) Math.Max(500.0, speed);
+    }
+    public virtual int AttackCriticalChance(InventoryItem weapon) => 0;
+	public virtual int SpellCriticalChance
+	{
+		get { return GetModified(eProperty.CriticalSpellHitChance); }
+		set { }
+	}
+	public virtual eDamageType AttackDamageType(InventoryItem weapon) => eDamageType.Natural;
+	public virtual bool AttackState { get; protected set; }
+	public override bool IsAttackable => (IsAlive && !IsStealthed && ObjectState == GameObject.eObjectState.Active);
+	public virtual bool IsAttacking => (AttackState && (m_attackAction != null) && m_attackAction.IsAlive);
+	public virtual int EffectiveOverallAF => 0;
+	public virtual int WeaponSpecLevel(InventoryItem weapon) => 0;
+	public virtual double WeaponDamage(InventoryItem weapon) => 0;
+	public virtual bool IsCrowdControlled => (IsStunned || IsMezzed);
+	public virtual bool IsIncapacitated => (ObjectState != eObjectState.Active || !IsAlive || IsStunned || IsMezzed);
+		
     public virtual void EnemyKilled(GameLiving enemy)
     {
 	    RemoveAttacker(enemy);
 	    Notify(GameLivingEvent.EnemyKilled, this, new EnemyKilledEventArgs(enemy));
     }
     
-    public virtual bool AttackState { get; protected set; } = false;
     public virtual void OnTargetDeadOrNoTarget()
     {
 	    StopAttack();
@@ -856,11 +1099,536 @@ public partial class GameLiving : GameObject
     {
 	    AttackState = false;
     }
-    
-
     #endregion
-    #region Inventory
 
+    #region attack calc
+	protected virtual float MinMeleeCriticalDamage
+	{
+		get { return 0.1f; }
+	}
+	public virtual int GetMeleeCriticalDamage(AttackData attackData, InventoryItem weapon)
+	{
+		if (RandomUtil.Chance(AttackCriticalChance(weapon)))
+		{
+			int maxCriticalDamage = (attackData.Target is GamePlayer)
+				? attackData.Damage / 2
+				: attackData.Damage;
+
+			int minCriticalDamage = (int)(attackData.Damage * MinMeleeCriticalDamage);
+
+			return RandomUtil.Int(minCriticalDamage, maxCriticalDamage);
+		}
+		return 0;
+	}
+	protected bool IsValidTarget
+	{
+		get
+		{
+			return true; //EffectList.CountOfType<NecromancerShadeEffect>() <= 0;
+		}
+	}
+	public GamePlayer GetPlayerAttacker(GameLiving living)
+	{
+		if (living is GamePlayer)
+			return living as GamePlayer;
+
+		GameNPC npc = living as GameNPC;
+
+		if (npc != null)
+		{
+			if (npc.Brain is IControlledBrain && (npc.Brain as IControlledBrain).Owner is GamePlayer)
+				return (npc.Brain as IControlledBrain).Owner as GamePlayer;
+		}
+
+		return null;
+	}
+		public virtual eAttackResult CalculateEnemyAttackResult(AttackData ad, InventoryItem weapon)
+		{
+			if (!IsValidTarget)
+				return eAttackResult.NoValidTarget;
+
+			GameSpellEffect bladeturn = null;
+
+			// ML effects
+			GameSpellEffect phaseshift = null;
+			GameSpellEffect grapple = null;
+			GameSpellEffect brittleguard = null;
+
+			AttackData lastAD = TempProperties.getProperty<AttackData>(LAST_ATTACK_DATA, null);
+			bool defenseDisabled = ad.Target.IsMezzed | ad.Target.IsStunned | ad.Target.IsSitting;
+
+			// get all needed effects in one loop
+			lock (EffectList)
+			{
+				foreach (IGameEffect effect in EffectList)
+				{
+					if (effect is GameSpellEffect)
+					{
+						switch ((effect as GameSpellEffect).Spell.SpellType)
+						{
+							case "Phaseshift":
+								if (phaseshift == null)
+									phaseshift = (GameSpellEffect)effect;
+								continue;
+							case "Grapple":
+								if (grapple == null)
+									grapple = (GameSpellEffect)effect;
+								continue;
+							case "BrittleGuard":
+								if (brittleguard == null)
+									brittleguard = (GameSpellEffect)effect;
+								continue;
+							case "Bladeturn":
+								if (bladeturn == null)
+									bladeturn = (GameSpellEffect)effect;
+								continue;
+						}
+					}
+				}
+			}
+
+			bool stealthStyle = false;
+			if (ad.Style != null && ad.Style.StealthRequirement && ad.Attacker is GamePlayer && StyleProcessor.CanUseStyle((GamePlayer)ad.Attacker, ad.Style, weapon))
+			{
+				stealthStyle = true;
+				defenseDisabled = true;
+				brittleguard = null;
+			}
+			
+			if (phaseshift != null)
+				return eAttackResult.Missed;
+
+			if (grapple != null)
+				return eAttackResult.Grappled;
+
+			if (brittleguard != null)
+			{
+				if (this is GamePlayer)
+					((GamePlayer)this).Out.SendMessage(LanguageMgr.GetTranslation(((GamePlayer)this).Network.Account.Language, "GameLiving.CalculateEnemyAttackResult.BlowIntercepted"), eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
+				if (ad.Attacker is GamePlayer)
+					((GamePlayer)ad.Attacker).Out.SendMessage(LanguageMgr.GetTranslation(((GamePlayer)ad.Attacker).Network.Account.Language, "GameLiving.CalculateEnemyAttackResult.StrikeIntercepted"), eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
+				brittleguard.Cancel(false);
+				return eAttackResult.Missed;
+			}
+
+			double attackerConLevel = -GetConLevel(ad.Attacker);
+			int attackerCount = m_attackers.Count;
+
+			if (!defenseDisabled)
+			{
+				double evadeChance = TryEvade( ad, lastAD, attackerConLevel, attackerCount );
+
+				if( RandomUtil.Chance( evadeChance ) )
+					return eAttackResult.Evaded;
+
+				if( ad.IsMeleeAttack )
+				{
+					double parryChance = TryParry( ad, lastAD, attackerConLevel, attackerCount );
+
+					if( RandomUtil.Chance( parryChance ) )
+						return eAttackResult.Parried;
+				}
+
+				double blockChance = TryBlock( ad, lastAD, attackerConLevel, attackerCount );
+
+				if( RandomUtil.Chance( blockChance ) )
+				{
+					// reactive effects on block moved to GamePlayer
+					return eAttackResult.Blocked;
+				}
+			}
+			
+			// Missrate
+			int missrate = (ad.Attacker is GamePlayer) ? 20 : 25; //player vs player tests show 20% miss on any level
+			missrate -= ad.Attacker.GetModified(eProperty.ToHitBonus);
+			
+			if (this is GameNPC || ad.Attacker is GameNPC) // if target is not player use level mod
+			{
+				missrate += (int)(5 * ad.Attacker.GetConLevel(this));
+			}
+
+			// weapon/armor bonus
+			int armorBonus = 0;
+			if (ad.Target is GamePlayer)
+			{
+				ad.ArmorHitLocation = ((GamePlayer)ad.Target).CalculateArmorHitLocation(ad);
+				InventoryItem armor = null;
+				if (ad.Target.Inventory != null)
+					armor = ad.Target.Inventory.GetItem((eInventorySlot)ad.ArmorHitLocation);
+				if (armor != null)
+					armorBonus = armor.Bonus;
+			}
+			if (weapon != null)
+			{
+				armorBonus -= weapon.Bonus;
+			}
+			if (ad.Target is GamePlayer && ad.Attacker is GamePlayer)
+			{
+				missrate += armorBonus;
+			}
+			else
+			{
+				missrate += missrate * armorBonus / 100;
+			}
+			if (ad.Style != null)
+			{
+				missrate -= ad.Style.BonusToHit; // add style bonus
+			}
+			if (lastAD != null && lastAD.AttackResult == eAttackResult.HitStyle && lastAD.Style != null)
+			{
+				// add defence bonus from last executed style if any
+				missrate += lastAD.Style.BonusToDefense;
+			}
+			if (this is GamePlayer && ad.Attacker is GamePlayer && weapon != null)
+			{
+				missrate -= (int)((ad.Attacker.WeaponSpecLevel(weapon) - 1) * 0.1);
+			}
+			if (this is GamePlayer && ((GamePlayer)this).IsSitting)
+			{
+				missrate >>= 1; //halved
+			}
+
+			if (RandomUtil.Chance(missrate))
+			{
+				return eAttackResult.Missed;
+			}
+
+			if (ad.IsRandomFumble)
+				return eAttackResult.Fumbled;
+
+			if (ad.IsRandomMiss)
+				return eAttackResult.Missed;
+
+
+			// Bladeturn
+			if (bladeturn != null)
+			{
+				bool penetrate = false;
+
+				if (stealthStyle)
+					penetrate = true;
+
+				if (ad.AttackType == AttackData.eAttackType.Ranged && ad.Target != bladeturn.SpellHandler.Caster && ad.Attacker is GamePlayer && ((GamePlayer)ad.Attacker).HasAbility(Abilities.PenetratingArrow))
+					penetrate = true;
+
+
+				if (ad.IsMeleeAttack && !RandomUtil.Chance((double)bladeturn.SpellHandler.Caster.Level / (double)ad.Attacker.Level))
+					penetrate = true;
+				if (penetrate)
+				{
+					if (ad.Target is GamePlayer) ((GamePlayer)ad.Target).Out.SendMessage(LanguageMgr.GetTranslation(((GamePlayer)ad.Target).Network.Account.Language, "GameLiving.CalculateEnemyAttackResult.BlowPenetrated"), eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
+					bladeturn.Cancel(false);
+				}
+				else
+				{
+					if (this is GamePlayer) ((GamePlayer)this).Out.SendMessage(LanguageMgr.GetTranslation(((GamePlayer)this).Network.Account.Language, "GameLiving.CalculateEnemyAttackResult.BlowAbsorbed"), eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
+					if (ad.Attacker is GamePlayer) ((GamePlayer)ad.Attacker).Out.SendMessage(LanguageMgr.GetTranslation(((GamePlayer)ad.Attacker).Network.Account.Language, "GameLiving.CalculateEnemyAttackResult.StrikeAbsorbed"), eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
+					bladeturn.Cancel(false);
+					Stealth(false);
+					return eAttackResult.Missed;
+				}
+			}
+			
+			return eAttackResult.HitUnstyled;
+		}
+
+		protected virtual double TryEvade( AttackData ad, AttackData lastAD, double attackerConLevel, int attackerCount )
+		{
+			double evadeChance = 0;
+			GamePlayer player = this as GamePlayer;
+
+			GameSpellEffect evadeBuff = SpellHandler.FindEffectOnTarget( this, "EvadeBuff" );
+			if( evadeBuff == null )
+				evadeBuff = SpellHandler.FindEffectOnTarget( this, "SavageEvadeBuff" );
+
+			if( player != null )
+			{
+				if (player.HasAbility(Abilities.Advanced_Evade) )
+					evadeChance = GetModified( eProperty.EvadeChance );
+				else if( IsObjectInFront( ad.Attacker, 180 ) && ( evadeBuff != null || player.HasAbility( Abilities.Evade ) ) )
+				{
+					int res = GetModified( eProperty.EvadeChance );
+					if( res > 0 )
+						evadeChance = res;
+				}
+			}
+			else if( this is GameNPC && IsObjectInFront( ad.Attacker, 180 ) )
+				evadeChance = GetModified( eProperty.EvadeChance );
+
+			if( evadeChance > 0 && !ad.Target.IsStunned && !ad.Target.IsSitting )
+			{
+				if( attackerCount > 1 )
+					evadeChance -= ( attackerCount - 1 ) * 0.03;
+
+				evadeChance *= 0.001;
+				evadeChance += 0.01 * attackerConLevel; // 1% per con level distance multiplied by evade level
+
+				if( lastAD != null && lastAD.Style != null )
+				{
+					evadeChance += lastAD.Style.BonusToDefense * 0.01;
+				}
+
+				if( ad.AttackType == AttackData.eAttackType.Ranged )
+					evadeChance /= 5.0;
+
+				if( evadeChance < 0.01 )
+					evadeChance = 0.01;
+				else if( evadeChance > ServerProperties.Properties.EVADE_CAP && ad.Attacker is GamePlayer && ad.Target is GamePlayer )
+					evadeChance = ServerProperties.Properties.EVADE_CAP; //50% evade cap RvR only; http://www.camelotherald.com/more/664.shtml
+				else if( evadeChance > 0.995 )
+					evadeChance = 0.995;
+			}
+			if (ad.AttackType == AttackData.eAttackType.MeleeDualWield)
+			{
+				evadeChance = Math.Max(evadeChance - 0.25, 0);
+			}
+
+			return evadeChance;
+		}
+
+		protected virtual double TryParry( AttackData ad, AttackData lastAD, double attackerConLevel, int attackerCount )
+		{
+			double parryChance = 0;
+
+			if( ad.IsMeleeAttack )
+			{
+				GamePlayer player = this as GamePlayer;
+
+				GameSpellEffect parryBuff = SpellHandler.FindEffectOnTarget( this, "ParryBuff" );
+				if( parryBuff == null )
+					parryBuff = SpellHandler.FindEffectOnTarget( this, "SavageParryBuff" );
+
+				if( player != null )
+				{
+					if( IsObjectInFront( ad.Attacker, 120 ) )
+					{
+						if( ( player.HasSpecialization( Specs.Parry ) || parryBuff != null ) && ( AttackWeapon != null ) )
+							parryChance = GetModified( eProperty.ParryChance );
+					}
+				}
+				else if( this is GameNPC && IsObjectInFront( ad.Attacker, 120 ) )
+					parryChance = GetModified( eProperty.ParryChance );
+
+				if( parryChance > 0 && !ad.Target.IsStunned && !ad.Target.IsSitting )
+				{
+					if( attackerCount > 1 )
+						parryChance /= attackerCount / 2;
+
+					parryChance *= 0.001;
+					parryChance += 0.05 * attackerConLevel;
+
+					if( parryChance < 0.01 )
+						parryChance = 0.01;
+					else if( parryChance > ServerProperties.Properties.PARRY_CAP && ad.Attacker is GamePlayer && ad.Target is GamePlayer )
+						parryChance = ServerProperties.Properties.PARRY_CAP;
+					else if( parryChance > 0.995 )
+						parryChance = 0.995;
+				}
+			}
+			return parryChance;
+		}
+
+		protected virtual double TryBlock( AttackData ad, AttackData lastAD, double attackerConLevel, int attackerCount)
+		{
+			double blockChance = 0;
+			GamePlayer player = this as GamePlayer;
+			InventoryItem lefthand = null;
+
+			if( this is GamePlayer && player != null && IsObjectInFront( ad.Attacker, 120 ) && player.HasAbility( Abilities.Shield ) )
+			{
+				lefthand = Inventory.GetItem( eInventorySlot.LeftHandWeapon );
+				if( lefthand != null && ( player.AttackWeapon == null || player.AttackWeapon.Item_Type == Slot.RIGHTHAND || player.AttackWeapon.Item_Type == Slot.LEFTHAND ) )
+				{
+					if( lefthand.Object_Type == (int)eObjectType.Shield && IsObjectInFront( ad.Attacker, 120 ) )
+						blockChance = GetModified( eProperty.BlockChance ) * lefthand.Quality * 0.01;
+				}
+			}
+			else if( this is GameNPC && IsObjectInFront( ad.Attacker, 120 ) )
+			{
+				int res = GetModified( eProperty.BlockChance );
+				if( res != 0 )
+					blockChance = res;
+			}
+			if( blockChance > 0 && IsObjectInFront( ad.Attacker, 120 ) && !ad.Target.IsStunned && !ad.Target.IsSitting )
+			{
+				// Reduce block chance if the shield used is too small (valable only for player because npc inventory does not store the shield size but only the model of item)
+				int shieldSize = 0;
+				if( lefthand != null )
+					shieldSize = lefthand.Type_Damage;
+				if( player != null && attackerCount > shieldSize )
+					blockChance *= (shieldSize / attackerCount);
+
+				blockChance *= 0.001;
+				blockChance += attackerConLevel * 0.05;
+
+				if (blockChance < 0.01)
+					blockChance = 0.01;
+				else if (blockChance > ServerProperties.Properties.BLOCK_CAP && ad.Attacker is GamePlayer)
+					blockChance = ServerProperties.Properties.BLOCK_CAP;
+				else if (shieldSize == 1 && ad.Attacker is GameNPC && blockChance > .8)
+					blockChance = .8;
+				else if (shieldSize == 2 && ad.Attacker is GameNPC && blockChance > .9)
+					blockChance = .9;
+				else if (shieldSize == 3 && ad.Attacker is GameNPC && blockChance > .99)
+					blockChance = .99;
+			}
+			if (ad.AttackType == AttackData.eAttackType.MeleeDualWield)
+			{
+				blockChance = Math.Max(blockChance - 0.25, 0);
+			}
+
+			return blockChance;
+		}
+		
+		public virtual void ModifyAttack(AttackData attackData)
+		{
+		}
+
+		public override void TakeDamage(GameObject source, eDamageType damageType, int damageAmount, int criticalAmount)
+		{
+			base.TakeDamage(source, damageType, damageAmount, criticalAmount);
+
+			double damageDealt = damageAmount + criticalAmount;
+
+			if (source != null && source is GameNPC)
+			{
+				IControlledBrain brain = ((GameNPC)source).Brain as IControlledBrain;
+				if (brain != null)
+					source = brain.GetLivingOwner();
+			}
+
+			bool wasAlive = IsAlive;
+			
+			Health -= damageAmount + criticalAmount;
+
+			Stealth(false);
+
+			if (!IsAlive)
+			{
+				if (wasAlive)
+					Die(source);
+			}
+			else
+			{
+				if (IsLowHealth)
+					Notify(GameLivingEvent.LowHealth, this, null);
+			}
+		}
+
+		public virtual void OnAttackedByEnemy(AttackData ad)
+		{
+			if (ad.IsHit && ad.CausesCombat)
+			{
+				Notify(GameLivingEvent.AttackedByEnemy, this, new AttackedByEnemyEventArgs(ad));
+
+				if (this is GameNPC && ActiveWeaponSlot == eActiveWeaponSlot.Distance && this.IsWithinRadius(ad.Attacker, 150))
+					((GameNPC)this).SwitchToMelee(ad.Attacker);
+
+				AddAttacker( ad.Attacker );
+
+				if (ad.Attacker.Realm == 0 || this.Realm == 0)
+				{
+					LastAttackedByEnemyTick = CurrentRegion.Time;
+					ad.Attacker.LastAttackedTick = CurrentRegion.Time;
+				}
+				else
+				{
+					LastAttackedByEnemyTick = CurrentRegion.Time;
+					ad.Attacker.LastAttackedTick = CurrentRegion.Time;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Called to display an attack animation of this living
+		/// </summary>
+		/// <param name="ad">Infos about the attack</param>
+		/// <param name="weapon">The weapon used for attack</param>
+		public virtual void ShowAttackAnimation(AttackData ad, InventoryItem weapon)
+		{
+			bool showAnim = false;
+			switch (ad.AttackResult)
+			{
+				case eAttackResult.HitUnstyled:
+				case eAttackResult.HitStyle:
+				case eAttackResult.Evaded:
+				case eAttackResult.Parried:
+				case eAttackResult.Missed:
+				case eAttackResult.Blocked:
+				case eAttackResult.Fumbled:
+					showAnim = true; break;
+			}
+
+			if (showAnim && ad.Target != null)
+			{
+				//http://dolserver.sourceforge.net/forum/showthread.php?s=&threadid=836
+				byte resultByte = 0;
+				int attackersWeapon = (weapon == null) ? 0 : weapon.Model;
+				int defendersWeapon = 0;
+
+				switch (ad.AttackResult)
+				{
+						case eAttackResult.Missed: resultByte = 0; break;
+						case eAttackResult.Evaded: resultByte = 3; break;
+						case eAttackResult.Fumbled: resultByte = 4; break;
+						case eAttackResult.HitUnstyled: resultByte = 10; break;
+						case eAttackResult.HitStyle: resultByte = 11; break;
+
+					case eAttackResult.Parried:
+						resultByte = 1;
+						if (ad.Target != null && ad.Target.AttackWeapon != null)
+						{
+							defendersWeapon = ad.Target.AttackWeapon.Model;
+						}
+						break;
+
+					case eAttackResult.Blocked:
+						resultByte = 2;
+						if (ad.Target != null && ad.Target.Inventory != null)
+						{
+							InventoryItem lefthand = ad.Target.Inventory.GetItem(eInventorySlot.LeftHandWeapon);
+							if (lefthand != null && lefthand.Object_Type == (int)eObjectType.Shield)
+							{
+								defendersWeapon = lefthand.Model;
+							}
+						}
+						break;
+				}
+
+				foreach (GamePlayer player in ad.Target.GetPlayersInRadius(WorldManager.VISIBILITY_DISTANCE))
+				{
+					if (player == null) continue;
+					int animationId;
+					switch (ad.AnimationId)
+					{
+						case -1:
+							animationId = player.Out.OneDualWeaponHit;
+							break;
+						case -2:
+							animationId = player.Out.BothDualWeaponHit;
+							break;
+						default:
+							animationId = ad.AnimationId;
+							break;
+					}
+					player.Out.SendCombatAnimation(this, ad.Target, (ushort)attackersWeapon, (ushort)defendersWeapon, animationId, 0, resultByte, ad.Target.HealthPercent);
+				}
+			}
+		}
+
+		/// <summary>
+		/// This method is called whenever this living is dealing
+		/// damage to some object
+		/// </summary>
+		/// <param name="ad">AttackData</param>
+		public virtual void DealDamage(AttackData ad)
+		{
+			ad.Target.TakeDamage(ad);
+		}
+//====================================================================================================================
+    #endregion
+    
+    #region Inventory
     protected IGameInventory m_inventory;
     public IGameInventory Inventory
     {
@@ -874,11 +1642,13 @@ public partial class GameLiving : GameObject
 	    }
     }
     #endregion
+    
     #region Effects
     protected readonly GameEffectList m_effects;
     public GameEffectList EffectList => m_effects;
     protected virtual GameEffectList CreateEffectsList() => new GameEffectList(this);
     #endregion
+    
     #region Stealth
     public virtual bool CanStealth
     { get; set; }
@@ -894,6 +1664,7 @@ public partial class GameLiving : GameObject
 		    log.Warn($"Stealth(): {GetType().FullName} cannot be stealthed.  You probably need to override Stealth() for this class");
     }
     #endregion
+    
     #region ControlledNpc
     private byte m_petCount = 0;
 
@@ -981,10 +1752,222 @@ public partial class GameLiving : GameObject
     }
     #endregion
     
-    public PropertyCollection TempProperties
+	#region Say/Yell/Whisper/Emote/Messages
+
+		private bool m_isSilent = false;
+		
+		public virtual bool IsSilent
+		{
+			get { return m_isSilent; }
+			set { m_isSilent = value; }
+		}
+
+		public virtual bool SayReceive(GameLiving source, string str)
+		{
+			if (source == null || str == null)
+			{
+				return false;
+			}
+			
+			Notify(GameLivingEvent.SayReceive, this, new SayReceiveEventArgs(source, this, str));
+			
+			return true;
+		}
+
+		/// <summary>
+		/// Broadcasts a message to all living beings around this object
+		/// </summary>
+		/// <param name="str">string to broadcast (without any "xxx says:" in front!!!)</param>
+		/// <returns>true if text was said successfully</returns>
+		public virtual bool Say(string str)
+		{
+			if (str == null || IsSilent)
+			{
+				return false;
+			}
+			
+			Notify(GameLivingEvent.Say, this, new SayEventArgs(str));
+			
+			foreach (GameNPC npc in GetNPCsInRadius(WorldManager.SAY_DISTANCE))
+			{
+				GameNPC receiver = npc;
+				// don't send say to the target, it will be whispered...
+				if (receiver != this && receiver != TargetObject)
+				{
+					receiver.SayReceive(this, str);
+				}
+			}
+			
+			foreach (GamePlayer player in GetPlayersInRadius(WorldManager.SAY_DISTANCE))
+			{
+				GamePlayer receiver = player;
+				if (receiver != this)
+				{
+					receiver.SayReceive(this, str);
+				}
+			}
+			
+			// whisper to Targeted NPC.
+			if (TargetObject != null && TargetObject is GameNPC)
+			{
+				GameNPC targetNPC = (GameNPC)TargetObject;
+				targetNPC.WhisperReceive(this, str);
+			}
+			
+			return true;
+		}
+
+		/// <summary>
+		/// This function is called when the living receives a yell
+		/// </summary>
+		/// <param name="source">GameLiving that was yelling</param>
+		/// <param name="str">string that was yelled</param>
+		/// <returns>true if the string should be processed further, false if it should be discarded</returns>
+		public virtual bool YellReceive(GameLiving source, string str)
+		{
+			if (source == null || str == null)
+			{
+				return false;
+			}
+			
+			Notify(GameLivingEvent.YellReceive, this, new YellReceiveEventArgs(source, this, str));
+			
+			return true;
+		}
+
+		/// <summary>
+		/// Broadcasts a message to all living beings around this object
+		/// </summary>
+		/// <param name="str">string to broadcast (without any "xxx yells:" in front!!!)</param>
+		/// <returns>true if text was yelled successfully</returns>
+		public virtual bool Yell(string str)
+		{
+			if (str == null || IsSilent)
+			{
+				return false;
+			}
+			
+			Notify(GameLivingEvent.Yell, this, new YellEventArgs(str));
+			
+			foreach (GameNPC npc in GetNPCsInRadius(WorldManager.YELL_DISTANCE))
+			{
+				GameNPC receiver = npc;
+				if (receiver != this)
+				{
+					receiver.YellReceive(this, str);
+				}
+			}
+			
+			foreach (GamePlayer player in GetPlayersInRadius(WorldManager.YELL_DISTANCE))
+			{
+				GamePlayer receiver = player;
+				if (receiver != this)
+				{
+					receiver.YellReceive(this, str);
+				}
+			}
+			
+			return true;
+		}
+
+		/// <summary>
+		/// This function is called when the Living receives a whispered text
+		/// </summary>
+		/// <param name="source">GameLiving that was whispering</param>
+		/// <param name="str">string that was whispered</param>
+		/// <returns>true if the string should be processed further, false if it should be discarded</returns>
+		public virtual bool WhisperReceive(GameLiving source, string str)
+		{
+			if (source == null || str == null)
+			{
+				return false;
+			}
+
+			GamePlayer player = null;
+			if (source != null && source is GamePlayer)
+			{
+				player = source as GamePlayer;
+				long whisperdelay = player.TempProperties.getProperty<long>("WHISPERDELAY");
+				if (whisperdelay > 0 && (CurrentRegion.Time - 1500) < whisperdelay && player.Network.Account.PrivLevel == 1)
+				{
+					//player.Out.SendMessage("Speak slower!", eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
+					return false;
+				}
+				
+				player.TempProperties.setProperty("WHISPERDELAY", CurrentRegion.Time);
+			}
+
+			Notify(GameLivingEvent.WhisperReceive, this, new WhisperReceiveEventArgs(source, this, str));
+
+			return true;
+		}
+
+		/// <summary>
+		/// Sends a whisper to a target
+		/// </summary>
+		/// <param name="target">The target of the whisper</param>
+		/// <param name="str">text to whisper (without any "xxx whispers:" in front!!!)</param>
+		/// <returns>true if text was whispered successfully</returns>
+		public virtual bool Whisper(GameObject target, string str)
+		{
+			if (target == null || str == null || IsSilent)
+			{
+				return false;
+			}
+			
+			if (!this.IsWithinRadius(target, WorldManager.WHISPER_DISTANCE))
+			{
+				return false;
+			}
+			
+			Notify(GameLivingEvent.Whisper, this, new WhisperEventArgs(target, str));
+			
+			if (target is GameLiving)
+			{
+				return ((GameLiving)target).WhisperReceive(this, str);
+			}
+			
+			return false;
+		}
+		/// <summary>
+		/// Makes this living do an emote-animation
+		/// </summary>
+		/// <param name="emote">the emote animation to show</param>
+		public virtual void Emote(eEmote emote)
+		{
+			foreach (GamePlayer player in GetPlayersInRadius(WorldManager.VISIBILITY_DISTANCE))
+			{
+				player.Out.SendEmoteAnimation(this, emote);
+			}
+		}
+
+		/// <summary>
+		/// A message to this living
+		/// </summary>
+		/// <param name="message"></param>
+		/// <param name="type"></param>
+		public virtual void MessageToSelf(string message, eChatType chatType)
+		{
+			// livings can't talk to themselves
+		}
+
+		/// <summary>
+		/// A message from something we control
+		/// </summary>
+		/// <param name="message"></param>
+		/// <param name="chatType"></param>
+		public virtual void MessageFromControlled(string message, eChatType chatType)
+		{
+			// ignore for livings
+		}
+		#endregion    
+    public virtual bool TargetInView
     {
-        get { return m_tempProps; }
+	    get => true;
+	    set{}
     }
+
+    public PropertyCollection TempProperties => m_tempProps;
     
     protected short m_race;
     public virtual short Race
@@ -1412,6 +2395,24 @@ public partial class GameLiving : GameObject
 			return (byte)(MaxEndurance <= 0 ? 0 : ((Endurance * 100) / MaxEndurance));
 		}
 	}
+	
+	public virtual int Concentration
+	{
+		get { return 0; }
+	}
+
+	public virtual int MaxConcentration
+	{
+		get { return 0; }
+	}
+
+	public virtual byte ConcentrationPercent
+	{
+		get
+		{
+			return (byte)(MaxConcentration <= 0 ? 0 : ((Concentration * 100) / MaxConcentration));
+		}
+	}	
 	#endregion
 		
 	#region Speed/Heading/Target/GroundTarget/GuildName/SitState/Level

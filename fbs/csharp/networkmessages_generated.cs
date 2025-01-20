@@ -1035,7 +1035,7 @@ public struct SC_PlayerCreate : IFlatbufferObject
   public ushort Objectid { get { int o = __p.__offset(8); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
   public ushort Heading { get { int o = __p.__offset(10); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
   public ushort Model { get { int o = __p.__offset(12); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
-  public ushort Level { get { int o = __p.__offset(14); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public byte Level { get { int o = __p.__offset(14); return o != 0 ? __p.bb.Get(o + __p.bb_pos) : (byte)0; } }
   public byte Flags { get { int o = __p.__offset(16); return o != 0 ? __p.bb.Get(o + __p.bb_pos) : (byte)0; } }
   public string Name { get { int o = __p.__offset(18); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
 #if ENABLE_SPAN_T
@@ -1065,7 +1065,7 @@ public struct SC_PlayerCreate : IFlatbufferObject
       ushort objectid = 0,
       ushort heading = 0,
       ushort model = 0,
-      ushort level = 0,
+      byte level = 0,
       byte flags = 0,
       StringOffset nameOffset = default(StringOffset),
       StringOffset guildnameOffset = default(StringOffset),
@@ -1076,11 +1076,11 @@ public struct SC_PlayerCreate : IFlatbufferObject
     SC_PlayerCreate.AddName(builder, nameOffset);
     SC_PlayerCreate.AddSessionid(builder, sessionid);
     SC_PlayerCreate.AddPosition(builder, NetworkMessage.Vector3Int.Pack(builder, position));
-    SC_PlayerCreate.AddLevel(builder, level);
     SC_PlayerCreate.AddModel(builder, model);
     SC_PlayerCreate.AddHeading(builder, heading);
     SC_PlayerCreate.AddObjectid(builder, objectid);
     SC_PlayerCreate.AddFlags(builder, flags);
+    SC_PlayerCreate.AddLevel(builder, level);
     return SC_PlayerCreate.EndSC_PlayerCreate(builder);
   }
 
@@ -1090,7 +1090,7 @@ public struct SC_PlayerCreate : IFlatbufferObject
   public static void AddObjectid(FlatBufferBuilder builder, ushort objectid) { builder.AddUshort(2, objectid, 0); }
   public static void AddHeading(FlatBufferBuilder builder, ushort heading) { builder.AddUshort(3, heading, 0); }
   public static void AddModel(FlatBufferBuilder builder, ushort model) { builder.AddUshort(4, model, 0); }
-  public static void AddLevel(FlatBufferBuilder builder, ushort level) { builder.AddUshort(5, level, 0); }
+  public static void AddLevel(FlatBufferBuilder builder, byte level) { builder.AddByte(5, level, 0); }
   public static void AddFlags(FlatBufferBuilder builder, byte flags) { builder.AddByte(6, flags, 0); }
   public static void AddName(FlatBufferBuilder builder, StringOffset nameOffset) { builder.AddOffset(7, nameOffset.Value, 0); }
   public static void AddGuildname(FlatBufferBuilder builder, StringOffset guildnameOffset) { builder.AddOffset(8, guildnameOffset.Value, 0); }
@@ -1143,7 +1143,7 @@ public class SC_PlayerCreate_FBS
   public ushort Objectid { get; set; }
   public ushort Heading { get; set; }
   public ushort Model { get; set; }
-  public ushort Level { get; set; }
+  public byte Level { get; set; }
   public byte Flags { get; set; }
   public string Name { get; set; }
   public string Guildname { get; set; }
@@ -1174,11 +1174,681 @@ static public class SC_PlayerCreateVerify
       && verifier.VerifyField(tablePos, 8 /*Objectid*/, 2 /*ushort*/, 2, false)
       && verifier.VerifyField(tablePos, 10 /*Heading*/, 2 /*ushort*/, 2, false)
       && verifier.VerifyField(tablePos, 12 /*Model*/, 2 /*ushort*/, 2, false)
-      && verifier.VerifyField(tablePos, 14 /*Level*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 14 /*Level*/, 1 /*byte*/, 1, false)
       && verifier.VerifyField(tablePos, 16 /*Flags*/, 1 /*byte*/, 1, false)
       && verifier.VerifyString(tablePos, 18 /*Name*/, false)
       && verifier.VerifyString(tablePos, 20 /*Guildname*/, false)
       && verifier.VerifyString(tablePos, 22 /*Lastname*/, false)
+      && verifier.VerifyTableEnd(tablePos);
+  }
+}
+public struct SC_ModelChange : IFlatbufferObject
+{
+  private Table __p;
+  public ByteBuffer ByteBuffer { get { return __p.bb; } }
+  public static void ValidateVersion() { FlatBufferConstants.FLATBUFFERS_24_3_25(); }
+  public static SC_ModelChange GetRootAsSC_ModelChange(ByteBuffer _bb) { return GetRootAsSC_ModelChange(_bb, new SC_ModelChange()); }
+  public static SC_ModelChange GetRootAsSC_ModelChange(ByteBuffer _bb, SC_ModelChange obj) { return (obj.__assign(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
+  public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
+  public SC_ModelChange __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
+
+  public ushort Objectid { get { int o = __p.__offset(4); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public ushort Model { get { int o = __p.__offset(6); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public int Newsize { get { int o = __p.__offset(8); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
+
+  public static Offset<NetworkMessage.SC_ModelChange> CreateSC_ModelChange(FlatBufferBuilder builder,
+      ushort objectid = 0,
+      ushort model = 0,
+      int newsize = 0) {
+    builder.StartTable(3);
+    SC_ModelChange.AddNewsize(builder, newsize);
+    SC_ModelChange.AddModel(builder, model);
+    SC_ModelChange.AddObjectid(builder, objectid);
+    return SC_ModelChange.EndSC_ModelChange(builder);
+  }
+
+  public static void StartSC_ModelChange(FlatBufferBuilder builder) { builder.StartTable(3); }
+  public static void AddObjectid(FlatBufferBuilder builder, ushort objectid) { builder.AddUshort(0, objectid, 0); }
+  public static void AddModel(FlatBufferBuilder builder, ushort model) { builder.AddUshort(1, model, 0); }
+  public static void AddNewsize(FlatBufferBuilder builder, int newsize) { builder.AddInt(2, newsize, 0); }
+  public static Offset<NetworkMessage.SC_ModelChange> EndSC_ModelChange(FlatBufferBuilder builder) {
+    int o = builder.EndTable();
+    return new Offset<NetworkMessage.SC_ModelChange>(o);
+  }
+  public SC_ModelChange_FBS UnPack() {
+    var _o = new SC_ModelChange_FBS();
+    this.UnPackTo(_o);
+    return _o;
+  }
+  public void UnPackTo(SC_ModelChange_FBS _o) {
+    _o.Objectid = this.Objectid;
+    _o.Model = this.Model;
+    _o.Newsize = this.Newsize;
+  }
+  public static Offset<NetworkMessage.SC_ModelChange> Pack(FlatBufferBuilder builder, SC_ModelChange_FBS _o) {
+    if (_o == null) return default(Offset<NetworkMessage.SC_ModelChange>);
+    return CreateSC_ModelChange(
+      builder,
+      _o.Objectid,
+      _o.Model,
+      _o.Newsize);
+  }
+}
+
+public class SC_ModelChange_FBS
+{
+  public ushort Objectid { get; set; }
+  public ushort Model { get; set; }
+  public int Newsize { get; set; }
+
+  public SC_ModelChange_FBS() {
+    this.Objectid = 0;
+    this.Model = 0;
+    this.Newsize = 0;
+  }
+}
+
+
+static public class SC_ModelChangeVerify
+{
+  static public bool Verify(Google.FlatBuffers.Verifier verifier, uint tablePos)
+  {
+    return verifier.VerifyTableStart(tablePos)
+      && verifier.VerifyField(tablePos, 4 /*Objectid*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 6 /*Model*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 8 /*Newsize*/, 4 /*int*/, 4, false)
+      && verifier.VerifyTableEnd(tablePos);
+  }
+}
+public struct SC_ObjectCreate : IFlatbufferObject
+{
+  private Table __p;
+  public ByteBuffer ByteBuffer { get { return __p.bb; } }
+  public static void ValidateVersion() { FlatBufferConstants.FLATBUFFERS_24_3_25(); }
+  public static SC_ObjectCreate GetRootAsSC_ObjectCreate(ByteBuffer _bb) { return GetRootAsSC_ObjectCreate(_bb, new SC_ObjectCreate()); }
+  public static SC_ObjectCreate GetRootAsSC_ObjectCreate(ByteBuffer _bb, SC_ObjectCreate obj) { return (obj.__assign(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
+  public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
+  public SC_ObjectCreate __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
+
+  public ushort Objectid { get { int o = __p.__offset(4); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public ushort Heading { get { int o = __p.__offset(6); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public ushort Emblem { get { int o = __p.__offset(8); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public ushort Model { get { int o = __p.__offset(10); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public NetworkMessage.Vector3Int? Position { get { int o = __p.__offset(12); return o != 0 ? (NetworkMessage.Vector3Int?)(new NetworkMessage.Vector3Int()).__assign(o + __p.bb_pos, __p.bb) : null; } }
+  public int Flags { get { int o = __p.__offset(14); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
+  public string Name { get { int o = __p.__offset(16); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
+#if ENABLE_SPAN_T
+  public Span<byte> GetNameBytes() { return __p.__vector_as_span<byte>(16, 1); }
+#else
+  public ArraySegment<byte>? GetNameBytes() { return __p.__vector_as_arraysegment(16); }
+#endif
+  public byte[] GetNameArray() { return __p.__vector_as_array<byte>(16); }
+
+  public static Offset<NetworkMessage.SC_ObjectCreate> CreateSC_ObjectCreate(FlatBufferBuilder builder,
+      ushort objectid = 0,
+      ushort heading = 0,
+      ushort emblem = 0,
+      ushort model = 0,
+      NetworkMessage.Vector3Int_FBS position = null,
+      int flags = 0,
+      StringOffset nameOffset = default(StringOffset)) {
+    builder.StartTable(7);
+    SC_ObjectCreate.AddName(builder, nameOffset);
+    SC_ObjectCreate.AddFlags(builder, flags);
+    SC_ObjectCreate.AddPosition(builder, NetworkMessage.Vector3Int.Pack(builder, position));
+    SC_ObjectCreate.AddModel(builder, model);
+    SC_ObjectCreate.AddEmblem(builder, emblem);
+    SC_ObjectCreate.AddHeading(builder, heading);
+    SC_ObjectCreate.AddObjectid(builder, objectid);
+    return SC_ObjectCreate.EndSC_ObjectCreate(builder);
+  }
+
+  public static void StartSC_ObjectCreate(FlatBufferBuilder builder) { builder.StartTable(7); }
+  public static void AddObjectid(FlatBufferBuilder builder, ushort objectid) { builder.AddUshort(0, objectid, 0); }
+  public static void AddHeading(FlatBufferBuilder builder, ushort heading) { builder.AddUshort(1, heading, 0); }
+  public static void AddEmblem(FlatBufferBuilder builder, ushort emblem) { builder.AddUshort(2, emblem, 0); }
+  public static void AddModel(FlatBufferBuilder builder, ushort model) { builder.AddUshort(3, model, 0); }
+  public static void AddPosition(FlatBufferBuilder builder, Offset<NetworkMessage.Vector3Int> positionOffset) { builder.AddStruct(4, positionOffset.Value, 0); }
+  public static void AddFlags(FlatBufferBuilder builder, int flags) { builder.AddInt(5, flags, 0); }
+  public static void AddName(FlatBufferBuilder builder, StringOffset nameOffset) { builder.AddOffset(6, nameOffset.Value, 0); }
+  public static Offset<NetworkMessage.SC_ObjectCreate> EndSC_ObjectCreate(FlatBufferBuilder builder) {
+    int o = builder.EndTable();
+    return new Offset<NetworkMessage.SC_ObjectCreate>(o);
+  }
+  public SC_ObjectCreate_FBS UnPack() {
+    var _o = new SC_ObjectCreate_FBS();
+    this.UnPackTo(_o);
+    return _o;
+  }
+  public void UnPackTo(SC_ObjectCreate_FBS _o) {
+    _o.Objectid = this.Objectid;
+    _o.Heading = this.Heading;
+    _o.Emblem = this.Emblem;
+    _o.Model = this.Model;
+    _o.Position = this.Position.HasValue ? this.Position.Value.UnPack() : null;
+    _o.Flags = this.Flags;
+    _o.Name = this.Name;
+  }
+  public static Offset<NetworkMessage.SC_ObjectCreate> Pack(FlatBufferBuilder builder, SC_ObjectCreate_FBS _o) {
+    if (_o == null) return default(Offset<NetworkMessage.SC_ObjectCreate>);
+    var _name = _o.Name == null ? default(StringOffset) : builder.CreateString(_o.Name);
+    return CreateSC_ObjectCreate(
+      builder,
+      _o.Objectid,
+      _o.Heading,
+      _o.Emblem,
+      _o.Model,
+      _o.Position,
+      _o.Flags,
+      _name);
+  }
+}
+
+public class SC_ObjectCreate_FBS
+{
+  public ushort Objectid { get; set; }
+  public ushort Heading { get; set; }
+  public ushort Emblem { get; set; }
+  public ushort Model { get; set; }
+  public NetworkMessage.Vector3Int_FBS Position { get; set; }
+  public int Flags { get; set; }
+  public string Name { get; set; }
+
+  public SC_ObjectCreate_FBS() {
+    this.Objectid = 0;
+    this.Heading = 0;
+    this.Emblem = 0;
+    this.Model = 0;
+    this.Position = new NetworkMessage.Vector3Int_FBS();
+    this.Flags = 0;
+    this.Name = null;
+  }
+}
+
+
+static public class SC_ObjectCreateVerify
+{
+  static public bool Verify(Google.FlatBuffers.Verifier verifier, uint tablePos)
+  {
+    return verifier.VerifyTableStart(tablePos)
+      && verifier.VerifyField(tablePos, 4 /*Objectid*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 6 /*Heading*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 8 /*Emblem*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 10 /*Model*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 12 /*Position*/, 12 /*NetworkMessage.Vector3Int*/, 4, false)
+      && verifier.VerifyField(tablePos, 14 /*Flags*/, 4 /*int*/, 4, false)
+      && verifier.VerifyString(tablePos, 16 /*Name*/, false)
+      && verifier.VerifyTableEnd(tablePos);
+  }
+}
+public struct SC_MovingObjectCreate : IFlatbufferObject
+{
+  private Table __p;
+  public ByteBuffer ByteBuffer { get { return __p.bb; } }
+  public static void ValidateVersion() { FlatBufferConstants.FLATBUFFERS_24_3_25(); }
+  public static SC_MovingObjectCreate GetRootAsSC_MovingObjectCreate(ByteBuffer _bb) { return GetRootAsSC_MovingObjectCreate(_bb, new SC_MovingObjectCreate()); }
+  public static SC_MovingObjectCreate GetRootAsSC_MovingObjectCreate(ByteBuffer _bb, SC_MovingObjectCreate obj) { return (obj.__assign(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
+  public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
+  public SC_MovingObjectCreate __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
+
+  public ushort Objectid { get { int o = __p.__offset(4); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public ushort Heading { get { int o = __p.__offset(6); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public NetworkMessage.Vector3Int? Position { get { int o = __p.__offset(8); return o != 0 ? (NetworkMessage.Vector3Int?)(new NetworkMessage.Vector3Int()).__assign(o + __p.bb_pos, __p.bb) : null; } }
+  public ushort Model { get { int o = __p.__offset(10); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public int Flags { get { int o = __p.__offset(12); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
+  public ushort Emblem { get { int o = __p.__offset(14); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public string Name { get { int o = __p.__offset(16); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
+#if ENABLE_SPAN_T
+  public Span<byte> GetNameBytes() { return __p.__vector_as_span<byte>(16, 1); }
+#else
+  public ArraySegment<byte>? GetNameBytes() { return __p.__vector_as_arraysegment(16); }
+#endif
+  public byte[] GetNameArray() { return __p.__vector_as_array<byte>(16); }
+
+  public static Offset<NetworkMessage.SC_MovingObjectCreate> CreateSC_MovingObjectCreate(FlatBufferBuilder builder,
+      ushort objectid = 0,
+      ushort heading = 0,
+      NetworkMessage.Vector3Int_FBS position = null,
+      ushort model = 0,
+      int flags = 0,
+      ushort emblem = 0,
+      StringOffset nameOffset = default(StringOffset)) {
+    builder.StartTable(7);
+    SC_MovingObjectCreate.AddName(builder, nameOffset);
+    SC_MovingObjectCreate.AddFlags(builder, flags);
+    SC_MovingObjectCreate.AddPosition(builder, NetworkMessage.Vector3Int.Pack(builder, position));
+    SC_MovingObjectCreate.AddEmblem(builder, emblem);
+    SC_MovingObjectCreate.AddModel(builder, model);
+    SC_MovingObjectCreate.AddHeading(builder, heading);
+    SC_MovingObjectCreate.AddObjectid(builder, objectid);
+    return SC_MovingObjectCreate.EndSC_MovingObjectCreate(builder);
+  }
+
+  public static void StartSC_MovingObjectCreate(FlatBufferBuilder builder) { builder.StartTable(7); }
+  public static void AddObjectid(FlatBufferBuilder builder, ushort objectid) { builder.AddUshort(0, objectid, 0); }
+  public static void AddHeading(FlatBufferBuilder builder, ushort heading) { builder.AddUshort(1, heading, 0); }
+  public static void AddPosition(FlatBufferBuilder builder, Offset<NetworkMessage.Vector3Int> positionOffset) { builder.AddStruct(2, positionOffset.Value, 0); }
+  public static void AddModel(FlatBufferBuilder builder, ushort model) { builder.AddUshort(3, model, 0); }
+  public static void AddFlags(FlatBufferBuilder builder, int flags) { builder.AddInt(4, flags, 0); }
+  public static void AddEmblem(FlatBufferBuilder builder, ushort emblem) { builder.AddUshort(5, emblem, 0); }
+  public static void AddName(FlatBufferBuilder builder, StringOffset nameOffset) { builder.AddOffset(6, nameOffset.Value, 0); }
+  public static Offset<NetworkMessage.SC_MovingObjectCreate> EndSC_MovingObjectCreate(FlatBufferBuilder builder) {
+    int o = builder.EndTable();
+    return new Offset<NetworkMessage.SC_MovingObjectCreate>(o);
+  }
+  public SC_MovingObjectCreate_FBS UnPack() {
+    var _o = new SC_MovingObjectCreate_FBS();
+    this.UnPackTo(_o);
+    return _o;
+  }
+  public void UnPackTo(SC_MovingObjectCreate_FBS _o) {
+    _o.Objectid = this.Objectid;
+    _o.Heading = this.Heading;
+    _o.Position = this.Position.HasValue ? this.Position.Value.UnPack() : null;
+    _o.Model = this.Model;
+    _o.Flags = this.Flags;
+    _o.Emblem = this.Emblem;
+    _o.Name = this.Name;
+  }
+  public static Offset<NetworkMessage.SC_MovingObjectCreate> Pack(FlatBufferBuilder builder, SC_MovingObjectCreate_FBS _o) {
+    if (_o == null) return default(Offset<NetworkMessage.SC_MovingObjectCreate>);
+    var _name = _o.Name == null ? default(StringOffset) : builder.CreateString(_o.Name);
+    return CreateSC_MovingObjectCreate(
+      builder,
+      _o.Objectid,
+      _o.Heading,
+      _o.Position,
+      _o.Model,
+      _o.Flags,
+      _o.Emblem,
+      _name);
+  }
+}
+
+public class SC_MovingObjectCreate_FBS
+{
+  public ushort Objectid { get; set; }
+  public ushort Heading { get; set; }
+  public NetworkMessage.Vector3Int_FBS Position { get; set; }
+  public ushort Model { get; set; }
+  public int Flags { get; set; }
+  public ushort Emblem { get; set; }
+  public string Name { get; set; }
+
+  public SC_MovingObjectCreate_FBS() {
+    this.Objectid = 0;
+    this.Heading = 0;
+    this.Position = new NetworkMessage.Vector3Int_FBS();
+    this.Model = 0;
+    this.Flags = 0;
+    this.Emblem = 0;
+    this.Name = null;
+  }
+}
+
+
+static public class SC_MovingObjectCreateVerify
+{
+  static public bool Verify(Google.FlatBuffers.Verifier verifier, uint tablePos)
+  {
+    return verifier.VerifyTableStart(tablePos)
+      && verifier.VerifyField(tablePos, 4 /*Objectid*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 6 /*Heading*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 8 /*Position*/, 12 /*NetworkMessage.Vector3Int*/, 4, false)
+      && verifier.VerifyField(tablePos, 10 /*Model*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 12 /*Flags*/, 4 /*int*/, 4, false)
+      && verifier.VerifyField(tablePos, 14 /*Emblem*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyString(tablePos, 16 /*Name*/, false)
+      && verifier.VerifyTableEnd(tablePos);
+  }
+}
+public struct SC_NPCCreate : IFlatbufferObject
+{
+  private Table __p;
+  public ByteBuffer ByteBuffer { get { return __p.bb; } }
+  public static void ValidateVersion() { FlatBufferConstants.FLATBUFFERS_24_3_25(); }
+  public static SC_NPCCreate GetRootAsSC_NPCCreate(ByteBuffer _bb) { return GetRootAsSC_NPCCreate(_bb, new SC_NPCCreate()); }
+  public static SC_NPCCreate GetRootAsSC_NPCCreate(ByteBuffer _bb, SC_NPCCreate obj) { return (obj.__assign(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
+  public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
+  public SC_NPCCreate __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
+
+  public ushort Objectid { get { int o = __p.__offset(4); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public ushort Heading { get { int o = __p.__offset(6); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public NetworkMessage.Vector3Int? Position { get { int o = __p.__offset(8); return o != 0 ? (NetworkMessage.Vector3Int?)(new NetworkMessage.Vector3Int()).__assign(o + __p.bb_pos, __p.bb) : null; } }
+  public ushort Speed { get { int o = __p.__offset(10); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public ushort Speedz { get { int o = __p.__offset(12); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public ushort Model { get { int o = __p.__offset(14); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public byte Size { get { int o = __p.__offset(16); return o != 0 ? __p.bb.Get(o + __p.bb_pos) : (byte)0; } }
+  public byte Level { get { int o = __p.__offset(18); return o != 0 ? __p.bb.Get(o + __p.bb_pos) : (byte)0; } }
+  public byte Flags { get { int o = __p.__offset(20); return o != 0 ? __p.bb.Get(o + __p.bb_pos) : (byte)0; } }
+  public byte Flags2 { get { int o = __p.__offset(22); return o != 0 ? __p.bb.Get(o + __p.bb_pos) : (byte)0; } }
+  public byte Flags3 { get { int o = __p.__offset(24); return o != 0 ? __p.bb.Get(o + __p.bb_pos) : (byte)0; } }
+  public string Name { get { int o = __p.__offset(26); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
+#if ENABLE_SPAN_T
+  public Span<byte> GetNameBytes() { return __p.__vector_as_span<byte>(26, 1); }
+#else
+  public ArraySegment<byte>? GetNameBytes() { return __p.__vector_as_arraysegment(26); }
+#endif
+  public byte[] GetNameArray() { return __p.__vector_as_array<byte>(26); }
+  public string Guildname { get { int o = __p.__offset(28); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
+#if ENABLE_SPAN_T
+  public Span<byte> GetGuildnameBytes() { return __p.__vector_as_span<byte>(28, 1); }
+#else
+  public ArraySegment<byte>? GetGuildnameBytes() { return __p.__vector_as_arraysegment(28); }
+#endif
+  public byte[] GetGuildnameArray() { return __p.__vector_as_array<byte>(28); }
+
+  public static Offset<NetworkMessage.SC_NPCCreate> CreateSC_NPCCreate(FlatBufferBuilder builder,
+      ushort objectid = 0,
+      ushort heading = 0,
+      NetworkMessage.Vector3Int_FBS position = null,
+      ushort speed = 0,
+      ushort speedz = 0,
+      ushort model = 0,
+      byte size = 0,
+      byte level = 0,
+      byte flags = 0,
+      byte flags2 = 0,
+      byte flags3 = 0,
+      StringOffset nameOffset = default(StringOffset),
+      StringOffset guildnameOffset = default(StringOffset)) {
+    builder.StartTable(13);
+    SC_NPCCreate.AddGuildname(builder, guildnameOffset);
+    SC_NPCCreate.AddName(builder, nameOffset);
+    SC_NPCCreate.AddPosition(builder, NetworkMessage.Vector3Int.Pack(builder, position));
+    SC_NPCCreate.AddModel(builder, model);
+    SC_NPCCreate.AddSpeedz(builder, speedz);
+    SC_NPCCreate.AddSpeed(builder, speed);
+    SC_NPCCreate.AddHeading(builder, heading);
+    SC_NPCCreate.AddObjectid(builder, objectid);
+    SC_NPCCreate.AddFlags3(builder, flags3);
+    SC_NPCCreate.AddFlags2(builder, flags2);
+    SC_NPCCreate.AddFlags(builder, flags);
+    SC_NPCCreate.AddLevel(builder, level);
+    SC_NPCCreate.AddSize(builder, size);
+    return SC_NPCCreate.EndSC_NPCCreate(builder);
+  }
+
+  public static void StartSC_NPCCreate(FlatBufferBuilder builder) { builder.StartTable(13); }
+  public static void AddObjectid(FlatBufferBuilder builder, ushort objectid) { builder.AddUshort(0, objectid, 0); }
+  public static void AddHeading(FlatBufferBuilder builder, ushort heading) { builder.AddUshort(1, heading, 0); }
+  public static void AddPosition(FlatBufferBuilder builder, Offset<NetworkMessage.Vector3Int> positionOffset) { builder.AddStruct(2, positionOffset.Value, 0); }
+  public static void AddSpeed(FlatBufferBuilder builder, ushort speed) { builder.AddUshort(3, speed, 0); }
+  public static void AddSpeedz(FlatBufferBuilder builder, ushort speedz) { builder.AddUshort(4, speedz, 0); }
+  public static void AddModel(FlatBufferBuilder builder, ushort model) { builder.AddUshort(5, model, 0); }
+  public static void AddSize(FlatBufferBuilder builder, byte size) { builder.AddByte(6, size, 0); }
+  public static void AddLevel(FlatBufferBuilder builder, byte level) { builder.AddByte(7, level, 0); }
+  public static void AddFlags(FlatBufferBuilder builder, byte flags) { builder.AddByte(8, flags, 0); }
+  public static void AddFlags2(FlatBufferBuilder builder, byte flags2) { builder.AddByte(9, flags2, 0); }
+  public static void AddFlags3(FlatBufferBuilder builder, byte flags3) { builder.AddByte(10, flags3, 0); }
+  public static void AddName(FlatBufferBuilder builder, StringOffset nameOffset) { builder.AddOffset(11, nameOffset.Value, 0); }
+  public static void AddGuildname(FlatBufferBuilder builder, StringOffset guildnameOffset) { builder.AddOffset(12, guildnameOffset.Value, 0); }
+  public static Offset<NetworkMessage.SC_NPCCreate> EndSC_NPCCreate(FlatBufferBuilder builder) {
+    int o = builder.EndTable();
+    return new Offset<NetworkMessage.SC_NPCCreate>(o);
+  }
+  public SC_NPCCreate_FBS UnPack() {
+    var _o = new SC_NPCCreate_FBS();
+    this.UnPackTo(_o);
+    return _o;
+  }
+  public void UnPackTo(SC_NPCCreate_FBS _o) {
+    _o.Objectid = this.Objectid;
+    _o.Heading = this.Heading;
+    _o.Position = this.Position.HasValue ? this.Position.Value.UnPack() : null;
+    _o.Speed = this.Speed;
+    _o.Speedz = this.Speedz;
+    _o.Model = this.Model;
+    _o.Size = this.Size;
+    _o.Level = this.Level;
+    _o.Flags = this.Flags;
+    _o.Flags2 = this.Flags2;
+    _o.Flags3 = this.Flags3;
+    _o.Name = this.Name;
+    _o.Guildname = this.Guildname;
+  }
+  public static Offset<NetworkMessage.SC_NPCCreate> Pack(FlatBufferBuilder builder, SC_NPCCreate_FBS _o) {
+    if (_o == null) return default(Offset<NetworkMessage.SC_NPCCreate>);
+    var _name = _o.Name == null ? default(StringOffset) : builder.CreateString(_o.Name);
+    var _guildname = _o.Guildname == null ? default(StringOffset) : builder.CreateString(_o.Guildname);
+    return CreateSC_NPCCreate(
+      builder,
+      _o.Objectid,
+      _o.Heading,
+      _o.Position,
+      _o.Speed,
+      _o.Speedz,
+      _o.Model,
+      _o.Size,
+      _o.Level,
+      _o.Flags,
+      _o.Flags2,
+      _o.Flags3,
+      _name,
+      _guildname);
+  }
+}
+
+public class SC_NPCCreate_FBS
+{
+  public ushort Objectid { get; set; }
+  public ushort Heading { get; set; }
+  public NetworkMessage.Vector3Int_FBS Position { get; set; }
+  public ushort Speed { get; set; }
+  public ushort Speedz { get; set; }
+  public ushort Model { get; set; }
+  public byte Size { get; set; }
+  public byte Level { get; set; }
+  public byte Flags { get; set; }
+  public byte Flags2 { get; set; }
+  public byte Flags3 { get; set; }
+  public string Name { get; set; }
+  public string Guildname { get; set; }
+
+  public SC_NPCCreate_FBS() {
+    this.Objectid = 0;
+    this.Heading = 0;
+    this.Position = new NetworkMessage.Vector3Int_FBS();
+    this.Speed = 0;
+    this.Speedz = 0;
+    this.Model = 0;
+    this.Size = 0;
+    this.Level = 0;
+    this.Flags = 0;
+    this.Flags2 = 0;
+    this.Flags3 = 0;
+    this.Name = null;
+    this.Guildname = null;
+  }
+}
+
+
+static public class SC_NPCCreateVerify
+{
+  static public bool Verify(Google.FlatBuffers.Verifier verifier, uint tablePos)
+  {
+    return verifier.VerifyTableStart(tablePos)
+      && verifier.VerifyField(tablePos, 4 /*Objectid*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 6 /*Heading*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 8 /*Position*/, 12 /*NetworkMessage.Vector3Int*/, 4, false)
+      && verifier.VerifyField(tablePos, 10 /*Speed*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 12 /*Speedz*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 14 /*Model*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 16 /*Size*/, 1 /*byte*/, 1, false)
+      && verifier.VerifyField(tablePos, 18 /*Level*/, 1 /*byte*/, 1, false)
+      && verifier.VerifyField(tablePos, 20 /*Flags*/, 1 /*byte*/, 1, false)
+      && verifier.VerifyField(tablePos, 22 /*Flags2*/, 1 /*byte*/, 1, false)
+      && verifier.VerifyField(tablePos, 24 /*Flags3*/, 1 /*byte*/, 1, false)
+      && verifier.VerifyString(tablePos, 26 /*Name*/, false)
+      && verifier.VerifyString(tablePos, 28 /*Guildname*/, false)
+      && verifier.VerifyTableEnd(tablePos);
+  }
+}
+public struct SC_CharacterStatusUpdate : IFlatbufferObject
+{
+  private Table __p;
+  public ByteBuffer ByteBuffer { get { return __p.bb; } }
+  public static void ValidateVersion() { FlatBufferConstants.FLATBUFFERS_24_3_25(); }
+  public static SC_CharacterStatusUpdate GetRootAsSC_CharacterStatusUpdate(ByteBuffer _bb) { return GetRootAsSC_CharacterStatusUpdate(_bb, new SC_CharacterStatusUpdate()); }
+  public static SC_CharacterStatusUpdate GetRootAsSC_CharacterStatusUpdate(ByteBuffer _bb, SC_CharacterStatusUpdate obj) { return (obj.__assign(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
+  public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
+  public SC_CharacterStatusUpdate __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
+
+  public bool Sittingflag { get { int o = __p.__offset(4); return o != 0 ? 0!=__p.bb.Get(o + __p.bb_pos) : (bool)false; } }
+  public byte Healthpercent { get { int o = __p.__offset(6); return o != 0 ? __p.bb.Get(o + __p.bb_pos) : (byte)0; } }
+  public byte Manapercent { get { int o = __p.__offset(8); return o != 0 ? __p.bb.Get(o + __p.bb_pos) : (byte)0; } }
+  public byte Endurancepercent { get { int o = __p.__offset(10); return o != 0 ? __p.bb.Get(o + __p.bb_pos) : (byte)0; } }
+  public byte Conpercent { get { int o = __p.__offset(12); return o != 0 ? __p.bb.Get(o + __p.bb_pos) : (byte)0; } }
+  public int Maxmana { get { int o = __p.__offset(14); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
+  public int Maxendurance { get { int o = __p.__offset(16); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
+  public int Maxconcetration { get { int o = __p.__offset(18); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
+  public int Maxhealth { get { int o = __p.__offset(20); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
+  public int Endurance { get { int o = __p.__offset(22); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
+  public int Mana { get { int o = __p.__offset(24); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
+  public int Concentration { get { int o = __p.__offset(26); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
+  public int Health { get { int o = __p.__offset(28); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
+
+  public static Offset<NetworkMessage.SC_CharacterStatusUpdate> CreateSC_CharacterStatusUpdate(FlatBufferBuilder builder,
+      bool sittingflag = false,
+      byte healthpercent = 0,
+      byte manapercent = 0,
+      byte endurancepercent = 0,
+      byte conpercent = 0,
+      int maxmana = 0,
+      int maxendurance = 0,
+      int maxconcetration = 0,
+      int maxhealth = 0,
+      int endurance = 0,
+      int mana = 0,
+      int concentration = 0,
+      int health = 0) {
+    builder.StartTable(13);
+    SC_CharacterStatusUpdate.AddHealth(builder, health);
+    SC_CharacterStatusUpdate.AddConcentration(builder, concentration);
+    SC_CharacterStatusUpdate.AddMana(builder, mana);
+    SC_CharacterStatusUpdate.AddEndurance(builder, endurance);
+    SC_CharacterStatusUpdate.AddMaxhealth(builder, maxhealth);
+    SC_CharacterStatusUpdate.AddMaxconcetration(builder, maxconcetration);
+    SC_CharacterStatusUpdate.AddMaxendurance(builder, maxendurance);
+    SC_CharacterStatusUpdate.AddMaxmana(builder, maxmana);
+    SC_CharacterStatusUpdate.AddConpercent(builder, conpercent);
+    SC_CharacterStatusUpdate.AddEndurancepercent(builder, endurancepercent);
+    SC_CharacterStatusUpdate.AddManapercent(builder, manapercent);
+    SC_CharacterStatusUpdate.AddHealthpercent(builder, healthpercent);
+    SC_CharacterStatusUpdate.AddSittingflag(builder, sittingflag);
+    return SC_CharacterStatusUpdate.EndSC_CharacterStatusUpdate(builder);
+  }
+
+  public static void StartSC_CharacterStatusUpdate(FlatBufferBuilder builder) { builder.StartTable(13); }
+  public static void AddSittingflag(FlatBufferBuilder builder, bool sittingflag) { builder.AddBool(0, sittingflag, false); }
+  public static void AddHealthpercent(FlatBufferBuilder builder, byte healthpercent) { builder.AddByte(1, healthpercent, 0); }
+  public static void AddManapercent(FlatBufferBuilder builder, byte manapercent) { builder.AddByte(2, manapercent, 0); }
+  public static void AddEndurancepercent(FlatBufferBuilder builder, byte endurancepercent) { builder.AddByte(3, endurancepercent, 0); }
+  public static void AddConpercent(FlatBufferBuilder builder, byte conpercent) { builder.AddByte(4, conpercent, 0); }
+  public static void AddMaxmana(FlatBufferBuilder builder, int maxmana) { builder.AddInt(5, maxmana, 0); }
+  public static void AddMaxendurance(FlatBufferBuilder builder, int maxendurance) { builder.AddInt(6, maxendurance, 0); }
+  public static void AddMaxconcetration(FlatBufferBuilder builder, int maxconcetration) { builder.AddInt(7, maxconcetration, 0); }
+  public static void AddMaxhealth(FlatBufferBuilder builder, int maxhealth) { builder.AddInt(8, maxhealth, 0); }
+  public static void AddEndurance(FlatBufferBuilder builder, int endurance) { builder.AddInt(9, endurance, 0); }
+  public static void AddMana(FlatBufferBuilder builder, int mana) { builder.AddInt(10, mana, 0); }
+  public static void AddConcentration(FlatBufferBuilder builder, int concentration) { builder.AddInt(11, concentration, 0); }
+  public static void AddHealth(FlatBufferBuilder builder, int health) { builder.AddInt(12, health, 0); }
+  public static Offset<NetworkMessage.SC_CharacterStatusUpdate> EndSC_CharacterStatusUpdate(FlatBufferBuilder builder) {
+    int o = builder.EndTable();
+    return new Offset<NetworkMessage.SC_CharacterStatusUpdate>(o);
+  }
+  public SC_CharacterStatusUpdate_FBS UnPack() {
+    var _o = new SC_CharacterStatusUpdate_FBS();
+    this.UnPackTo(_o);
+    return _o;
+  }
+  public void UnPackTo(SC_CharacterStatusUpdate_FBS _o) {
+    _o.Sittingflag = this.Sittingflag;
+    _o.Healthpercent = this.Healthpercent;
+    _o.Manapercent = this.Manapercent;
+    _o.Endurancepercent = this.Endurancepercent;
+    _o.Conpercent = this.Conpercent;
+    _o.Maxmana = this.Maxmana;
+    _o.Maxendurance = this.Maxendurance;
+    _o.Maxconcetration = this.Maxconcetration;
+    _o.Maxhealth = this.Maxhealth;
+    _o.Endurance = this.Endurance;
+    _o.Mana = this.Mana;
+    _o.Concentration = this.Concentration;
+    _o.Health = this.Health;
+  }
+  public static Offset<NetworkMessage.SC_CharacterStatusUpdate> Pack(FlatBufferBuilder builder, SC_CharacterStatusUpdate_FBS _o) {
+    if (_o == null) return default(Offset<NetworkMessage.SC_CharacterStatusUpdate>);
+    return CreateSC_CharacterStatusUpdate(
+      builder,
+      _o.Sittingflag,
+      _o.Healthpercent,
+      _o.Manapercent,
+      _o.Endurancepercent,
+      _o.Conpercent,
+      _o.Maxmana,
+      _o.Maxendurance,
+      _o.Maxconcetration,
+      _o.Maxhealth,
+      _o.Endurance,
+      _o.Mana,
+      _o.Concentration,
+      _o.Health);
+  }
+}
+
+public class SC_CharacterStatusUpdate_FBS
+{
+  public bool Sittingflag { get; set; }
+  public byte Healthpercent { get; set; }
+  public byte Manapercent { get; set; }
+  public byte Endurancepercent { get; set; }
+  public byte Conpercent { get; set; }
+  public int Maxmana { get; set; }
+  public int Maxendurance { get; set; }
+  public int Maxconcetration { get; set; }
+  public int Maxhealth { get; set; }
+  public int Endurance { get; set; }
+  public int Mana { get; set; }
+  public int Concentration { get; set; }
+  public int Health { get; set; }
+
+  public SC_CharacterStatusUpdate_FBS() {
+    this.Sittingflag = false;
+    this.Healthpercent = 0;
+    this.Manapercent = 0;
+    this.Endurancepercent = 0;
+    this.Conpercent = 0;
+    this.Maxmana = 0;
+    this.Maxendurance = 0;
+    this.Maxconcetration = 0;
+    this.Maxhealth = 0;
+    this.Endurance = 0;
+    this.Mana = 0;
+    this.Concentration = 0;
+    this.Health = 0;
+  }
+}
+
+
+static public class SC_CharacterStatusUpdateVerify
+{
+  static public bool Verify(Google.FlatBuffers.Verifier verifier, uint tablePos)
+  {
+    return verifier.VerifyTableStart(tablePos)
+      && verifier.VerifyField(tablePos, 4 /*Sittingflag*/, 1 /*bool*/, 1, false)
+      && verifier.VerifyField(tablePos, 6 /*Healthpercent*/, 1 /*byte*/, 1, false)
+      && verifier.VerifyField(tablePos, 8 /*Manapercent*/, 1 /*byte*/, 1, false)
+      && verifier.VerifyField(tablePos, 10 /*Endurancepercent*/, 1 /*byte*/, 1, false)
+      && verifier.VerifyField(tablePos, 12 /*Conpercent*/, 1 /*byte*/, 1, false)
+      && verifier.VerifyField(tablePos, 14 /*Maxmana*/, 4 /*int*/, 4, false)
+      && verifier.VerifyField(tablePos, 16 /*Maxendurance*/, 4 /*int*/, 4, false)
+      && verifier.VerifyField(tablePos, 18 /*Maxconcetration*/, 4 /*int*/, 4, false)
+      && verifier.VerifyField(tablePos, 20 /*Maxhealth*/, 4 /*int*/, 4, false)
+      && verifier.VerifyField(tablePos, 22 /*Endurance*/, 4 /*int*/, 4, false)
+      && verifier.VerifyField(tablePos, 24 /*Mana*/, 4 /*int*/, 4, false)
+      && verifier.VerifyField(tablePos, 26 /*Concentration*/, 4 /*int*/, 4, false)
+      && verifier.VerifyField(tablePos, 28 /*Health*/, 4 /*int*/, 4, false)
       && verifier.VerifyTableEnd(tablePos);
   }
 }
@@ -1314,6 +1984,381 @@ static public class SC_ObjectUpdateVerify
       && verifier.VerifyTableEnd(tablePos);
   }
 }
+public struct SC_CombatAnimation : IFlatbufferObject
+{
+  private Table __p;
+  public ByteBuffer ByteBuffer { get { return __p.bb; } }
+  public static void ValidateVersion() { FlatBufferConstants.FLATBUFFERS_24_3_25(); }
+  public static SC_CombatAnimation GetRootAsSC_CombatAnimation(ByteBuffer _bb) { return GetRootAsSC_CombatAnimation(_bb, new SC_CombatAnimation()); }
+  public static SC_CombatAnimation GetRootAsSC_CombatAnimation(ByteBuffer _bb, SC_CombatAnimation obj) { return (obj.__assign(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
+  public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
+  public SC_CombatAnimation __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
+
+  public ushort Attackobjectid { get { int o = __p.__offset(4); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public ushort Defenderobjectid { get { int o = __p.__offset(6); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public ushort Weaponid { get { int o = __p.__offset(8); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public ushort Shieldid { get { int o = __p.__offset(10); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public ushort Style { get { int o = __p.__offset(12); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public byte Stance { get { int o = __p.__offset(14); return o != 0 ? __p.bb.Get(o + __p.bb_pos) : (byte)0; } }
+  public byte Result { get { int o = __p.__offset(16); return o != 0 ? __p.bb.Get(o + __p.bb_pos) : (byte)0; } }
+  public byte Healthpercent { get { int o = __p.__offset(18); return o != 0 ? __p.bb.Get(o + __p.bb_pos) : (byte)0; } }
+
+  public static Offset<NetworkMessage.SC_CombatAnimation> CreateSC_CombatAnimation(FlatBufferBuilder builder,
+      ushort attackobjectid = 0,
+      ushort defenderobjectid = 0,
+      ushort weaponid = 0,
+      ushort shieldid = 0,
+      ushort style = 0,
+      byte stance = 0,
+      byte result = 0,
+      byte healthpercent = 0) {
+    builder.StartTable(8);
+    SC_CombatAnimation.AddStyle(builder, style);
+    SC_CombatAnimation.AddShieldid(builder, shieldid);
+    SC_CombatAnimation.AddWeaponid(builder, weaponid);
+    SC_CombatAnimation.AddDefenderobjectid(builder, defenderobjectid);
+    SC_CombatAnimation.AddAttackobjectid(builder, attackobjectid);
+    SC_CombatAnimation.AddHealthpercent(builder, healthpercent);
+    SC_CombatAnimation.AddResult(builder, result);
+    SC_CombatAnimation.AddStance(builder, stance);
+    return SC_CombatAnimation.EndSC_CombatAnimation(builder);
+  }
+
+  public static void StartSC_CombatAnimation(FlatBufferBuilder builder) { builder.StartTable(8); }
+  public static void AddAttackobjectid(FlatBufferBuilder builder, ushort attackobjectid) { builder.AddUshort(0, attackobjectid, 0); }
+  public static void AddDefenderobjectid(FlatBufferBuilder builder, ushort defenderobjectid) { builder.AddUshort(1, defenderobjectid, 0); }
+  public static void AddWeaponid(FlatBufferBuilder builder, ushort weaponid) { builder.AddUshort(2, weaponid, 0); }
+  public static void AddShieldid(FlatBufferBuilder builder, ushort shieldid) { builder.AddUshort(3, shieldid, 0); }
+  public static void AddStyle(FlatBufferBuilder builder, ushort style) { builder.AddUshort(4, style, 0); }
+  public static void AddStance(FlatBufferBuilder builder, byte stance) { builder.AddByte(5, stance, 0); }
+  public static void AddResult(FlatBufferBuilder builder, byte result) { builder.AddByte(6, result, 0); }
+  public static void AddHealthpercent(FlatBufferBuilder builder, byte healthpercent) { builder.AddByte(7, healthpercent, 0); }
+  public static Offset<NetworkMessage.SC_CombatAnimation> EndSC_CombatAnimation(FlatBufferBuilder builder) {
+    int o = builder.EndTable();
+    return new Offset<NetworkMessage.SC_CombatAnimation>(o);
+  }
+  public SC_CombatAnimation_FBS UnPack() {
+    var _o = new SC_CombatAnimation_FBS();
+    this.UnPackTo(_o);
+    return _o;
+  }
+  public void UnPackTo(SC_CombatAnimation_FBS _o) {
+    _o.Attackobjectid = this.Attackobjectid;
+    _o.Defenderobjectid = this.Defenderobjectid;
+    _o.Weaponid = this.Weaponid;
+    _o.Shieldid = this.Shieldid;
+    _o.Style = this.Style;
+    _o.Stance = this.Stance;
+    _o.Result = this.Result;
+    _o.Healthpercent = this.Healthpercent;
+  }
+  public static Offset<NetworkMessage.SC_CombatAnimation> Pack(FlatBufferBuilder builder, SC_CombatAnimation_FBS _o) {
+    if (_o == null) return default(Offset<NetworkMessage.SC_CombatAnimation>);
+    return CreateSC_CombatAnimation(
+      builder,
+      _o.Attackobjectid,
+      _o.Defenderobjectid,
+      _o.Weaponid,
+      _o.Shieldid,
+      _o.Style,
+      _o.Stance,
+      _o.Result,
+      _o.Healthpercent);
+  }
+}
+
+public class SC_CombatAnimation_FBS
+{
+  public ushort Attackobjectid { get; set; }
+  public ushort Defenderobjectid { get; set; }
+  public ushort Weaponid { get; set; }
+  public ushort Shieldid { get; set; }
+  public ushort Style { get; set; }
+  public byte Stance { get; set; }
+  public byte Result { get; set; }
+  public byte Healthpercent { get; set; }
+
+  public SC_CombatAnimation_FBS() {
+    this.Attackobjectid = 0;
+    this.Defenderobjectid = 0;
+    this.Weaponid = 0;
+    this.Shieldid = 0;
+    this.Style = 0;
+    this.Stance = 0;
+    this.Result = 0;
+    this.Healthpercent = 0;
+  }
+}
+
+
+static public class SC_CombatAnimationVerify
+{
+  static public bool Verify(Google.FlatBuffers.Verifier verifier, uint tablePos)
+  {
+    return verifier.VerifyTableStart(tablePos)
+      && verifier.VerifyField(tablePos, 4 /*Attackobjectid*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 6 /*Defenderobjectid*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 8 /*Weaponid*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 10 /*Shieldid*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 12 /*Style*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 14 /*Stance*/, 1 /*byte*/, 1, false)
+      && verifier.VerifyField(tablePos, 16 /*Result*/, 1 /*byte*/, 1, false)
+      && verifier.VerifyField(tablePos, 18 /*Healthpercent*/, 1 /*byte*/, 1, false)
+      && verifier.VerifyTableEnd(tablePos);
+  }
+}
+public struct SC_SpellCastAnimation : IFlatbufferObject
+{
+  private Table __p;
+  public ByteBuffer ByteBuffer { get { return __p.bb; } }
+  public static void ValidateVersion() { FlatBufferConstants.FLATBUFFERS_24_3_25(); }
+  public static SC_SpellCastAnimation GetRootAsSC_SpellCastAnimation(ByteBuffer _bb) { return GetRootAsSC_SpellCastAnimation(_bb, new SC_SpellCastAnimation()); }
+  public static SC_SpellCastAnimation GetRootAsSC_SpellCastAnimation(ByteBuffer _bb, SC_SpellCastAnimation obj) { return (obj.__assign(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
+  public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
+  public SC_SpellCastAnimation __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
+
+  public ushort Objectid { get { int o = __p.__offset(4); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public ushort Spellid { get { int o = __p.__offset(6); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public ushort Castingtime { get { int o = __p.__offset(8); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+
+  public static Offset<NetworkMessage.SC_SpellCastAnimation> CreateSC_SpellCastAnimation(FlatBufferBuilder builder,
+      ushort objectid = 0,
+      ushort spellid = 0,
+      ushort castingtime = 0) {
+    builder.StartTable(3);
+    SC_SpellCastAnimation.AddCastingtime(builder, castingtime);
+    SC_SpellCastAnimation.AddSpellid(builder, spellid);
+    SC_SpellCastAnimation.AddObjectid(builder, objectid);
+    return SC_SpellCastAnimation.EndSC_SpellCastAnimation(builder);
+  }
+
+  public static void StartSC_SpellCastAnimation(FlatBufferBuilder builder) { builder.StartTable(3); }
+  public static void AddObjectid(FlatBufferBuilder builder, ushort objectid) { builder.AddUshort(0, objectid, 0); }
+  public static void AddSpellid(FlatBufferBuilder builder, ushort spellid) { builder.AddUshort(1, spellid, 0); }
+  public static void AddCastingtime(FlatBufferBuilder builder, ushort castingtime) { builder.AddUshort(2, castingtime, 0); }
+  public static Offset<NetworkMessage.SC_SpellCastAnimation> EndSC_SpellCastAnimation(FlatBufferBuilder builder) {
+    int o = builder.EndTable();
+    return new Offset<NetworkMessage.SC_SpellCastAnimation>(o);
+  }
+  public SC_SpellCastAnimation_FBS UnPack() {
+    var _o = new SC_SpellCastAnimation_FBS();
+    this.UnPackTo(_o);
+    return _o;
+  }
+  public void UnPackTo(SC_SpellCastAnimation_FBS _o) {
+    _o.Objectid = this.Objectid;
+    _o.Spellid = this.Spellid;
+    _o.Castingtime = this.Castingtime;
+  }
+  public static Offset<NetworkMessage.SC_SpellCastAnimation> Pack(FlatBufferBuilder builder, SC_SpellCastAnimation_FBS _o) {
+    if (_o == null) return default(Offset<NetworkMessage.SC_SpellCastAnimation>);
+    return CreateSC_SpellCastAnimation(
+      builder,
+      _o.Objectid,
+      _o.Spellid,
+      _o.Castingtime);
+  }
+}
+
+public class SC_SpellCastAnimation_FBS
+{
+  public ushort Objectid { get; set; }
+  public ushort Spellid { get; set; }
+  public ushort Castingtime { get; set; }
+
+  public SC_SpellCastAnimation_FBS() {
+    this.Objectid = 0;
+    this.Spellid = 0;
+    this.Castingtime = 0;
+  }
+}
+
+
+static public class SC_SpellCastAnimationVerify
+{
+  static public bool Verify(Google.FlatBuffers.Verifier verifier, uint tablePos)
+  {
+    return verifier.VerifyTableStart(tablePos)
+      && verifier.VerifyField(tablePos, 4 /*Objectid*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 6 /*Spellid*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 8 /*Castingtime*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyTableEnd(tablePos);
+  }
+}
+public struct SC_SpellEffectAnimation : IFlatbufferObject
+{
+  private Table __p;
+  public ByteBuffer ByteBuffer { get { return __p.bb; } }
+  public static void ValidateVersion() { FlatBufferConstants.FLATBUFFERS_24_3_25(); }
+  public static SC_SpellEffectAnimation GetRootAsSC_SpellEffectAnimation(ByteBuffer _bb) { return GetRootAsSC_SpellEffectAnimation(_bb, new SC_SpellEffectAnimation()); }
+  public static SC_SpellEffectAnimation GetRootAsSC_SpellEffectAnimation(ByteBuffer _bb, SC_SpellEffectAnimation obj) { return (obj.__assign(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
+  public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
+  public SC_SpellEffectAnimation __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
+
+  public ushort Casterobjectid { get { int o = __p.__offset(4); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public ushort Spellid { get { int o = __p.__offset(6); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public ushort Spelltarget { get { int o = __p.__offset(8); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public ushort Bolttime { get { int o = __p.__offset(10); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public bool Nosound { get { int o = __p.__offset(12); return o != 0 ? 0!=__p.bb.Get(o + __p.bb_pos) : (bool)false; } }
+  public bool Success { get { int o = __p.__offset(14); return o != 0 ? 0!=__p.bb.Get(o + __p.bb_pos) : (bool)false; } }
+
+  public static Offset<NetworkMessage.SC_SpellEffectAnimation> CreateSC_SpellEffectAnimation(FlatBufferBuilder builder,
+      ushort casterobjectid = 0,
+      ushort spellid = 0,
+      ushort spelltarget = 0,
+      ushort bolttime = 0,
+      bool nosound = false,
+      bool success = false) {
+    builder.StartTable(6);
+    SC_SpellEffectAnimation.AddBolttime(builder, bolttime);
+    SC_SpellEffectAnimation.AddSpelltarget(builder, spelltarget);
+    SC_SpellEffectAnimation.AddSpellid(builder, spellid);
+    SC_SpellEffectAnimation.AddCasterobjectid(builder, casterobjectid);
+    SC_SpellEffectAnimation.AddSuccess(builder, success);
+    SC_SpellEffectAnimation.AddNosound(builder, nosound);
+    return SC_SpellEffectAnimation.EndSC_SpellEffectAnimation(builder);
+  }
+
+  public static void StartSC_SpellEffectAnimation(FlatBufferBuilder builder) { builder.StartTable(6); }
+  public static void AddCasterobjectid(FlatBufferBuilder builder, ushort casterobjectid) { builder.AddUshort(0, casterobjectid, 0); }
+  public static void AddSpellid(FlatBufferBuilder builder, ushort spellid) { builder.AddUshort(1, spellid, 0); }
+  public static void AddSpelltarget(FlatBufferBuilder builder, ushort spelltarget) { builder.AddUshort(2, spelltarget, 0); }
+  public static void AddBolttime(FlatBufferBuilder builder, ushort bolttime) { builder.AddUshort(3, bolttime, 0); }
+  public static void AddNosound(FlatBufferBuilder builder, bool nosound) { builder.AddBool(4, nosound, false); }
+  public static void AddSuccess(FlatBufferBuilder builder, bool success) { builder.AddBool(5, success, false); }
+  public static Offset<NetworkMessage.SC_SpellEffectAnimation> EndSC_SpellEffectAnimation(FlatBufferBuilder builder) {
+    int o = builder.EndTable();
+    return new Offset<NetworkMessage.SC_SpellEffectAnimation>(o);
+  }
+  public SC_SpellEffectAnimation_FBS UnPack() {
+    var _o = new SC_SpellEffectAnimation_FBS();
+    this.UnPackTo(_o);
+    return _o;
+  }
+  public void UnPackTo(SC_SpellEffectAnimation_FBS _o) {
+    _o.Casterobjectid = this.Casterobjectid;
+    _o.Spellid = this.Spellid;
+    _o.Spelltarget = this.Spelltarget;
+    _o.Bolttime = this.Bolttime;
+    _o.Nosound = this.Nosound;
+    _o.Success = this.Success;
+  }
+  public static Offset<NetworkMessage.SC_SpellEffectAnimation> Pack(FlatBufferBuilder builder, SC_SpellEffectAnimation_FBS _o) {
+    if (_o == null) return default(Offset<NetworkMessage.SC_SpellEffectAnimation>);
+    return CreateSC_SpellEffectAnimation(
+      builder,
+      _o.Casterobjectid,
+      _o.Spellid,
+      _o.Spelltarget,
+      _o.Bolttime,
+      _o.Nosound,
+      _o.Success);
+  }
+}
+
+public class SC_SpellEffectAnimation_FBS
+{
+  public ushort Casterobjectid { get; set; }
+  public ushort Spellid { get; set; }
+  public ushort Spelltarget { get; set; }
+  public ushort Bolttime { get; set; }
+  public bool Nosound { get; set; }
+  public bool Success { get; set; }
+
+  public SC_SpellEffectAnimation_FBS() {
+    this.Casterobjectid = 0;
+    this.Spellid = 0;
+    this.Spelltarget = 0;
+    this.Bolttime = 0;
+    this.Nosound = false;
+    this.Success = false;
+  }
+}
+
+
+static public class SC_SpellEffectAnimationVerify
+{
+  static public bool Verify(Google.FlatBuffers.Verifier verifier, uint tablePos)
+  {
+    return verifier.VerifyTableStart(tablePos)
+      && verifier.VerifyField(tablePos, 4 /*Casterobjectid*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 6 /*Spellid*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 8 /*Spelltarget*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 10 /*Bolttime*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 12 /*Nosound*/, 1 /*bool*/, 1, false)
+      && verifier.VerifyField(tablePos, 14 /*Success*/, 1 /*bool*/, 1, false)
+      && verifier.VerifyTableEnd(tablePos);
+  }
+}
+public struct SC_EmoteAnimation : IFlatbufferObject
+{
+  private Table __p;
+  public ByteBuffer ByteBuffer { get { return __p.bb; } }
+  public static void ValidateVersion() { FlatBufferConstants.FLATBUFFERS_24_3_25(); }
+  public static SC_EmoteAnimation GetRootAsSC_EmoteAnimation(ByteBuffer _bb) { return GetRootAsSC_EmoteAnimation(_bb, new SC_EmoteAnimation()); }
+  public static SC_EmoteAnimation GetRootAsSC_EmoteAnimation(ByteBuffer _bb, SC_EmoteAnimation obj) { return (obj.__assign(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
+  public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
+  public SC_EmoteAnimation __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
+
+  public ushort Objectid { get { int o = __p.__offset(4); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public byte Emote { get { int o = __p.__offset(6); return o != 0 ? __p.bb.Get(o + __p.bb_pos) : (byte)0; } }
+
+  public static Offset<NetworkMessage.SC_EmoteAnimation> CreateSC_EmoteAnimation(FlatBufferBuilder builder,
+      ushort objectid = 0,
+      byte emote = 0) {
+    builder.StartTable(2);
+    SC_EmoteAnimation.AddObjectid(builder, objectid);
+    SC_EmoteAnimation.AddEmote(builder, emote);
+    return SC_EmoteAnimation.EndSC_EmoteAnimation(builder);
+  }
+
+  public static void StartSC_EmoteAnimation(FlatBufferBuilder builder) { builder.StartTable(2); }
+  public static void AddObjectid(FlatBufferBuilder builder, ushort objectid) { builder.AddUshort(0, objectid, 0); }
+  public static void AddEmote(FlatBufferBuilder builder, byte emote) { builder.AddByte(1, emote, 0); }
+  public static Offset<NetworkMessage.SC_EmoteAnimation> EndSC_EmoteAnimation(FlatBufferBuilder builder) {
+    int o = builder.EndTable();
+    return new Offset<NetworkMessage.SC_EmoteAnimation>(o);
+  }
+  public SC_EmoteAnimation_FBS UnPack() {
+    var _o = new SC_EmoteAnimation_FBS();
+    this.UnPackTo(_o);
+    return _o;
+  }
+  public void UnPackTo(SC_EmoteAnimation_FBS _o) {
+    _o.Objectid = this.Objectid;
+    _o.Emote = this.Emote;
+  }
+  public static Offset<NetworkMessage.SC_EmoteAnimation> Pack(FlatBufferBuilder builder, SC_EmoteAnimation_FBS _o) {
+    if (_o == null) return default(Offset<NetworkMessage.SC_EmoteAnimation>);
+    return CreateSC_EmoteAnimation(
+      builder,
+      _o.Objectid,
+      _o.Emote);
+  }
+}
+
+public class SC_EmoteAnimation_FBS
+{
+  public ushort Objectid { get; set; }
+  public byte Emote { get; set; }
+
+  public SC_EmoteAnimation_FBS() {
+    this.Objectid = 0;
+    this.Emote = 0;
+  }
+}
+
+
+static public class SC_EmoteAnimationVerify
+{
+  static public bool Verify(Google.FlatBuffers.Verifier verifier, uint tablePos)
+  {
+    return verifier.VerifyTableStart(tablePos)
+      && verifier.VerifyField(tablePos, 4 /*Objectid*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 6 /*Emote*/, 1 /*byte*/, 1, false)
+      && verifier.VerifyTableEnd(tablePos);
+  }
+}
 public struct SC_ConcentrationList : IFlatbufferObject
 {
   private Table __p;
@@ -1398,8 +2443,8 @@ public struct SC_StringMessage : IFlatbufferObject
   public SC_StringMessage __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
   public int Seesionid { get { int o = __p.__offset(4); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
-  public NetworkMessage.eChatType Chattype { get { int o = __p.__offset(6); return o != 0 ? (NetworkMessage.eChatType)__p.bb.GetSbyte(o + __p.bb_pos) : NetworkMessage.eChatType.CT_System; } }
-  public NetworkMessage.eChatLoc Chatloc { get { int o = __p.__offset(8); return o != 0 ? (NetworkMessage.eChatLoc)__p.bb.GetSbyte(o + __p.bb_pos) : NetworkMessage.eChatLoc.CL_ChatWindow; } }
+  public NetworkMessage.eChatType Chattype { get { int o = __p.__offset(6); return o != 0 ? (NetworkMessage.eChatType)__p.bb.Get(o + __p.bb_pos) : NetworkMessage.eChatType.CT_System; } }
+  public NetworkMessage.eChatLoc Chatloc { get { int o = __p.__offset(8); return o != 0 ? (NetworkMessage.eChatLoc)__p.bb.Get(o + __p.bb_pos) : NetworkMessage.eChatLoc.CL_ChatWindow; } }
   public string Message { get { int o = __p.__offset(10); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
 #if ENABLE_SPAN_T
   public Span<byte> GetMessageBytes() { return __p.__vector_as_span<byte>(10, 1); }
@@ -1423,8 +2468,8 @@ public struct SC_StringMessage : IFlatbufferObject
 
   public static void StartSC_StringMessage(FlatBufferBuilder builder) { builder.StartTable(4); }
   public static void AddSeesionid(FlatBufferBuilder builder, int seesionid) { builder.AddInt(0, seesionid, 0); }
-  public static void AddChattype(FlatBufferBuilder builder, NetworkMessage.eChatType chattype) { builder.AddSbyte(1, (sbyte)chattype, 0); }
-  public static void AddChatloc(FlatBufferBuilder builder, NetworkMessage.eChatLoc chatloc) { builder.AddSbyte(2, (sbyte)chatloc, 0); }
+  public static void AddChattype(FlatBufferBuilder builder, NetworkMessage.eChatType chattype) { builder.AddByte(1, (byte)chattype, 0); }
+  public static void AddChatloc(FlatBufferBuilder builder, NetworkMessage.eChatLoc chatloc) { builder.AddByte(2, (byte)chatloc, 0); }
   public static void AddMessage(FlatBufferBuilder builder, StringOffset messageOffset) { builder.AddOffset(3, messageOffset.Value, 0); }
   public static Offset<NetworkMessage.SC_StringMessage> EndSC_StringMessage(FlatBufferBuilder builder) {
     int o = builder.EndTable();
@@ -1491,8 +2536,8 @@ public struct SC_DialogBoxMessage : IFlatbufferObject
   public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
   public SC_DialogBoxMessage __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
-  public NetworkMessage.eDialogCode Code { get { int o = __p.__offset(4); return o != 0 ? (NetworkMessage.eDialogCode)__p.bb.GetSbyte(o + __p.bb_pos) : NetworkMessage.eDialogCode.SimpleWarning; } }
-  public NetworkMessage.eDialogType Type { get { int o = __p.__offset(6); return o != 0 ? (NetworkMessage.eDialogType)__p.bb.GetSbyte(o + __p.bb_pos) : NetworkMessage.eDialogType.Ok; } }
+  public NetworkMessage.eDialogCode Code { get { int o = __p.__offset(4); return o != 0 ? (NetworkMessage.eDialogCode)__p.bb.Get(o + __p.bb_pos) : NetworkMessage.eDialogCode.SimpleWarning; } }
+  public NetworkMessage.eDialogType Type { get { int o = __p.__offset(6); return o != 0 ? (NetworkMessage.eDialogType)__p.bb.Get(o + __p.bb_pos) : NetworkMessage.eDialogType.Ok; } }
   public bool Autowraptext { get { int o = __p.__offset(8); return o != 0 ? 0!=__p.bb.Get(o + __p.bb_pos) : (bool)false; } }
   public ushort Data1 { get { int o = __p.__offset(10); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
   public ushort Data2 { get { int o = __p.__offset(12); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
@@ -1528,8 +2573,8 @@ public struct SC_DialogBoxMessage : IFlatbufferObject
   }
 
   public static void StartSC_DialogBoxMessage(FlatBufferBuilder builder) { builder.StartTable(8); }
-  public static void AddCode(FlatBufferBuilder builder, NetworkMessage.eDialogCode code) { builder.AddSbyte(0, (sbyte)code, 0); }
-  public static void AddType(FlatBufferBuilder builder, NetworkMessage.eDialogType type) { builder.AddSbyte(1, (sbyte)type, 0); }
+  public static void AddCode(FlatBufferBuilder builder, NetworkMessage.eDialogCode code) { builder.AddByte(0, (byte)code, 0); }
+  public static void AddType(FlatBufferBuilder builder, NetworkMessage.eDialogType type) { builder.AddByte(1, (byte)type, 0); }
   public static void AddAutowraptext(FlatBufferBuilder builder, bool autowraptext) { builder.AddBool(2, autowraptext, false); }
   public static void AddData1(FlatBufferBuilder builder, ushort data1) { builder.AddUshort(3, data1, 0); }
   public static void AddData2(FlatBufferBuilder builder, ushort data2) { builder.AddUshort(4, data2, 0); }
