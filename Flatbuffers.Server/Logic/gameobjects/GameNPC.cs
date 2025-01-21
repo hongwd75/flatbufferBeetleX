@@ -3815,14 +3815,6 @@ namespace Game.Logic
 		/// </summary>
 		public override int AttackCriticalChance(InventoryItem weapon)
 		{
-			if (m_activeWeaponSlot == eActiveWeaponSlot.Distance)
-			{
-				if (RangedAttackType == eRangedAttackType.Critical)
-					return 0; // no crit damage for crit shots
-				else
-					return GetModified(eProperty.CriticalArcheryHitChance);
-			}
-
 			return GetModified(eProperty.CriticalMeleeHitChance);
 		}
 

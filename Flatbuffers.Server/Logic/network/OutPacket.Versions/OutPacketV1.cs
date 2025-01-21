@@ -324,13 +324,27 @@ namespace Game.Logic.network
 
         public override void SendSpellCastAnimation(GameLiving spellCaster, ushort spellID, ushort castingTime)
         {
-            
+            SC_SpellCastAnimation_FBS req = new SC_SpellCastAnimation_FBS()
+            {
+                Objectid = (ushort)spellCaster.ObjectID,
+                Spellid = spellID,
+                Castingtime = castingTime
+            };
+            SendFlatBufferPacket(ServerPackets.SC_SpellCastAnimation, req);
         }
 
-        public override void SendSpellEffectAnimation(GameObject spellCaster, GameObject spellTarget, ushort spellid,
-            ushort boltTime, bool noSound, byte success)
+        public override void SendSpellEffectAnimation(GameObject spellCaster, GameObject spellTarget, ushort spellid, ushort boltTime, bool noSound, byte success)
         {
-            
+            SC_SpellEffectAnimation_FBS req = new SC_SpellEffectAnimation_FBS()
+            {
+                Casterobjectid = (ushort)spellCaster.ObjectID,
+                Spellid = spellid,
+                Spelltarget = spellTarget == null ? (ushort)0 : (ushort)spellTarget.ObjectID,
+                Bolttime = boltTime,
+                Nosound = noSound,
+                Success = (bool) (success != 0)
+            };
+            SendFlatBufferPacket(ServerPackets.SC_SpellEffectAnimation, req);            
         }
         public override void SendEmoteAnimation(GameObject obj, eEmote emote)
         {

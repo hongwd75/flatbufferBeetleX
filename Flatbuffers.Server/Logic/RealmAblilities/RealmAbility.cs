@@ -193,17 +193,17 @@ public class TimedRealmAbility : RealmAbility
 	/// </summary>
 	protected virtual void SendCastMessage(GameLiving caster)
 	{
-		foreach (GamePlayer player in caster.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+		foreach (GamePlayer player in caster.GetPlayersInRadius(WorldManager.VISIBILITY_DISTANCE))
 		{
-			if ( caster.IsWithinRadius( player, WorldMgr.INFO_DISTANCE ) )
+			if ( caster.IsWithinRadius( player, WorldManager.INFO_DISTANCE ) )
 			{
 				if (player == caster)
 				{
-					player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility.SendCastMessage.YouCast", m_name), eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+					player.Out.SendMessage(LanguageMgr.GetTranslation(player.Network.Account.Language, "RealmAbility.SendCastMessage.YouCast", m_name), eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
 				}
 				else
 				{
-					player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility.SendCastMessage.PlayerCasts", player.Name), eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+					player.Out.SendMessage(LanguageMgr.GetTranslation(player.Network.Account.Language, "RealmAbility.SendCastMessage.PlayerCasts", player.Name), eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
 				}
 			}
 		}
@@ -223,7 +223,7 @@ public class TimedRealmAbility : RealmAbility
 		{
 			if (player != null)
 			{
-				player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility..CheckPreconditions.Dead"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+				player.Out.SendMessage(LanguageMgr.GetTranslation(player.Network.Account.Language, "RealmAbility..CheckPreconditions.Dead"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 			}
 			return true;
 		}
@@ -231,7 +231,7 @@ public class TimedRealmAbility : RealmAbility
 		{
 			if (player != null)
 			{
-				player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility..CheckPreconditions.Mesmerized"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+				player.Out.SendMessage(LanguageMgr.GetTranslation(player.Network.Account.Language, "RealmAbility..CheckPreconditions.Mesmerized"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 			}
 			return true;
 		}
@@ -239,7 +239,7 @@ public class TimedRealmAbility : RealmAbility
 		{
 			if (player != null)
 			{
-				player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility..CheckPreconditions.Stunned"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+				player.Out.SendMessage(LanguageMgr.GetTranslation(player.Network.Account.Language, "RealmAbility..CheckPreconditions.Stunned"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 			}
 			return true;
 		}
@@ -247,7 +247,7 @@ public class TimedRealmAbility : RealmAbility
 		{
 			if (player != null)
 			{
-				player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility..CheckPreconditions.Sitting"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+				player.Out.SendMessage(LanguageMgr.GetTranslation(player.Network.Account.Language, "RealmAbility..CheckPreconditions.Sitting"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 			}
 			return true;
 		}
@@ -255,7 +255,7 @@ public class TimedRealmAbility : RealmAbility
 		{
 			if (player != null)
 			{
-				player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility..CheckPreconditions.Combat"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+				player.Out.SendMessage(LanguageMgr.GetTranslation(player.Network.Account.Language, "RealmAbility..CheckPreconditions.Combat"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 			}
 			return true;
 		}
@@ -263,7 +263,7 @@ public class TimedRealmAbility : RealmAbility
 		{
 			if (player != null)
 			{
-				player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility..CheckPreconditions.BeInCombat"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+				player.Out.SendMessage(LanguageMgr.GetTranslation(player.Network.Account.Language, "RealmAbility..CheckPreconditions.BeInCombat"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 			}
 			return true;
 		}
@@ -271,13 +271,13 @@ public class TimedRealmAbility : RealmAbility
 		{
 			if (player != null)
 			{
-				player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility..CheckPreconditions.Stealthed"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+				player.Out.SendMessage(LanguageMgr.GetTranslation(player.Network.Account.Language, "RealmAbility..CheckPreconditions.Stealthed"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 			}
 			return true;
 		}
-		if (player != null && (bitmask & NOTINGROUP) != 0 && player.Group == null)
+		if (player != null && (bitmask & NOTINGROUP) != 0)
 		{
-			player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "RealmAbility..CheckPreconditions.BeInGroup"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+			player.Out.SendMessage(LanguageMgr.GetTranslation(player.Network.Account.Language, "RealmAbility..CheckPreconditions.BeInGroup"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 			return true;
 		}
 		return false;
@@ -318,23 +318,23 @@ public class L5RealmAbility : RealmAbility
 
 	public override int CostForUpgrade(int level)
 	{
-		if (ServerProperties.Properties.USE_NEW_PASSIVES_RAS_SCALING)
-		{
-			switch (level)
-			{
-					case 0: return 1;
-					case 1: return 1;
-					case 2: return 2;
-					case 3: return 3;
-					case 4: return 3;
-					case 5: return 5;
-					case 6: return 5;
-					case 7: return 7;
-					case 8: return 7;
-					default: return 1000;
-			}
-		}
-		else
+		// if (ServerProperties.Properties.USE_NEW_PASSIVES_RAS_SCALING)
+		// {
+		// 	switch (level)
+		// 	{
+		// 			case 0: return 1;
+		// 			case 1: return 1;
+		// 			case 2: return 2;
+		// 			case 3: return 3;
+		// 			case 4: return 3;
+		// 			case 5: return 5;
+		// 			case 6: return 5;
+		// 			case 7: return 7;
+		// 			case 8: return 7;
+		// 			default: return 1000;
+		// 	}
+		// }
+		// else
 		{
 			switch (level)
 			{
@@ -350,11 +350,11 @@ public class L5RealmAbility : RealmAbility
 
 	public override bool CheckRequirement(GamePlayer player)
 	{
-		if (ServerProperties.Properties.USE_NEW_PASSIVES_RAS_SCALING)
-		{
-			return Level <= 9;
-		}
-		else
+		// if (ServerProperties.Properties.USE_NEW_PASSIVES_RAS_SCALING)
+		// {
+		// 	return Level <= 9;
+		// }
+		// else
 		{
 			return Level <= 5;
 		}
@@ -364,11 +364,11 @@ public class L5RealmAbility : RealmAbility
 	{
 		get
 		{
-			if (ServerProperties.Properties.USE_NEW_PASSIVES_RAS_SCALING)
-			{
-				return 9;
-			}
-			else
+			// if (ServerProperties.Properties.USE_NEW_PASSIVES_RAS_SCALING)
+			// {
+			// 	return 9;
+			// }
+			// else
 			{
 				return 5;
 			}

@@ -1943,23 +1943,10 @@ public class SkillBase
 			                                                                      "SkillBase.RegisterPropertyNames.WeaponSkill"));
 			m_propertyNames.Add(eProperty.AllSkills, LanguageMgr.GetTranslation(ServerProperties.Properties.DB_LANGUAGE,
 			                                                                    "SkillBase.RegisterPropertyNames.AllSkills"));
-			m_propertyNames.Add(eProperty.CriticalArcheryHitChance, LanguageMgr.GetTranslation(ServerProperties.Properties.DB_LANGUAGE, "SkillBase.RegisterPropertyNames.CriticalArcheryHit"));
 			m_propertyNames.Add(eProperty.CriticalMeleeHitChance, LanguageMgr.GetTranslation(ServerProperties.Properties.DB_LANGUAGE, "SkillBase.RegisterPropertyNames.CriticalMeleeHit"));
 			m_propertyNames.Add(eProperty.CriticalSpellHitChance, LanguageMgr.GetTranslation(ServerProperties.Properties.DB_LANGUAGE, "SkillBase.RegisterPropertyNames.CriticalSpellHit"));
 			m_propertyNames.Add(eProperty.CriticalHealHitChance, LanguageMgr.GetTranslation(ServerProperties.Properties.DB_LANGUAGE, "SkillBase.RegisterPropertyNames.CriticalHealHit"));
-			
-            //Forsaken Worlds: Mythical Stat Cap
-            m_propertyNames.Add(eProperty.MythicalStrCapBonus, "Mythical Stat Cap (Strength)");
-			m_propertyNames.Add(eProperty.MythicalDexCapBonus, "Mythical Stat Cap (Dexterity)");
-			m_propertyNames.Add(eProperty.MythicalConCapBonus, "Mythical Stat Cap (Constitution)");
-			m_propertyNames.Add(eProperty.MythicalQuiCapBonus, "Mythical Stat Cap (Quickness)");
-			m_propertyNames.Add(eProperty.MythicalIntCapBonus, "Mythical Stat Cap (Intelligence)");
-			m_propertyNames.Add(eProperty.MythicalPieCapBonus, "Mythical Stat Cap (Piety)");
-			m_propertyNames.Add(eProperty.MythicalChaCapBonus, "Mythical Stat Cap (Charisma)");
-			m_propertyNames.Add(eProperty.MythicalEmpCapBonus, "Mythical Stat Cap (Empathy)");
-			m_propertyNames.Add(eProperty.MythicalAcuCapBonus, "Mythical Stat Cap (Acuity)");
-
-            #endregion
+			#endregion
 		}
 
 		#endregion

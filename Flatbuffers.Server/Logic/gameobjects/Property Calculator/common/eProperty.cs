@@ -8,7 +8,7 @@ public enum eBuffBonusType : byte
     SpecBuff,
     ItemBonus,
     AbilityBonus,
-    BuffBonus,
+    BuffBonus,              //BuffBonusCategory4
     MaxBonusType
 }
 
@@ -114,30 +114,34 @@ public enum eProperty : byte
     Resist_Natural = 75,
     WeaponSkill = 76,
     CriticalMeleeHitChance = 77,
-    CriticalArcheryHitChance = 78,
-    CriticalSpellHitChance = 79,
-    WaterSpeed = 80,
-    SpellLevel = 81,
-    MissHit = 82,
-    DPS = 83,
+    CriticalSpellHitChance = 78,
+    CriticalHealHitChance = 79,
+    AllSkills = 80,
+    WaterSpeed = 81,
+    SpellLevel = 82,
+    MissHit = 83,
+    DPS = 84,
     #region TOA
     //TOA
-    ToABonus_First = 84,
-    BuffEffectiveness = 85,
-    CastingSpeed = 86,
-    DebuffEffectivness = 87,
-    HealingEffectiveness = 88,
-    PowerPool = 89,
-    ResistPierce = 90,
-    SpellDamage = 91,
-    SpellDuration = 92,
-    StyleDamage = 93,
-    ToABonus_Last = 94,
+    ToABonus_First = 85,
+    BuffEffectiveness = 86,
+    CastingSpeed = 87,
+    DebuffEffectivness = 88,
+    HealingEffectiveness = 89,
+    PowerPool = 90,
+    ResistPierce = 91,
+    SpellDamage = 92,
+    SpellDuration = 93,
+    StyleDamage = 94,
+    ToABonus_Last = 95,
     #endregion    
-    StyleAbsorb = 95,
-
+    StyleAbsorb = 96,
+    LivingEffectiveLevel = 97,
+    
     #region === SKILLS ===
+    Skill_First = 100,
     Skill_Stealth = 100,
+    Skill_Last = 200,
     #endregion
     
     MaxProperty = 255

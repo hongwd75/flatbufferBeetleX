@@ -531,14 +531,12 @@ public class SpellHandler : ISpellHandler
 		{
 			if (Spell.Uninterruptible)
 				return false;
-			if (Caster.EffectList.CountOfType(typeof(QuickCastEffect), typeof(MasteryofConcentrationEffect), typeof(FacilitatePainworkingEffect)) > 0)
+			if (Caster.EffectList.CountOfType(typeof(QuickCastEffect)) > 0)
 				return false;
 			if (IsCasting && Stage < 2)
 			{
 				if (Caster.ChanceSpellInterrupt(attacker))
 				{
-					Caster.LastInterruptMessage = attacker.GetName(0, true) + " attacks you and your spell is interrupted!";
-					MessageToLiving(Caster, Caster.LastInterruptMessage, eChatType.CT_SpellResisted);
 					InterruptCasting(); // always interrupt at the moment
 					return true;
 				}
@@ -578,20 +576,7 @@ public class SpellHandler : ISpellHandler
 
 				if (nextSpellAvailTime > m_caster.CurrentRegion.Time)
 				{
-					((GamePlayer)m_caster).Out.SendMessage(LanguageMgr.GetTranslation(((GamePlayer)m_caster).Client, "GamePlayer.CastSpell.MustWaitBeforeCast", (nextSpellAvailTime - m_caster.CurrentRegion.Time) / 1000), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-					return false;
-				}
-				if (((GamePlayer)m_caster).Steed != null && ((GamePlayer)m_caster).Steed is GameSiegeRam)
-				{
-					if (!quiet) MessageToCaster("You can't cast in a siegeram!.", eChatType.CT_System);
-					return false;
-				}
-				GameSpellEffect naturesWomb = FindEffectOnTarget(Caster, typeof(NaturesWombEffect));
-				if (naturesWomb != null)
-				{
-					//[StephenxPimentel]
-					//Get Correct Message for 1.108 update.
-					MessageToCaster("You are silenced and cannot cast a spell right now.", eChatType.CT_SpellResisted);
+					((GamePlayer)m_caster).Out.SendMessage(LanguageMgr.GetTranslation(((GamePlayer)m_caster).Network, "GamePlayer.CastSpell.MustWaitBeforeCast", (nextSpellAvailTime - m_caster.CurrentRegion.Time) / 1000), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 					return false;
 				}
 			}
@@ -601,23 +586,6 @@ public class SpellHandler : ISpellHandler
 			{
 				if (!quiet) MessageToCaster("You're phaseshifted and can't cast a spell", eChatType.CT_System);
 				return false;
-			}
-
-			// Apply Mentalist RA5L
-			if (Spell.Range > 0)
-			{
-				SelectiveBlindnessEffect SelectiveBlindness = Caster.EffectList.GetOfType<SelectiveBlindnessEffect>();
-				if (SelectiveBlindness != null)
-				{
-					GameLiving EffectOwner = SelectiveBlindness.EffectSource;
-					if (EffectOwner == selectedTarget)
-					{
-						if (m_caster is GamePlayer && !quiet)
-							((GamePlayer)m_caster).Out.SendMessage(string.Format("{0} is invisible to you!", selectedTarget.GetName(0, true)), eChatType.CT_Missed, eChatLoc.CL_SystemWindow);
-
-						return false;
-					}
-				}
 			}
 
 			if (selectedTarget != null && selectedTarget.HasAbility("DamageImmunity") && Spell.SpellType == "DirectDamage" && Spell.Radius == 0)
@@ -652,8 +620,7 @@ public class SpellHandler : ISpellHandler
 				}
 			}
 
-			if (!m_spell.Uninterruptible && m_spell.CastTime > 0 && m_caster is GamePlayer &&
-				m_caster.EffectList.GetOfType<QuickCastEffect>() == null && m_caster.EffectList.GetOfType<MasteryofConcentrationEffect>() == null)
+			if (!m_spell.Uninterruptible && m_spell.CastTime > 0 && m_caster is GamePlayer && m_caster.EffectList.GetOfType<QuickCastEffect>() == null)
 			{
 				if (Caster.InterruptAction > 0 && Caster.InterruptAction + Caster.SpellInterruptRecastTime > Caster.CurrentRegion.Time)
 				{
@@ -667,15 +634,7 @@ public class SpellHandler : ISpellHandler
 				int left = m_caster.GetSkillDisabledDuration(m_spell);
 				if (left > 0)
 				{
-					if (m_caster is NecromancerPet && ((m_caster as NecromancerPet).Owner as GamePlayer).Client.Account.PrivLevel > (int)ePrivLevel.Player)
-					{
-						// Ignore Recast Timer
-					}
-					else
-					{
-						if (!quiet) MessageToCaster("You must wait " + (left / 1000 + 1).ToString() + " seconds to use this spell!", eChatType.CT_System);
-						return false;
-					}
+					return false;
 				}
 			}
 
@@ -705,12 +664,8 @@ public class SpellHandler : ISpellHandler
 					if (!quiet) MessageToCaster("Your area target is out of range.  Select a closer target.", eChatType.CT_SpellResisted);
 					return false;
 				}
-				if (!Caster.GroundTargetInView)
-				{
-					MessageToCaster("Your ground target is not in view!", eChatType.CT_SpellResisted);
-					return false;
-				}
 			}
+			
 			else if (targetType != "self" && targetType != "group" && targetType != "pet"
 					 && targetType != "controlled" && targetType != "cone" && m_spell.Range > 0)
 			{
@@ -740,13 +695,7 @@ public class SpellHandler : ISpellHandler
 							if (!quiet) MessageToCaster("You can't attack yourself! ", eChatType.CT_System);
 							return false;
 						}
-
-						if (FindStaticEffectOnTarget(selectedTarget, typeof(NecromancerShadeEffect)) != null)
-						{
-							if (!quiet) MessageToCaster("Invalid target.", eChatType.CT_System);
-							return false;
-						}
-
+						
 						if (m_spell.SpellType == "Charm" && m_spell.CastTime == 0 && m_spell.Pulse != 0)
 							break;
 
@@ -785,8 +734,7 @@ public class SpellHandler : ISpellHandler
 						}
 						break;
 				}
-
-				//heals/buffs/rez need LOS only to start casting, TargetInView only works if selectedTarget == TargetObject
+				
 				if (selectedTarget == Caster.TargetObject && !m_caster.TargetInView && m_spell.Target.ToLower() != "pet")
 				{
 					if (!quiet) MessageToCaster("Your target is not in visible!", eChatType.CT_SpellResisted);
@@ -802,7 +750,7 @@ public class SpellHandler : ISpellHandler
 			}
 
 			//Ryan: don't want mobs to have reductions in mana
-			if (Spell.Power != 0 && m_caster is GamePlayer && (m_caster as GamePlayer).CharacterClass.ID != (int)eCharacterClass.Savage && m_caster.Mana < PowerCost(selectedTarget) && Spell.SpellType != "Archery")
+			if (Spell.Power != 0 && m_caster is GamePlayer && m_caster.Mana < PowerCost(selectedTarget) && Spell.SpellType != "Archery")
 			{
 				if (!quiet) MessageToCaster("You don't have enough power to cast that!", eChatType.CT_SpellResisted);
 				return false;
@@ -820,16 +768,6 @@ public class SpellHandler : ISpellHandler
 				{
 					if (!quiet) MessageToCaster("You can only cast up to 50 simultaneous concentration spells!", eChatType.CT_SpellResisted);
 					return false;
-				}
-			}
-
-			// Cancel engage if user starts attack
-			if (m_caster.IsEngaging)
-			{
-				EngageEffect engage = m_caster.EffectList.GetOfType<EngageEffect>();
-				if (engage != null)
-				{
-					engage.Cancel(false);
 				}
 			}
 
@@ -890,12 +828,6 @@ public class SpellHandler : ISpellHandler
 			if ((response & 0x100) == 0x100) // In view?
 				return;
 
-			if (ServerProperties.Properties.ENABLE_DEBUG)
-			{
-				MessageToCaster("LoS Interrupt in CheckLOSPlayerToTarget", eChatType.CT_System);
-				log.Debug("LoS Interrupt in CheckLOSPlayerToTarget");
-			}
-
 			if (Caster is GamePlayer)
 			{
 				MessageToCaster("You can't see your target from here!", eChatType.CT_SpellResisted);
@@ -921,13 +853,7 @@ public class SpellHandler : ISpellHandler
 
 			if ((response & 0x100) == 0x100) // In view?
 				return;
-
-			if (ServerProperties.Properties.ENABLE_DEBUG)
-			{
-				MessageToCaster("LoS Interrupt in CheckLOSNPCToTarget", eChatType.CT_System);
-				log.Debug("LoS Interrupt in CheckLOSNPCToTarget");
-			}
-
+			
 			InterruptCasting();
 		}
 		/// <summary>
@@ -1093,16 +1019,10 @@ public class SpellHandler : ISpellHandler
 				return false;
 			}
 
-			if (!m_spell.Uninterruptible && m_spell.CastTime > 0 && m_caster is GamePlayer &&
-				m_caster.EffectList.GetOfType<QuickCastEffect>() == null && m_caster.EffectList.GetOfType<MasteryofConcentrationEffect>() == null)
+			if (!m_spell.Uninterruptible && m_spell.CastTime > 0 && m_caster is GamePlayer && m_caster.EffectList.GetOfType<QuickCastEffect>() == null)
 			{
 				if (Caster.InterruptTime > 0 && Caster.InterruptTime > m_started)
 				{
-					if (!quiet)
-					{
-						if (Caster.LastInterruptMessage != "") MessageToCaster(Caster.LastInterruptMessage, eChatType.CT_SpellResisted);
-						else MessageToCaster("You are interrupted and must wait " + ((Caster.InterruptTime - m_started) / 1000 + 1).ToString() + " seconds to cast a spell!", eChatType.CT_SpellResisted);
-					}
 					return false;
 				}
 			}
@@ -1297,16 +1217,10 @@ public class SpellHandler : ISpellHandler
 				return false;
 			}
 
-			if (!m_spell.Uninterruptible && m_spell.CastTime > 0 && m_caster is GamePlayer &&
-				m_caster.EffectList.GetOfType<QuickCastEffect>() == null && m_caster.EffectList.GetOfType<MasteryofConcentrationEffect>() == null)
+			if (!m_spell.Uninterruptible && m_spell.CastTime > 0 && m_caster is GamePlayer && m_caster.EffectList.GetOfType<QuickCastEffect>() == null)
 			{
 				if (Caster.InterruptTime > 0 && Caster.InterruptTime > m_started)
 				{
-					if (!quiet)
-					{
-						if (Caster.LastInterruptMessage != "") MessageToCaster(Caster.LastInterruptMessage, eChatType.CT_SpellResisted);
-						else MessageToCaster("You are interrupted and must wait " + ((Caster.InterruptTime - m_started) / 1000 + 1).ToString() + " seconds to cast a spell!", eChatType.CT_SpellResisted);
-					}
 					Caster.InterruptAction = Caster.CurrentRegion.Time - Caster.SpellInterruptRecastAgain;
 					return false;
 				}
@@ -1344,11 +1258,6 @@ public class SpellHandler : ISpellHandler
 				if (m_caster.Coordinate.DistanceTo(m_caster.GroundTargetPosition) > CalculateSpellRange())
 				{
 					if (!quiet) MessageToCaster("Your area target is out of range.  Select a closer target.", eChatType.CT_SpellResisted);
-					return false;
-				}
-				if (!Caster.GroundTargetInView)
-				{
-					MessageToCaster("Your ground target is not in view!", eChatType.CT_SpellResisted);
 					return false;
 				}
 			}
@@ -1469,36 +1378,12 @@ public class SpellHandler : ISpellHandler
 		/// <returns></returns>
 		public virtual int PowerCost(GameLiving target)
 		{
-			// warlock
 			GameSpellEffect effect = SpellHandler.FindEffectOnTarget(m_caster, "Powerless");
 			if (effect != null && !m_spell.IsPrimary)
 				return 0;
+			
+			double basepower = m_spell.Power;
 
-			//1.108 - Valhallas Blessing now has a 75% chance to not use power.
-			ValhallasBlessingEffect ValhallasBlessing = m_caster.EffectList.GetOfType<ValhallasBlessingEffect>();
-			if (ValhallasBlessing != null && Util.Chance(75))
-				return 0;
-
-			//patch 1.108 increases the chance to not use power to 50%.
-			FungalUnionEffect FungalUnion = m_caster.EffectList.GetOfType<FungalUnionEffect>();
-			{
-				if (FungalUnion != null && Util.Chance(50))
-					return 0;
-			}
-
-			// Arcane Syphon chance
-			int syphon = Caster.GetModified(eProperty.ArcaneSyphon);
-			if (syphon > 0)
-			{
-				if (Util.Chance(syphon))
-				{
-					return 0;
-				}
-			}
-
-			double basepower = m_spell.Power; //<== defined a basevar first then modified this base-var to tell %-costs from absolut-costs
-
-			// percent of maxPower if less than zero
 			if (basepower < 0)
 			{
 				if (Caster is GamePlayer && ((GamePlayer)Caster).CharacterClass.ManaStat != eStat.UNDEFINED)

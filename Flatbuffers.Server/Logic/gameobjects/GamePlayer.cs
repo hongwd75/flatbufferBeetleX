@@ -13,6 +13,7 @@ using Game.Logic.Inventory;
 using Game.Logic.Language;
 using Game.Logic.network;
 using Game.Logic.PropertyCalc;
+using Game.Logic.RealmAblilities;
 using Game.Logic.Skills;
 using Game.Logic.Spells;
 using Game.Logic.Styles;
@@ -224,9 +225,148 @@ namespace Game.Logic
 			GameEventManager.Notify(GamePlayerEvent.Moving, this);
 		}
         #endregion
-        
-#region Spells/Skills/Abilities/Effects
 
+        #region mana / endu / con
+		public virtual int CalculateMaxMana(int level, int manaStat)
+		{
+			int maxpower = 0;
+
+			if (CharacterClass.ManaStat != eStat.UNDEFINED)
+			{
+				maxpower = Math.Max(5, (level * 5) + (manaStat - 50));
+			}
+			else if (CharacterClass.ManaStat == eStat.UNDEFINED)
+			{
+				maxpower = 100;
+			}
+			if (maxpower < 0)
+				maxpower = 0;
+
+			return maxpower;
+		}
+		public override int Mana
+		{
+			get { return DBCharacter != null ? DBCharacter.Mana : base.Mana; }
+			set
+			{
+				value = Math.Min(value, MaxMana);
+				value = Math.Max(value, 0);
+				//If it is already set, don't do anything
+				if (Mana == value)
+				{
+					base.Mana = value; //needed to start regeneration
+					return;
+				}
+				int oldPercent = ManaPercent;
+				base.Mana = value;
+				if (DBCharacter != null)
+					DBCharacter.Mana = value;
+				if (oldPercent != ManaPercent)
+				{
+					UpdatePlayerStatus();
+				}
+			}
+		}
+		public override int MaxMana
+		{
+			get { return GetModified(eProperty.MaxMana); }
+		}
+		public override int Endurance
+		{
+			get { return DBCharacter != null ? DBCharacter.Endurance : base.Endurance; }
+			set
+			{
+				value = Math.Min(value, MaxEndurance);
+				value = Math.Max(value, 0);
+				//If it is already set, don't do anything
+				if (Endurance == value)
+				{
+					base.Endurance = value; //needed to start regeneration
+					return;
+				}
+				else if (IsAlive && value < MaxEndurance)
+					StartEnduranceRegeneration();
+				int oldPercent = EndurancePercent;
+				base.Endurance = value;
+				if (DBCharacter != null)
+					DBCharacter.Endurance = value;
+				if (oldPercent != EndurancePercent)
+				{
+					UpdatePlayerStatus();
+				}
+			}
+		}
+
+		/// <summary>
+		/// Gets/sets the objects maximum endurance
+		/// </summary>
+		public override int MaxEndurance
+		{
+			get { return base.MaxEndurance; }
+			set
+			{
+				//If it is already set, don't do anything
+				if (MaxEndurance == value)
+					return;
+				base.MaxEndurance = value;
+				DBMaxEndurance = value;
+				UpdatePlayerStatus();
+			}
+		}
+		
+		public int DBMaxEndurance
+		{
+			get { return DBCharacter != null ? DBCharacter.MaxEndurance : 100; }
+			set { if (DBCharacter != null) DBCharacter.MaxEndurance = value; }
+		}
+		
+		public override int Concentration
+		{
+			get { return MaxConcentration - ConcentrationEffects.UsedConcentration; }
+		}
+		public override int MaxConcentration
+		{
+			get { return GetModified(eProperty.MaxConcentration); }
+		}
+        
+		public override int Health
+		{
+			get { return DBCharacter != null ? DBCharacter.Health : base.Health; }
+			set
+			{
+				value = value.Clamp(0, MaxHealth);
+				//If it is already set, don't do anything
+				if (Health == value)
+				{
+					base.Health = value; //needed to start regeneration
+					return;
+				}
+
+				int oldPercent = HealthPercent;
+				if (DBCharacter != null)
+					DBCharacter.Health = value;
+				base.Health = value;
+				if (oldPercent != HealthPercent)
+				{
+					UpdatePlayerStatus();
+				}
+			}
+		}
+
+		public virtual int CalculateMaxHealth(int level, int constitution)
+		{
+			constitution -= 50;
+			if (constitution < 0) constitution *= 2;
+
+			int hp1 = CharacterClass.BaseHP * level;
+			int hp2 = hp1 * constitution / 10000;
+			int hp3 = 0;
+			double hp4 = 20 + hp1 / 50 + hp2 + hp3;
+			return Math.Max(1, (int)hp4);
+		}
+        #endregion
+        
+		#region Spells/Skills/Abilities/Effects
 		/// <summary>
 		/// Holds the player choosen list of Realm Abilities.
 		/// </summary>
@@ -455,7 +595,7 @@ namespace Game.Logic
 						CanStealth = true;
 
 					if (notify)
-						Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GamePlayer.AddSpecialisation.YouLearn", skill.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+						Out.SendMessage(LanguageMgr.GetTranslation(Network.Account.Language, "GamePlayer.AddSpecialisation.YouLearn", skill.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 				}
 				else
 				{
@@ -485,7 +625,7 @@ namespace Game.Logic
 					CanStealth = false;
 			}
 			
-			Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GamePlayer.RemoveSpecialization.YouLose", playerSpec.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+			Out.SendMessage(LanguageMgr.GetTranslation(Network.Account.Language, "GamePlayer.RemoveSpecialization.YouLose", playerSpec.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
 			return true;
 		}
@@ -507,7 +647,7 @@ namespace Game.Logic
 				m_spellLines.Remove(line);
 			}
 
-			Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GamePlayer.RemoveSpellLine.YouLose", line.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+			Out.SendMessage(LanguageMgr.GetTranslation(Network.Account.Language, "GamePlayer.RemoveSpellLine.YouLose", line.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 			
 			return true;
 		}
@@ -533,7 +673,6 @@ namespace Game.Logic
 		{
 			byte originalLevel = Level;
 			Level = 1;
-			Experience = 0;
 			RespecAllLines();
 
 			if (Level < originalLevel && originalLevel > 5)
@@ -571,6 +710,11 @@ namespace Game.Logic
 			return false;
 		}
 
+		public virtual int GetAutoTrainPoints(Specialization spec, int Mode)
+		{
+			return 0;
+		}
+		
 		public virtual bool RespecDOL()
 		{
 			if(RespecAllLines()) // Wipe skills and styles.
@@ -585,8 +729,8 @@ namespace Game.Logic
 		public virtual int RespecSingle(Specialization specLine)
 		{
 			int specPoints = RespecSingleLine(specLine); // Wipe skills and styles.
-			if (!ServerProperties.Properties.FREE_RESPEC)
-				RespecAmountSingleSkill--; // Decriment players respecs available.
+
+			RespecAmountSingleSkill--; // Decriment players respecs available.
 			if (Level == 20 || Level == 40)
 			{
 				IsLevelRespecUsed = true;
@@ -602,8 +746,7 @@ namespace Game.Logic
 				RemoveAbility(ab.KeyName);
 			
 			m_realmAbilities.Clear();
-			if (!ServerProperties.Properties.FREE_RESPEC)
-				RespecAmountRealmSkill--;
+			RespecAmountRealmSkill--;
 			return any;
 		}
 
@@ -638,17 +781,7 @@ namespace Game.Logic
 				specLine.Level = (int)Math.Floor((double)Level / 4);
 			}
 			else specLine.Level = 1;
-
-			// If BD subpet spells scaled and capped by BD spec, respecing a spell line
-			//	requires re-scaling the spells for all subpets from that line.
-			if (CharacterClass.Equals(GS.CharacterClass.Bonedancer)
-				&& DOL.GS.ServerProperties.Properties.PET_SCALE_SPELL_MAX_LEVEL > 0
-				&& DOL.GS.ServerProperties.Properties.PET_CAP_BD_MINION_SPELL_SCALING_BY_SPEC
-				&& ControlledBody is GamePet pet && pet.ControlledNpcList != null)
-					foreach (ABrain subBrain in pet.ControlledNpcList)
-						if (subBrain != null && subBrain.Body is BDSubPet subPet && subPet.PetSpecLine == specLine.KeyName)
-							subPet.SortSpells();
-
+			
 			return specPoints;
 		}
 
@@ -822,7 +955,7 @@ namespace Game.Logic
 					if (notify)
 					{
 						Style style = st;
-						Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GamePlayer.RefreshSpec.YouLearn", style.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+						Out.SendMessage(LanguageMgr.GetTranslation(Network.Account.Language, "GamePlayer.RefreshSpec.YouLearn", style.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 	
 						string message = null;
 						
@@ -836,20 +969,20 @@ namespace Game.Logic
 									Style reqStyle = SkillBase.GetStyleByID(style.OpeningRequirementValue, CharacterClass.ID);
 									
 									if (reqStyle == null)
-										message = LanguageMgr.GetTranslation(Client.Account.Language, "GamePlayer.RefreshSpec.AfterStyle", "(style " + style.OpeningRequirementValue + " not found)");
+										message = LanguageMgr.GetTranslation(Network.Account.Language, "GamePlayer.RefreshSpec.AfterStyle", "(style " + style.OpeningRequirementValue + " not found)");
 									
-									else message = LanguageMgr.GetTranslation(Client.Account.Language, "GamePlayer.RefreshSpec.AfterStyle", reqStyle.Name);
+									else message = LanguageMgr.GetTranslation(Network.Account.Language, "GamePlayer.RefreshSpec.AfterStyle", reqStyle.Name);
 	
 								break;
-								case Style.eAttackResultRequirement.Miss: message = LanguageMgr.GetTranslation(Client.Account.Language, "GamePlayer.RefreshSpec.AfterMissed");
+								case Style.eAttackResultRequirement.Miss: message = LanguageMgr.GetTranslation(Network.Account.Language, "GamePlayer.RefreshSpec.AfterMissed");
 								break;
-								case Style.eAttackResultRequirement.Parry: message = LanguageMgr.GetTranslation(Client.Account.Language, "GamePlayer.RefreshSpec.AfterParried");
+								case Style.eAttackResultRequirement.Parry: message = LanguageMgr.GetTranslation(Network.Account.Language, "GamePlayer.RefreshSpec.AfterParried");
 								break;
-								case Style.eAttackResultRequirement.Block: message = LanguageMgr.GetTranslation(Client.Account.Language, "GamePlayer.RefreshSpec.AfterBlocked");
+								case Style.eAttackResultRequirement.Block: message = LanguageMgr.GetTranslation(Network.Account.Language, "GamePlayer.RefreshSpec.AfterBlocked");
 								break;
-								case Style.eAttackResultRequirement.Evade: message = LanguageMgr.GetTranslation(Client.Account.Language, "GamePlayer.RefreshSpec.AfterEvaded");
+								case Style.eAttackResultRequirement.Evade: message = LanguageMgr.GetTranslation(Network.Account.Language, "GamePlayer.RefreshSpec.AfterEvaded");
 								break;
-								case Style.eAttackResultRequirement.Fumble: message = LanguageMgr.GetTranslation(Client.Account.Language, "GamePlayer.RefreshSpec.AfterFumbles");
+								case Style.eAttackResultRequirement.Fumble: message = LanguageMgr.GetTranslation(Network.Account.Language, "GamePlayer.RefreshSpec.AfterFumbles");
 								break;
 							}
 						}
@@ -857,19 +990,19 @@ namespace Game.Logic
 						{
 							switch (style.AttackResultRequirement)
 							{
-								case Style.eAttackResultRequirement.Miss: message = LanguageMgr.GetTranslation(Client.Account.Language, "GamePlayer.RefreshSpec.TargetMisses");
+								case Style.eAttackResultRequirement.Miss: message = LanguageMgr.GetTranslation(Network.Account.Language, "GamePlayer.RefreshSpec.TargetMisses");
 								break;
-								case Style.eAttackResultRequirement.Hit: message = LanguageMgr.GetTranslation(Client.Account.Language, "GamePlayer.RefreshSpec.TargetHits");
+								case Style.eAttackResultRequirement.Hit: message = LanguageMgr.GetTranslation(Network.Account.Language, "GamePlayer.RefreshSpec.TargetHits");
 								break;
-								case Style.eAttackResultRequirement.Parry: message = LanguageMgr.GetTranslation(Client.Account.Language, "GamePlayer.RefreshSpec.TargetParried");
+								case Style.eAttackResultRequirement.Parry: message = LanguageMgr.GetTranslation(Network.Account.Language, "GamePlayer.RefreshSpec.TargetParried");
 								break;
-								case Style.eAttackResultRequirement.Block: message = LanguageMgr.GetTranslation(Client.Account.Language, "GamePlayer.RefreshSpec.TargetBlocked");
+								case Style.eAttackResultRequirement.Block: message = LanguageMgr.GetTranslation(Network.Account.Language, "GamePlayer.RefreshSpec.TargetBlocked");
 								break;
-								case Style.eAttackResultRequirement.Evade: message = LanguageMgr.GetTranslation(Client.Account.Language, "GamePlayer.RefreshSpec.TargetEvaded");
+								case Style.eAttackResultRequirement.Evade: message = LanguageMgr.GetTranslation(Network.Account.Language, "GamePlayer.RefreshSpec.TargetEvaded");
 								break;
-								case Style.eAttackResultRequirement.Fumble: message = LanguageMgr.GetTranslation(Client.Account.Language, "GamePlayer.RefreshSpec.TargetFumbles");
+								case Style.eAttackResultRequirement.Fumble: message = LanguageMgr.GetTranslation(Network.Account.Language, "GamePlayer.RefreshSpec.TargetFumbles");
 								break;
-								case Style.eAttackResultRequirement.Style: message = LanguageMgr.GetTranslation(Client.Account.Language, "GamePlayer.RefreshSpec.TargetStyle");
+								case Style.eAttackResultRequirement.Style: message = LanguageMgr.GetTranslation(Network.Account.Language, "GamePlayer.RefreshSpec.TargetStyle");
 								break;
 							}
 						}
@@ -933,7 +1066,7 @@ namespace Game.Logic
 			specLevel = Math.Max(specLevel, GetModifiedSpecLevel(Specs.Fist_Wraps));
 			if (specLevel > 0)
 			{
-				return Util.Chance(25 + (specLevel - 1) * 68 / 100) ? 1 : 0;
+				return RandomUtil.Chance(25 + (specLevel - 1) * 68 / 100) ? 1 : 0;
 			}
 
 			// HtH chance
@@ -945,7 +1078,7 @@ namespace Game.Logic
 			    leftWeapon != null && leftWeapon.Object_Type == (int)eObjectType.HandToHand)
 			{
 				specLevel--;
-				int randomChance = Util.Random(99);
+				int randomChance = RandomUtil.Int(99);
 				int hitChance = specLevel >> 1;
 				if (randomChance < hitChance)
 					return 1; // 1 hit = spec/2

@@ -1977,6 +1977,15 @@ public partial class GameLiving : GameObject
     }    
 
     #region GetModifieds
+    public override int EffectiveLevel
+    {
+	    get { return GetModified(eProperty.LivingEffectiveLevel); }
+    }    
+    public virtual int GetBaseSpecLevel(string keyName)
+    {
+	    return Level;
+    }
+    
     public virtual int GetModifiedSpecLevel(string keyName)
     {
 	    return Level;
