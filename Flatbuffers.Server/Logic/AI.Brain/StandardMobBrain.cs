@@ -9,6 +9,7 @@ using Game.Logic.ServerProperties;
 using Game.Logic.Skills;
 using Game.Logic.Utils;
 using Game.Logic.World;
+using Game.Logic.World.Movement;
 using log4net;
 using NetworkMessage;
 
@@ -400,20 +401,20 @@ public class StandardMobBrain : APlayerVicinityBrain, IOldAggressiveBrain
 
 			// Check LOS (walls, pits, etc...) before  attacking, player + pet
 			// Be sure the aggrocheck is triggered by the brain on Think() method
-			if (Properties.ALWAYS_CHECK_LOS && CheckLOS)
-			{
-				GamePlayer thisLiving = null;
-				if (living is GamePlayer)
-					thisLiving = (GamePlayer)living;
-				else if (living is GameNPC && (living as GameNPC).Brain is IControlledBrain)
-					thisLiving = ((living as GameNPC).Brain as IControlledBrain).GetPlayerOwner();
-
-				if (thisLiving != null)
-				{
-					thisLiving.Out.SendCheckLOS (Body, living, new CheckLOSResponse(CheckAggroLOS));
-					if (!AggroLOS) return;
-				}
-			}
+			// if (Properties.ALWAYS_CHECK_LOS && CheckLOS)
+			// {
+			// 	GamePlayer thisLiving = null;
+			// 	if (living is GamePlayer)
+			// 		thisLiving = (GamePlayer)living;
+			// 	else if (living is GameNPC && (living as GameNPC).Brain is IControlledBrain)
+			// 		thisLiving = ((living as GameNPC).Brain as IControlledBrain).GetPlayerOwner();
+			//
+			// 	if (thisLiving != null)
+			// 	{
+			// 		thisLiving.Out.SendCheckLOS (Body, living, new CheckLOSResponse(CheckAggroLOS));
+			// 		if (!AggroLOS) return;
+			// 	}
+			// }
 
 			BringFriends(living);
 
@@ -424,52 +425,52 @@ public class StandardMobBrain : APlayerVicinityBrain, IOldAggressiveBrain
 			}
 
 			// only protect if gameplayer and aggroamout > 0
-			if (living is GamePlayer && aggroamount > 0)
-			{
-				GamePlayer player = (GamePlayer)living;
-
-				foreach (ProtectEffect protect in player.EffectList.GetAllOfType<ProtectEffect>())
-				{
-					// if no aggro left => break
-					if (aggroamount <= 0) break;
-
-					//if (protect==null) continue;
-					if (protect.ProtectTarget != living) continue;
-					if (protect.ProtectSource.IsStunned) continue;
-					if (protect.ProtectSource.IsMezzed) continue;
-					if (protect.ProtectSource.IsSitting) continue;
-					if (protect.ProtectSource.ObjectState != GameObject.eObjectState.Active) continue;
-					if (!protect.ProtectSource.IsAlive) continue;
-					if (!protect.ProtectSource.InCombat) continue;
-
-					if (!living.IsWithinRadius(protect.ProtectSource, ProtectAbilityHandler.PROTECT_DISTANCE))
-						continue;
-					// P I: prevents 10% of aggro amount
-					// P II: prevents 20% of aggro amount
-					// P III: prevents 30% of aggro amount
-					// guessed percentages, should never be higher than or equal to 50%
-					int abilityLevel = protect.ProtectSource.GetAbilityLevel(Abilities.Protect);
-					int protectAmount = (int)((abilityLevel * 0.10) * aggroamount);
-
-					if (protectAmount > 0)
-					{
-						aggroamount -= protectAmount;
-						protect.ProtectSource.Out.SendMessage(LanguageMgr.GetTranslation(protect.ProtectSource.Client.Account.Language, 
-																						 "AI.Brain.StandardMobBrain.YouProtDist", player.GetName(0, false),
-						                                                                 Body.GetName(0, false, protect.ProtectSource.Client.Account.Language, Body)), 
-																						 eChatType.CT_System, eChatLoc.CL_SystemWindow);
-						//player.Out.SendMessage("You are protected by " + protect.ProtectSource.GetName(0, false) + " from " + Body.GetName(0, false) + ".", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-
-						lock ((m_aggroTable as ICollection).SyncRoot)
-						{
-							if (m_aggroTable.ContainsKey(protect.ProtectSource))
-								m_aggroTable[protect.ProtectSource] += protectAmount;
-							else
-								m_aggroTable[protect.ProtectSource] = protectAmount;
-						}
-					}
-				}
-			}
+			// if (living is GamePlayer && aggroamount > 0)
+			// {
+			// 	GamePlayer player = (GamePlayer)living;
+			//
+			// 	foreach (ProtectEffect protect in player.EffectList.GetAllOfType<ProtectEffect>())
+			// 	{
+			// 		// if no aggro left => break
+			// 		if (aggroamount <= 0) break;
+			//
+			// 		//if (protect==null) continue;
+			// 		if (protect.ProtectTarget != living) continue;
+			// 		if (protect.ProtectSource.IsStunned) continue;
+			// 		if (protect.ProtectSource.IsMezzed) continue;
+			// 		if (protect.ProtectSource.IsSitting) continue;
+			// 		if (protect.ProtectSource.ObjectState != GameObject.eObjectState.Active) continue;
+			// 		if (!protect.ProtectSource.IsAlive) continue;
+			// 		if (!protect.ProtectSource.InCombat) continue;
+			//
+			// 		if (!living.IsWithinRadius(protect.ProtectSource, ProtectAbilityHandler.PROTECT_DISTANCE))
+			// 			continue;
+			// 		// P I: prevents 10% of aggro amount
+			// 		// P II: prevents 20% of aggro amount
+			// 		// P III: prevents 30% of aggro amount
+			// 		// guessed percentages, should never be higher than or equal to 50%
+			// 		int abilityLevel = protect.ProtectSource.GetAbilityLevel(Abilities.Protect);
+			// 		int protectAmount = (int)((abilityLevel * 0.10) * aggroamount);
+			//
+			// 		if (protectAmount > 0)
+			// 		{
+			// 			aggroamount -= protectAmount;
+			// 			protect.ProtectSource.Out.SendMessage(LanguageMgr.GetTranslation(protect.ProtectSource.Client.Account.Language, 
+			// 																			 "AI.Brain.StandardMobBrain.YouProtDist", player.GetName(0, false),
+			// 			                                                                 Body.GetName(0, false, protect.ProtectSource.Client.Account.Language, Body)), 
+			// 																			 eChatType.CT_System, eChatLoc.CL_SystemWindow);
+			// 			//player.Out.SendMessage("You are protected by " + protect.ProtectSource.GetName(0, false) + " from " + Body.GetName(0, false) + ".", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+			//
+			// 			lock ((m_aggroTable as ICollection).SyncRoot)
+			// 			{
+			// 				if (m_aggroTable.ContainsKey(protect.ProtectSource))
+			// 					m_aggroTable[protect.ProtectSource] += protectAmount;
+			// 				else
+			// 					m_aggroTable[protect.ProtectSource] = protectAmount;
+			// 			}
+			// 		}
+			// 	}
+			// }
 
 			lock ((m_aggroTable as ICollection).SyncRoot)
 			{
@@ -659,11 +660,6 @@ public class StandardMobBrain : APlayerVicinityBrain, IOldAggressiveBrain
 				}
 			}
 			
-			// only attack if green+ to target
-			if (realTarget.IsObjectGreyCon(Body))
-				return 0;	
-
-			// If this npc have Faction return the AggroAmount to Player
 			if (Body.Faction != null)
 			{
 				if (realTarget is GamePlayer)
@@ -682,13 +678,7 @@ public class StandardMobBrain : APlayerVicinityBrain, IOldAggressiveBrain
 			
 			return Math.Min(100, AggroLevel);
 		}
-
-		/// <summary>
-		/// Receives all messages of the body
-		/// </summary>
-		/// <param name="e">The event received</param>
-		/// <param name="sender">The event sender</param>
-		/// <param name="args">The event arguments</param>
+		
 		public override void Notify(GameEvent e, object sender, EventArgs args)
 		{
 			base.Notify(e, sender, args);
@@ -886,8 +876,8 @@ public class StandardMobBrain : APlayerVicinityBrain, IOldAggressiveBrain
 				// Player is alone
 				numAttackers = 1;
 
-			int percentBAF = DOL.GS.ServerProperties.Properties.BAF_INITIAL_CHANCE
-				+ ((numAttackers - 1) * DOL.GS.ServerProperties.Properties.BAF_ADDITIONAL_CHANCE);
+			int percentBAF = Game.Logic.ServerProperties.Properties.BAF_INITIAL_CHANCE
+			                 + ((numAttackers - 1) * Game.Logic.ServerProperties.Properties.BAF_ADDITIONAL_CHANCE);
 
 			int maxAdds = percentBAF / 100; // Multiple of 100 are guaranteed BAFs
 
@@ -1184,7 +1174,7 @@ public class StandardMobBrain : APlayerVicinityBrain, IOldAggressiveBrain
                     if (spell.Target.ToLower() == "self")
 					{
 						// if we have a self heal and health is less than 75% then heal, otherwise return false to try another spell or do nothing
-						if (Body.HealthPercent < DOL.GS.ServerProperties.Properties.NPC_HEAL_THRESHOLD)
+						if (Body.HealthPercent < Game.Logic.ServerProperties.Properties.NPC_HEAL_THRESHOLD)
 						{
 							Body.TargetObject = Body;
 						}
@@ -1192,7 +1182,7 @@ public class StandardMobBrain : APlayerVicinityBrain, IOldAggressiveBrain
 					}
 
 					// Chance to heal self when dropping below 30%, do NOT spam it.
-					if (Body.HealthPercent < (DOL.GS.ServerProperties.Properties.NPC_HEAL_THRESHOLD / 2.0)
+					if (Body.HealthPercent < (Game.Logic.ServerProperties.Properties.NPC_HEAL_THRESHOLD / 2.0)
 						&& RandomUtil.Chance(10) && spell.Target.ToLower() != "pet")
 					{
 						Body.TargetObject = Body;
@@ -1201,7 +1191,7 @@ public class StandardMobBrain : APlayerVicinityBrain, IOldAggressiveBrain
 
 					if (Body.ControlledBrain != null && Body.ControlledBrain.Body != null
 					    && Body.GetDistanceTo(Body.ControlledBrain.Body) <= spell.Range 
-					    && Body.ControlledBrain.Body.HealthPercent < DOL.GS.ServerProperties.Properties.NPC_HEAL_THRESHOLD 
+					    && Body.ControlledBrain.Body.HealthPercent < Game.Logic.ServerProperties.Properties.NPC_HEAL_THRESHOLD 
 					    && spell.Target.ToLower() != "self")
 					{
 						Body.TargetObject = Body.ControlledBrain.Body;
@@ -1336,31 +1326,25 @@ public class StandardMobBrain : APlayerVicinityBrain, IOldAggressiveBrain
 
 		protected static SpellLine m_mobSpellLine = SkillBase.GetSpellLine(GlobalSpellsLines.Mob_Spells);
 
-		/// <summary>
-		/// Checks if the living target has a spell effect
-		/// </summary>
-		/// <param name="target">The target living object</param>
-		/// <param name="spell">The spell to check</param>
-		/// <returns>True if the living has the effect</returns>
 		public static bool LivingHasEffect(GameLiving target, Spell spell)
 		{
 			if (target == null)
 				return true;
 
-			if (target is GamePlayer && (target as GamePlayer).CharacterClass.ID == (int)eCharacterClass.Vampiir)
-			{
-				switch (spell.SpellType)
-				{
-					case "StrengthConstitutionBuff":
-					case "DexterityQuicknessBuff":
-					case "StrengthBuff":
-					case "DexterityBuff":
-					case "ConstitutionBuff":
-					case "AcuityBuff":
-
-						return true;
-				}
-			}
+			// if (target is GamePlayer && (target as GamePlayer).CharacterClass.ID == (int)eCharacterClass.Vampiir)
+			// {
+			// 	switch (spell.SpellType)
+			// 	{
+			// 		case "StrengthConstitutionBuff":
+			// 		case "DexterityQuicknessBuff":
+			// 		case "StrengthBuff":
+			// 		case "DexterityBuff":
+			// 		case "ConstitutionBuff":
+			// 		case "AcuityBuff":
+			//
+			// 			return true;
+			// 	}
+			// }
 
 			lock (target.EffectList)
 			{
@@ -1415,7 +1399,7 @@ public class StandardMobBrain : APlayerVicinityBrain, IOldAggressiveBrain
 				   >0 means range of roaming
 				   defaut roaming range is defined in CanRandomWalk method
 				 */
-				if (!DOL.GS.ServerProperties.Properties.ALLOW_ROAM)
+				if (!Game.Logic.ServerProperties.Properties.ALLOW_ROAM)
 					return false;
 				if (Body.RoamingRange == 0)
 					return false;

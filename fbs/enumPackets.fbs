@@ -46,8 +46,13 @@ enum eDialogCode : ubyte {
 enum ServerPackets : ushort {
 	SC_LoginAns	= 1,
 	SC_AccountInfo,
-	
+	SC_WorldEnterNotify,
+	SC_CreatePlayer,
+	SC_CreatePlayers,
+	SC_RemovePlayer,
+	SC_PlayerUpdate,
 	SC_VariousUpdate,
+	SC_UpdatePosition,
 	SC_ObjectUpdate,
 	SC_CharacterStatusUpdate,
 	SC_PlayerCreate,

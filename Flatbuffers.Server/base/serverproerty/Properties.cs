@@ -31,6 +31,8 @@ namespace Game.Logic.ServerProperties
 		public static ushort REGION_MAX_OBJECTS;
 		[ServerProperty("server", "disable_quit_timer", "대기하지 않고 바로 logout", false)]
 		public static bool DISABLE_QUIT_TIMER;		
+		[ServerProperty("server", "autoselect_caster", "현재 대상이 유효하지 않을 경우, 유익한 주문이 시전자에게 자동으로 적용되도록 설정합니다. 이를 통해 대상을 변경하지 않고도 자기 치유가 가능합니다.", false)]
+		public static bool AUTOSELECT_CASTER;	
 		
 		[ServerProperty("account", "allow_auto_account_creation", "자동 계정 생성 허용 - 이 설정은 serverconfig.xml에서도 설정되며, 이 속성이 작동하려면 활성화되어 있어야 합니다.", true)]
 		public static bool ALLOW_AUTO_ACCOUNT_CREATION;
@@ -67,6 +69,11 @@ namespace Game.Logic.ServerProperties
 		[ServerProperty("pvp", "Timer_PvP_Teleport", "Immunity Timer when player teleports within the same region, in seconds", 30)] //30 seconds default
 		public static int TIMER_PVP_TELEPORT;
 		
+		[ServerProperty("pve", "baf_initial_chance", "Percent chance for a mob to bring a friend when attacked by a single attacker.  Each multiples of 100 guarantee an add, so a cumulative chance of 250% guarantees two adds with a 50% chance of a third.", 0)]
+		public static int BAF_INITIAL_CHANCE;
+		[ServerProperty("pve", "baf_additional_chance", "Percent chance for a mob to bring a friend for each additional attacker.  Each multiples of 100 guarantee an add, so a cumulative chance of 250% guarantees two adds with a 50% chance of a third.", 50)]
+		public static int BAF_ADDITIONAL_CHANCE;		
+		
 		[ServerProperty("spells", "spell_interrupt_duration", "공격 받은 후 주문 방해 지속 시간 (밀리초 단위), 기본값: 4500", 4500)]
 		public static int SPELL_INTERRUPT_DURATION;
 		[ServerProperty("spells", "spell_interrupt_recast", "주문 방해 후 재시전 대기 시간 (밀리초 단위), 기본값: 2000", 2000)]
@@ -82,6 +89,34 @@ namespace Game.Logic.ServerProperties
 
 		[ServerProperty("npc", "gamenpc_default_classtype", "game npc typeclass 설정.", "Game.Logic.GameNPC")]
 		public static string GAMENPC_DEFAULT_CLASSTYPE;
+		[ServerProperty("npc", "allow_roam", "Allow mobs to roam on the server", true)]
+		public static bool ALLOW_ROAM;
+		[ServerProperty("npc", "npc_heal_threshold", "NPCs, including pets, heal targets whose health falls below this percentage.", 75)]
+		public static int NPC_HEAL_THRESHOLD;
+		[ServerProperty("npc", "gamenpc_randomwalk_chance", "Chance for NPC to random walk. Default is 20", 20)]
+		public static int GAMENPC_RANDOMWALK_CHANCE;
+		[ServerProperty("npc", "mob_autoset_str_base", "Base Value to use when auto-setting STR stat. ", (short)30)]
+		public static short MOB_AUTOSET_STR_BASE;
+		[ServerProperty("npc", "mob_autoset_str_multiplier", "Multiplier to use when auto-setting STR stat. Multiplied by 10 when applied. ", 1.0)]
+		public static double MOB_AUTOSET_STR_MULTIPLIER;
+		[ServerProperty("npc", "mob_autoset_con_base", "Base Value to use when auto-setting CON stat. ", (short)30)]
+		public static short MOB_AUTOSET_CON_BASE;
+		[ServerProperty("npc", "mob_autoset_con_multiplier", "Multiplier to use when auto-setting CON stat. ", 1.0)]
+		public static double MOB_AUTOSET_CON_MULTIPLIER;
+		[ServerProperty("npc", "mob_autoset_qui_base", "Base Value to use when auto-setting qui stat. ", (short)30)]
+		public static short MOB_AUTOSET_QUI_BASE;
+		[ServerProperty("npc", "mob_autoset_qui_multiplier", "Multiplier to use when auto-setting QUI stat. ", 1.0)]
+		public static double MOB_AUTOSET_QUI_MULTIPLIER;
+		[ServerProperty("npc", "mob_autoset_dex_base", "Base Value to use when auto-setting DEX stat. ", (short)30)]
+		public static short MOB_AUTOSET_DEX_BASE;
+		[ServerProperty("npc", "mob_autoset_dex_multiplier", "Multiplier to use when auto-setting DEX stat. ", 1.0)]
+		public static double MOB_AUTOSET_DEX_MULTIPLIER;
+		[ServerProperty("npc", "mob_autoset_int_base", "Base Value to use when auto-setting INT stat. ", (short)30)]
+		public static short MOB_AUTOSET_INT_BASE;
+		[ServerProperty("npc", "mob_autoset_int_multiplier", "Multiplier to use when auto-setting INT stat. ", 1.0)]
+		public static double MOB_AUTOSET_INT_MULTIPLIER;		
+		[ServerProperty("npc", "gamenpc_followcheck_time", "How often, in milliseconds, to check follow distance. Lower numbers make NPC follow closer but increase load on server.", 500)]
+		public static int GAMENPC_FOLLOWCHECK_TIME;		
 		
 		[ServerProperty("rates", "item_sell_ratio", "상인한테 팔 때 아이템 가격할인 비율 %", 50)]
 		public static int ITEM_SELL_RATIO;		
@@ -97,8 +132,7 @@ namespace Game.Logic.ServerProperties
 		[ServerProperty("classes", "allow_cross_realm_items", "다른 랠름의 아이템 장착 허용", false)]
 		public static bool ALLOW_CROSS_REALM_ITEMS;		
 		
-		[ServerProperty("server", "autoselect_caster", "현재 대상이 유효하지 않을 경우, 유익한 주문이 시전자에게 자동으로 적용되도록 설정합니다. 이를 통해 대상을 변경하지 않고도 자기 치유가 가능합니다.", false)]
-		public static bool AUTOSELECT_CASTER;		
+	
 		//----------------------------------------------------------------------------------------------
 		#region #### 설정 함수 ####
 		public static void InitProperties()

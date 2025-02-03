@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Game.Logic.AI.Brain;
+using Game.Logic.Currencys;
 using Game.Logic.datatable;
 using Game.Logic.Events;
 using Game.Logic.Geometry;
@@ -14,11 +15,13 @@ using Game.Logic.Spells;
 using Game.Logic.Styles;
 using Game.Logic.Utils;
 using Game.Logic.World;
+using Game.Logic.World.Movement;
 using Game.Logic.World.Timer;
 using Logic.database;
 using Logic.database.table;
 using Microsoft.VisualBasic;
 using NetworkMessage;
+using Money = Game.Logic.Utils.Money;
 
 namespace Game.Logic
 {
@@ -338,7 +341,7 @@ namespace Game.Logic
 				base.Realm = value;
 				if (ObjectState == eObjectState.Active)
 				{
-					foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+					foreach (GamePlayer player in GetPlayersInRadius(WorldManager.VISIBILITY_DISTANCE))
 					{
 						player.Out.SendNPCCreate(this);
 						if (m_inventory != null)
@@ -359,7 +362,7 @@ namespace Game.Logic
 				base.Name = value;
 				if (ObjectState == eObjectState.Active)
 				{
-					foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+					foreach (GamePlayer player in GetPlayersInRadius(WorldManager.VISIBILITY_DISTANCE))
 					{
 						player.Out.SendNPCCreate(this);
 						if (m_inventory != null)
@@ -404,7 +407,7 @@ namespace Game.Logic
 				base.GuildName = value;
 				if (ObjectState == eObjectState.Active)
 				{
-					foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+					foreach (GamePlayer player in GetPlayersInRadius(WorldManager.VISIBILITY_DISTANCE))
 					{
 						player.Out.SendNPCCreate(this);
 						if (m_inventory != null)
@@ -705,7 +708,7 @@ namespace Game.Logic
 				{
 					if (oldflags != m_flags)
 					{
-						foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+						foreach (GamePlayer player in GetPlayersInRadius(WorldManager.VISIBILITY_DISTANCE))
 						{
 							player.Out.SendNPCCreate(this);
 							if (m_inventory != null)
@@ -1377,25 +1380,18 @@ namespace Game.Logic
 		{
 			if (AttackState)
 			{
-				// if in last attack the enemy was out of range, we can attack him now immediately
 				AttackData ad = (AttackData)TempProperties.getProperty<object>(LAST_ATTACK_DATA, null);
 				if (ad != null && ad.AttackResult == eAttackResult.OutOfRange)
 				{
 					m_attackAction.Start(1);// schedule for next tick
 				}
 			}
-			//sirru
+
 			else if (m_attackers.Count == 0 && this.Spells.Count > 0 && this.TargetObject != null && GameServer.ServerRules.IsAllowedToAttack(this, (this.TargetObject as GameLiving), true))
 			{
-				if (TargetObject.Realm == 0 || Realm == 0)
-					m_lastAttackTickPvE = CurrentRegion.Time;
-				else m_lastAttackTickPvP = CurrentRegion.Time;
+				m_lastAttackedTick = CurrentRegion.Time;
 				if (this.CurrentRegion.Time - LastAttackedByEnemyTick > 10 * 1000)
 				{
-					// Aredhel: Erm, checking for spells in a follow method, what did we create
-					// brain classes for again?
-
-					//Check for negatively casting spells
 					StandardMobBrain stanBrain = (StandardMobBrain)Brain;
 					if (stanBrain != null)
 						((StandardMobBrain)stanBrain).CheckSpells(StandardMobBrain.eCheckSpellType.Offensive);
@@ -1609,7 +1605,7 @@ namespace Game.Logic
 
 			if (CurrentWayPoint != null)
 			{
-				GameEventMgr.AddHandler(this, GameNPCEvent.ArriveAtTarget, new DOLEventHandler(OnArriveAtWaypoint));
+				GameEventManager.AddHandler(this, GameNPCEvent.ArriveAtTarget, new GameEventHandler(OnArriveAtWaypoint));
 				WalkTo(CurrentWayPoint.Coordinate, Math.Min(speed, (short)CurrentWayPoint.MaxSpeed));
 				m_IsMovingOnPath = true;
 				Notify(GameNPCEvent.PathMoveStarts, this);
@@ -1628,7 +1624,7 @@ namespace Game.Logic
 			if (!IsMovingOnPath)
 				return;
 
-			GameEventMgr.RemoveHandler(this, GameNPCEvent.ArriveAtTarget, new DOLEventHandler(OnArriveAtWaypoint));
+			GameEventManager.RemoveHandler(this, GameNPCEvent.ArriveAtTarget, new GameEventHandler(OnArriveAtWaypoint));
 			Notify(GameNPCEvent.PathMoveEnds, this);
 			m_IsMovingOnPath = false;
 		}
@@ -1639,7 +1635,7 @@ namespace Game.Logic
 		/// <param name="e"></param>
 		/// <param name="n"></param>
 		/// <param name="args"></param>
-		protected void OnArriveAtWaypoint(DOLEvent e, object n, EventArgs args)
+		protected void OnArriveAtWaypoint(GameEvent e, object n, EventArgs args)
 		{
 			if (!IsMovingOnPath || n != this)
 				return;
@@ -1766,7 +1762,7 @@ namespace Game.Logic
 
 						if (twohand != null && onehand != null)
 							//Let's add some random chance
-							SwitchWeapon(Util.Chance(50) ? eActiveWeaponSlot.TwoHanded : eActiveWeaponSlot.Standard);
+							SwitchWeapon(RandomUtil.Chance(50) ? eActiveWeaponSlot.TwoHanded : eActiveWeaponSlot.Standard);
 						else if (twohand != null)
 							//Hmm our right hand weapon may have been null
 							SwitchWeapon(eActiveWeaponSlot.TwoHanded);
@@ -2075,7 +2071,7 @@ namespace Game.Logic
 				if (!Util.IsEmpty(template.Level))
 				{
 					var split = Util.SplitCSV(template.Level, true);
-					byte.TryParse(split[Util.Random(0, split.Count - 1)], out choosenLevel);
+					byte.TryParse(split[RandomUtil.Int(0, split.Count - 1)], out choosenLevel);
 				}
 				this.Level = choosenLevel; // Also calls AutosetStats()
 			}
@@ -2108,12 +2104,12 @@ namespace Game.Logic
 			// so i must use them, and not directly use private variables
 			ushort choosenModel = 1;
 			var splitModel = Util.SplitCSV(template.Model, true);
-			ushort.TryParse(splitModel[Util.Random(0, splitModel.Count - 1)], out choosenModel);
+			ushort.TryParse(splitModel[RandomUtil.Int(0, splitModel.Count - 1)], out choosenModel);
 			this.Model = choosenModel;
 
 			// Graveen: template.Gender is 0,1 or 2 for respectively eGender.Neutral("it"), eGender.Male ("he"), 
 			// eGender.Female ("she"). Any other value is randomly choosing a gender for current GameNPC
-			int choosenGender = template.Gender > 2 ? Util.Random(0, 2) : template.Gender;
+			int choosenGender = template.Gender > 2 ? RandomUtil.Int(0, 2) : template.Gender;
 
 			switch (choosenGender)
 			{
@@ -2127,7 +2123,7 @@ namespace Game.Logic
 			if (!Util.IsEmpty(template.Size))
 			{
 				var split = Util.SplitCSV(template.Size, true);
-				byte.TryParse(split[Util.Random(0, split.Count - 1)], out choosenSize);
+				byte.TryParse(split[RandomUtil.Int(0, split.Count - 1)], out choosenSize);
 			}
 			this.Size = choosenSize;
 			#endregion
@@ -2166,7 +2162,7 @@ namespace Game.Logic
 						if (m_templatedInventory.Count == 1)
 							equipid = template.Inventory;
 						else
-							equipid = m_templatedInventory[Util.Random(m_templatedInventory.Count - 1)];
+							equipid = m_templatedInventory[RandomUtil.Int(m_templatedInventory.Count - 1)];
 					}
 					if (equip.LoadFromDatabase(equipid))
 						equipHasItems = true;
@@ -2205,7 +2201,7 @@ namespace Game.Logic
 
 								//If we found some models let's randomly pick one and add it the equipment
 								if (tempModels.Count > 0)
-									equipHasItems |= equip.AddNPCEquipment((eInventorySlot)slot, tempModels[Util.Random(tempModels.Count - 1)]);
+									equipHasItems |= equip.AddNPCEquipment((eInventorySlot)slot, tempModels[RandomUtil.Int(tempModels.Count - 1)]);
 							}
 						}
 					}
@@ -2297,7 +2293,7 @@ namespace Game.Logic
 				Riders = new GamePlayer[MAX_PASSENGERS];
 
 			bool anyPlayer = false;
-			foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+			foreach (GamePlayer player in GetPlayersInRadius(WorldManager.VISIBILITY_DISTANCE))
 			{
 				if (player == null) continue;
 				player.Out.SendNPCCreate(this);
@@ -2432,7 +2428,7 @@ namespace Game.Logic
 
 			if (ObjectState == eObjectState.Active)
 			{
-				foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+				foreach (GamePlayer player in GetPlayersInRadius(WorldManager.VISIBILITY_DISTANCE))
 					player.Out.SendObjectRemove(this);
 			}
 			if (!base.RemoveFromWorld()) return false;
@@ -2490,7 +2486,7 @@ namespace Game.Logic
 
 			if (ObjectState == eObjectState.Active)
 			{
-				foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+				foreach (GamePlayer player in GetPlayersInRadius(WorldManager.VISIBILITY_DISTANCE))
 				{
 					player.Out.SendObjectRemove(this);
 				}
@@ -2498,7 +2494,7 @@ namespace Game.Logic
 
             Position = destination;
 
-			foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+			foreach (GamePlayer player in GetPlayersInRadius(WorldManager.VISIBILITY_DISTANCE))
 			{
 				if (player == null) continue;
 
@@ -3106,7 +3102,7 @@ namespace Game.Logic
 				else
 				{
 					// try to find another player to use for checking line of site
-					foreach (GamePlayer player in this.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+					foreach (GamePlayer player in this.GetPlayersInRadius(WorldManager.VISIBILITY_DISTANCE))
 					{
 						losChecker = player;
 						break;
@@ -3214,57 +3210,11 @@ namespace Game.Logic
 			}
 
 		}
-
-
-		public override void RangedAttackFinished()
-		{
-			base.RangedAttackFinished();
-
-			if (ServerProperties.Properties.ALWAYS_CHECK_PET_LOS &&
-				Brain is IControlledBrain &&
-				(TargetObject is GamePlayer || (TargetObject is GameNPC && (TargetObject as GameNPC).Brain != null && (TargetObject as GameNPC).Brain is IControlledBrain)))
-			{
-				GamePlayer player = null;
-
-				if (TargetObject is GamePlayer)
-				{
-					player = TargetObject as GamePlayer;
-				}
-				else if (TargetObject is GameNPC && (TargetObject as GameNPC).Brain != null && (TargetObject as GameNPC).Brain is IControlledBrain)
-				{
-					if (((TargetObject as GameNPC).Brain as IControlledBrain).Owner is GamePlayer)
-					{
-						player = ((TargetObject as GameNPC).Brain as IControlledBrain).Owner as GamePlayer;
-					}
-				}
-
-				if (player != null)
-				{
-					player.Out.SendCheckLOS(this, TargetObject, new CheckLOSResponse(NPCStopRangedAttackCheckLOS));
-					if (ServerProperties.Properties.ENABLE_DEBUG)
-					{
-						log.Debug(Name + " sent LOS check to player " + player.Name);
-					}
-				}
-			}
-		}
-
-
-		/// <summary>
-		/// If we don't have LOS we stop attack
-		/// </summary>
-		/// <param name="player"></param>
-		/// <param name="response"></param>
-		/// <param name="targetOID"></param>
+		
 		public void NPCStopRangedAttackCheckLOS(GamePlayer player, ushort response, ushort targetOID)
 		{
 			if ((response & 0x100) != 0x100)
 			{
-				if (ServerProperties.Properties.ENABLE_DEBUG)
-				{
-					log.Debug(Name + " FAILED stop ranged attack LOS check to player " + player.Name);
-				}
-
 				StopAttack();
 			}
 		}
@@ -3272,10 +3222,7 @@ namespace Game.Logic
 
 		public void SetLastMeleeAttackTick()
 		{
-			if (TargetObject.Realm == 0 || Realm == 0)
-				m_lastAttackTickPvE = CurrentRegion.Time;
-			else
-				m_lastAttackTickPvP = CurrentRegion.Time;
+			m_lastAttackedTick = CurrentRegion.Time;
 		}
 
 		private void StartMeleeAttackTimer()
@@ -3300,21 +3247,9 @@ namespace Game.Logic
 			double damage = base.AttackDamage(weapon);
 
 			if (ActiveWeaponSlot == eActiveWeaponSlot.TwoHanded && m_blockChance > 0)
-				switch (this)
-				{
-					case Keeps.GameKeepGuard guard:
-						if (ServerProperties.Properties.GUARD_2H_BONUS_DAMAGE)
-							damage *= (100 + m_blockChance) / 100.00;
-						break;
-					case GamePet pet:
-						if (ServerProperties.Properties.PET_2H_BONUS_DAMAGE)
-							damage *= (100 + m_blockChance) / 100.00;
-						break;
-					default:
-						if (ServerProperties.Properties.MOB_2H_BONUS_DAMAGE)
-							damage *= (100 + m_blockChance) / 100.00;
-						break;
-				}
+			{
+				damage *= (100 + m_blockChance) / 100.00;
+			}
 
 			return damage;
 		}
@@ -3365,66 +3300,19 @@ namespace Game.Logic
 			}
 		}
 
-		/// <summary>
-		/// Tests if this MOB should give XP and loot based on the XPGainers
-		/// </summary>
-		/// <returns>true if it should deal XP and give loot</returns>
 		public virtual bool IsWorthReward
 		{
-			get
-			{
-				if (CurrentRegion == null || CurrentRegion.Time - CHARMED_NOEXP_TIMEOUT < TempProperties.getProperty<long>(CHARMED_TICK_PROP))
-					return false;
-				if (this.Brain is IControlledBrain)
-					return false;
-				lock (m_xpGainers.SyncRoot)
-				{
-					if (m_xpGainers.Keys.Count == 0) return false;
-					foreach (DictionaryEntry de in m_xpGainers)
-					{
-						GameObject obj = (GameObject)de.Key;
-						if (obj is GamePlayer)
-						{
-							//If a gameplayer with privlevel > 1 attacked the
-							//mob, then the players won't gain xp ...
-							if (((GamePlayer)obj).Client.Account.PrivLevel > 1)
-								return false;
-							//If a player to which we are gray killed up we
-							//aren't worth anything either
-							if (((GamePlayer)obj).IsObjectGreyCon(this))
-								return false;
-						}
-						else
-						{
-							//If object is no gameplayer and realm is != none
-							//then it means that a npc has hit this living and
-							//it is not worth any xp ...
-							//if(obj.Realm != (byte)eRealm.None)
-							//If grey to at least one living then no exp
-							if (obj is GameLiving && ((GameLiving)obj).IsObjectGreyCon(this))
-								return false;
-						}
-					}
-					return true;
-				}
-			}
-			set
-			{
-			}
+			get =>  false;
 		}
 
 		protected void ControlledNPC_Release()
 		{
 			if (this.ControlledBrain != null)
 			{
-				//log.Info("On tue le pet !");
 				this.Notify(GameLivingEvent.PetReleased, ControlledBrain.Body);
 			}
 		}
 
-		/// <summary>
-		/// Called when this living dies
-		/// </summary>
 		public override void Die(GameObject killer)
 		{
 			FireAmbientSentence(eAmbientTrigger.dieing, killer as GameLiving);
@@ -3443,32 +3331,9 @@ namespace Game.Logic
 			}
 			StopFollowing();
 
-			if (Group != null)
-				Group.RemoveMember(this);
 
 			if (killer != null)
 			{
-				// Handle faction alignement changes // TODO Review
-				if ((Faction != null) && (killer is GamePlayer))
-				{
-					// Get All Attackers. // TODO check if this shouldn't be set to Attackers instead of XPGainers ?
-					foreach (DictionaryEntry de in this.XPGainers)
-					{
-						GameLiving living = de.Key as GameLiving;
-						GamePlayer player = living as GamePlayer;
-
-						// Get Pets Owner (// TODO check if they are not already treated as attackers ?)
-						if (living is GameNPC && (living as GameNPC).Brain is IControlledBrain)
-							player = ((living as GameNPC).Brain as IControlledBrain).GetPlayerOwner();
-
-						if (player != null && player.ObjectState == GameObject.eObjectState.Active && player.IsAlive && player.IsWithinRadius(this, WorldMgr.MAX_EXPFORKILL_DISTANCE))
-						{
-							Faction.KillMember(player);
-						}
-					}
-				}
-
-				// deal out exp and realm points based on server rules
 				GameServer.ServerRules.OnNPCKilled(this, killer);
 				base.Die(killer);
 			}
@@ -3481,59 +3346,28 @@ namespace Game.Logic
 			if (!(this is GamePet))
 				StartRespawn();
 		}
-
-		/// <summary>
-		/// Stores the melee damage type of this NPC
-		/// </summary>
 		protected eDamageType m_meleeDamageType = eDamageType.Slash;
-
-		/// <summary>
-		/// Gets or sets the melee damage type of this NPC
-		/// </summary>
 		public virtual eDamageType MeleeDamageType
 		{
 			get { return m_meleeDamageType; }
 			set { m_meleeDamageType = value; }
 		}
-
-		/// <summary>
-		/// Returns the damage type of the current attack
-		/// </summary>
-		/// <param name="weapon">attack weapon</param>
 		public override eDamageType AttackDamageType(InventoryItem weapon)
 		{
 			return m_meleeDamageType;
 		}
-
-		/// <summary>
-		/// Stores the NPC evade chance
-		/// </summary>
 		protected byte m_evadeChance;
-		/// <summary>
-		/// Stores the NPC block chance
-		/// </summary>
 		protected byte m_blockChance;
-		/// <summary>
-		/// Stores the NPC parry chance
-		/// </summary>
 		protected byte m_parryChance;
-		/// <summary>
-		/// Stores the NPC left hand swing chance
-		/// </summary>
 		protected byte m_leftHandSwingChance;
 
-		/// <summary>
-		/// Gets or sets the NPC evade chance
-		/// </summary>
+
 		public virtual byte EvadeChance
 		{
 			get { return m_evadeChance; }
 			set { m_evadeChance = value; }
 		}
-
-		/// <summary>
-		/// Gets or sets the NPC block chance
-		/// </summary>
+		
 		public virtual byte BlockChance
 		{
 			get
@@ -3549,48 +3383,30 @@ namespace Game.Logic
 				m_blockChance = value;
 			}
 		}
-
-		/// <summary>
-		/// Gets or sets the NPC parry chance
-		/// </summary>
+		
 		public virtual byte ParryChance
 		{
 			get { return m_parryChance; }
 			set { m_parryChance = value; }
 		}
-
-		/// <summary>
-		/// Gets or sets the NPC left hand swing chance
-		/// </summary>
 		public byte LeftHandSwingChance
 		{
 			get { return m_leftHandSwingChance; }
 			set { m_leftHandSwingChance = value; }
 		}
-
-		/// <summary>
-		/// Calculates how many times left hand swings
-		/// </summary>
-		/// <returns></returns>
+		
 		public override int CalculateLeftHandSwingCount()
 		{
 			if (RandomUtil.Chance(m_leftHandSwingChance))
 				return 1;
 			return 0;
 		}
-
-		/// <summary>
-		/// Checks whether Living has ability to use lefthanded weapons
-		/// </summary>
+		
 		public override bool CanUseLefthandedWeapon
 		{
 			get { return m_leftHandSwingChance > 0; }
 		}
-
-		/// <summary>
-		/// Method to switch the npc to Melee attacks
-		/// </summary>
-		/// <param name="target"></param>
+		
 		public void SwitchToMelee(GameObject target)
 		{
 			// Tolakram: Order is important here.  First StopAttack, then switch weapon
@@ -3614,10 +3430,6 @@ namespace Game.Logic
 			StartAttack(target);
 		}
 
-		/// <summary>
-		/// Method to switch the guard to Ranged attacks
-		/// </summary>
-		/// <param name="target"></param>
 		public void SwitchToRanged(GameObject target)
 		{
 			StopFollowing();
