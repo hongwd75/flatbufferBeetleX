@@ -2333,17 +2333,7 @@ namespace Game.Logic
 					MoveOnPath((short)path.MaxSpeed);
 				}
 			}
-
-			if (m_houseNumber > 0 && !(this is GameConsignmentMerchant))
-			{
-				log.Info("NPC '" + Name + "' added to house " + m_houseNumber);
-				CurrentHouse = HouseMgr.GetHouse(m_houseNumber);
-				if (CurrentHouse == null)
-					log.Warn("House " + CurrentHouse + " for NPC " + Name + " doesn't exist !!!");
-				else
-					log.Info("Confirmed number: " + CurrentHouse.HouseNumber.ToString());
-			}
-
+			
 			// [Ganrod] Nidel: spawn full life
 			if (!InCombat && IsAlive && base.Health < MaxHealth)
 			{

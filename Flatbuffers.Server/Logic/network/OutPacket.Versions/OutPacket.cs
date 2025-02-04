@@ -122,12 +122,12 @@ namespace Game.Logic.network
         public abstract void SendLivingDataUpdate(GameLiving living, bool updateStrings); // 코드 작업 안함
         public abstract void SendModelAndSizeChange(ushort objectId, ushort newModel, byte newSize);      
         public abstract void SendStatusUpdate();
-
         public abstract void SendCombatAnimation(GameObject attacker, GameObject defender, ushort weaponID,
             ushort shieldID, int style, byte stance, byte result, byte targetHealthPercent);
         public abstract void SendSpellCastAnimation(GameLiving spellCaster, ushort spellID, ushort castingTime);
         public abstract void SendSpellEffectAnimation(GameObject spellCaster, GameObject spellTarget, ushort spellid, ushort boltTime, bool noSound, byte success);
         public abstract void SendEmoteAnimation(GameObject obj, eEmote emote);
+        public abstract void SendUpdateIcons(System.Collections.IList changedEffects, ref int lastUpdateEffectsCount);
         public abstract void SendStatusUpdate(bool sittingFlag);
         public abstract void SendPlayerQuit(bool totalOut);
         public abstract void SendMessage(string message, eChatType type, eChatLoc loc);
@@ -139,5 +139,6 @@ namespace Game.Logic.network
         public abstract void SendLivingEquipmentUpdate(GameLiving obj);
         public abstract void SendConcentrationList();
         public abstract void SendUpdateMaxSpeed();
+        public abstract void SendObjectGuildID(GameObject obj, Guild.Guild guild);
     }
 }

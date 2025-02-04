@@ -662,11 +662,7 @@ public class StandardMobBrain : APlayerVicinityBrain, IOldAggressiveBrain
 			
 			if (Body.Faction != null)
 			{
-				if (realTarget is GamePlayer)
-				{
-					return Math.Min(100, Body.Faction.GetAggroToFaction((GamePlayer)realTarget));
-				}
-				else if (realTarget is GameNPC && Body.Faction.EnemyFactions.Contains(((GameNPC)realTarget).Faction))
+				if (realTarget is GameNPC && Body.Faction.EnemyFactions.Contains(((GameNPC)realTarget).Faction))
 				{
 					return 100;
 				}
@@ -857,8 +853,6 @@ public class StandardMobBrain : APlayerVicinityBrain, IOldAggressiveBrain
 				puller = (GamePlayer)attacker;
 			else if (attacker is GamePet pet && pet.Owner is GamePlayer owner)
 				puller = owner;
-			else if (attacker is BDSubPet bdSubPet && bdSubPet.Owner is GamePet bdPet && bdPet.Owner is GamePlayer bdOwner)
-				puller = bdOwner;
 			else
 				return;
 

@@ -94,6 +94,8 @@ namespace Game.Logic.World
         
         private static readonly ReaderWriterDictionary<ushort, Zone> m_zones = new();
 
+        public static ushort m_lastZoneError = 0;
+        
         public static IDictionary<ushort, Zone> Zones
         {
             get { return m_zones; }
@@ -108,6 +110,21 @@ namespace Game.Logic.World
             }
             throw new KeyNotFoundException($"Region with ID {regionID} not found.");
         }
+        
+        public static Zone GetZone(ushort zoneID)
+        {
+            Zone z;
+            if (m_zones.TryGetValue(zoneID, out z))
+                return z;
+			
+            if (m_lastZoneError != zoneID)
+            {
+                log.ErrorFormat("Trying to access inexistent ZoneID {0} {1}", zoneID, Environment.StackTrace);
+                m_lastZoneError = zoneID;
+            }
+            return null;
+        }
+        
         
         private static Dictionary<ushort, RegionData> m_regionData;
 
@@ -331,7 +348,7 @@ namespace Game.Logic.World
             m_zones.AddOrReplace(zoneID, zone);
             log.InfoFormat("   - Added a zone, {0}, to region {1}", zoneData.Description, region.Name);
         }
-
+        
         private static void RelocateRegions()
         {
             log.InfoFormat("started RelocateRegions() thread ID:{0}", Thread.CurrentThread.ManagedThreadId);
@@ -382,6 +399,41 @@ namespace Game.Logic.World
                     client.Out?.SendTime();
                 }
             }
+        }
+        
+        public static uint GetCurrentGameTime(GamePlayer player)
+        {
+            if (player.CurrentRegion != null)
+                return player.CurrentRegion.GameTime;
+
+            return GetCurrentGameTime();
+        }
+        
+        public static uint GetCurrentGameTime()
+        {
+            if (m_dayIncrement == 0)
+            {
+                return (uint)m_dayStartTick;
+            }
+            else
+            {
+                long diff = Environment.TickCount - m_dayStartTick;
+                long curTime = diff * m_dayIncrement;
+                return (uint)(curTime % DAY);
+            }
+        }
+        
+        public static uint GetDayIncrement(GamePlayer player)
+        {
+            if (player.CurrentRegion != null)
+                return player.CurrentRegion.DayIncrement;
+
+            return GetDayIncrement();
+        }
+
+        public static uint GetDayIncrement()
+        {
+            return m_dayIncrement;
         }        
     }
 }

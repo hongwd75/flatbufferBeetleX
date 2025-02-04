@@ -1,10 +1,11 @@
 ﻿using System.Reflection;
+using Game.Logic.Currencys;
 using Game.Logic.Language;
-using Game.Logic.Utils;
 using Game.Logic.World;
 using log4net;
 using Logic.database.table;
 using NetworkMessage;
+using Money = Game.Logic.Utils.Money;
 
 namespace Game.Logic.Guild;
 
@@ -104,7 +105,7 @@ public class Guild
 		/// <summary>
 		/// Stores claimed keeps (unique)
 		/// </summary>
-		protected List<AbstractGameKeep> m_claimedKeeps = new List<AbstractGameKeep>();
+		// protected List<AbstractGameKeep> m_claimedKeeps = new List<AbstractGameKeep>();
 
 		public eRealm Realm
 		{
@@ -221,12 +222,12 @@ public class Guild
 
 			if (amount < 0)
 			{
-				donating.Out.SendMessage(LanguageMgr.GetTranslation(donating.Client, "Scripts.Player.Guild.DepositInvalid"), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
+				donating.Out.SendMessage(LanguageMgr.GetTranslation(donating.Network, "Scripts.Player.Guild.DepositInvalid"), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
 				return;
 			}
 			else if ((donating.Guild.GetGuildBank() + amount) >= 1000000001)
 			{
-				donating.Out.SendMessage(LanguageMgr.GetTranslation(donating.Client, "Scripts.Player.Guild.DepositFull"), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
+				donating.Out.SendMessage(LanguageMgr.GetTranslation(donating.Network, "Scripts.Player.Guild.DepositFull"), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
 				return;
 			}
 
@@ -236,12 +237,12 @@ public class Guild
                 return;
             }
 
-			donating.Out.SendMessage(LanguageMgr.GetTranslation(donating.Client, "Scripts.Player.Guild.DepositAmount", Money.GetString(long.Parse(amount.ToString()))), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
+			donating.Out.SendMessage(LanguageMgr.GetTranslation(donating.Network, "Scripts.Player.Guild.DepositAmount", Money.GetString(long.Parse(amount.ToString()))), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
 
 			donating.Guild.UpdateGuildWindow();
 			m_DBguild.Bank += amount;
 
-            InventoryLogging.LogInventoryAction(donating, "(GUILD;" + Name + ")", eInventoryActionType.Other, long.Parse(amount.ToString()));
+            //InventoryLogging.LogInventoryAction(donating, "(GUILD;" + Name + ")", eInventoryActionType.Other, long.Parse(amount.ToString()));
             donating.Out.SendUpdatePlayer();
 			return;
 		}
@@ -249,22 +250,22 @@ public class Guild
 		{
             if (amount < 0)
 			{
-				withdraw.Out.SendMessage(LanguageMgr.GetTranslation(withdraw.Client, "Scripts.Player.Guild.WithdrawInvalid"), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
+				withdraw.Out.SendMessage(LanguageMgr.GetTranslation(withdraw.Network, "Scripts.Player.Guild.WithdrawInvalid"), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
 				return;
 			}
 			else if ((withdraw.Guild.GetGuildBank() - amount) < 0)
 			{
-				withdraw.Out.SendMessage(LanguageMgr.GetTranslation(withdraw.Client, "Scripts.Player.Guild.WithdrawTooMuch"), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
+				withdraw.Out.SendMessage(LanguageMgr.GetTranslation(withdraw.Network, "Scripts.Player.Guild.WithdrawTooMuch"), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
 				return;
 			}
 
-            withdraw.Out.SendMessage(LanguageMgr.GetTranslation(withdraw.Client, "Scripts.Player.Guild.Withdrawamount", Money.GetString(long.Parse(amount.ToString()))), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
+            withdraw.Out.SendMessage(LanguageMgr.GetTranslation(withdraw.Network, "Scripts.Player.Guild.Withdrawamount", Money.GetString(long.Parse(amount.ToString()))), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
 			withdraw.Guild.UpdateGuildWindow();
 			m_DBguild.Bank -= amount;
 
 		    var amt = long.Parse(amount.ToString());
             withdraw.AddMoney(Currency.Copper.Mint(amt));
-            InventoryLogging.LogInventoryAction("(GUILD;" + Name + ")", withdraw, eInventoryActionType.Other, amt);
+            //InventoryLogging.LogInventoryAction("(GUILD;" + Name + ")", withdraw, eInventoryActionType.Other, amt);
             withdraw.Out.SendUpdatePlayer();
             withdraw.SaveIntoDatabase();
             withdraw.Guild.SaveIntoDatabase();
@@ -358,9 +359,6 @@ public class Guild
 			}
 		}
 
-		/// <summary>
-		/// Gets or sets the guild alliance
-		/// </summary>
 		public Alliance alliance
 		{
 			get 
@@ -373,9 +371,6 @@ public class Guild
 			}
 		}
 
-		/// <summary>
-		/// Gets or sets the guild id
-		/// </summary>
 		public string GuildID
 		{
 			get 
@@ -389,9 +384,6 @@ public class Guild
 			}
 		}
 
-		/// <summary>
-		/// Gets or sets the runtime guild id
-		/// </summary>
 		public ushort ID
 		{
 			get 
@@ -404,9 +396,6 @@ public class Guild
 			}
 		}
 
-		/// <summary>
-		/// Gets or sets the guild name
-		/// </summary>
 		public string Name
 		{
 			get 
@@ -446,18 +435,6 @@ public class Guild
 			}
 		}
 
-		/// <summary>
-		/// Gets or sets the guild claimed keep
-		/// </summary>
-		public List<AbstractGameKeep> ClaimedKeeps
-		{
-			get { return m_claimedKeeps; }
-			set { m_claimedKeeps = value; }
-		}
-
-		/// <summary>
-		/// Returns the number of players online inside this guild
-		/// </summary>
 		public int MemberOnlineCount
 		{
 			get
@@ -466,13 +443,6 @@ public class Guild
 			}
 		}
 
-		public Quests.AbstractMission Mission = null;
-
-		/// <summary>
-		/// Adds a player to the guild
-		/// </summary>
-		/// <param name="player">GamePlayer to be added to the guild</param>
-		/// <returns>true if added successfully</returns>
 		public bool AddOnlineMember(GamePlayer player)
 		{
 			if(player==null) return false;
@@ -480,9 +450,7 @@ public class Guild
 			{
 				if (!m_onlineGuildPlayers.ContainsKey(player.InternalID))
 				{
-					if (!player.IsAnonymous)
-						NotifyGuildMembers(player);
-
+					NotifyGuildMembers(player);
 					m_onlineGuildPlayers.Add(player.InternalID, player);
 					return true;
 				}
@@ -496,16 +464,14 @@ public class Guild
 			foreach (GamePlayer player in m_onlineGuildPlayers.Values)
 			{
 				if (player == member) continue;
-				if (player.ShowGuildLogins)
-					player.Out.SendMessage("Guild member " + member.Name + " has logged in!", DOL.GS.PacketHandler.eChatType.CT_System, DOL.GS.PacketHandler.eChatLoc.CL_SystemWindow);
+				if (player.Network.Account.ShowGuildLogins)
+				{
+					player.Out.SendMessage("Guild member " + member.Name + " has logged in!",
+						NetworkMessage.eChatType.CT_System, NetworkMessage.eChatLoc.CL_SystemWindow);
+				}
 			}
 		}
 
-		/// <summary>
-		/// Removes a player from the guild
-		/// </summary>
-		/// <param name="player">GamePlayer to be removed</param>
-		/// <returns>true if removed, false if not</returns>
 		public bool RemoveOnlineMember(GamePlayer player)
 		{
 			lock (m_memberListLock)
@@ -514,7 +480,6 @@ public class Guild
 				{
 					m_onlineGuildPlayers.Remove(player.InternalID);
 
-					// now update the all member list to display lastonline time instead of zone
 					Dictionary<string, GuildMgr.GuildMemberDisplay> memberList = GuildMgr.GetAllGuildMembers(player.GuildID);
 
 					if (memberList != null && memberList.ContainsKey(player.InternalID))
@@ -528,9 +493,6 @@ public class Guild
 			return false;
 		}
 
-		/// <summary>
-		/// Remove all Members from memory
-		/// </summary>
 		public void ClearOnlineMemberList()
 		{
 			lock (m_memberListLock)
@@ -539,10 +501,6 @@ public class Guild
 			}
 		}
 
-		/// <summary>
-		/// Returns a player according to the matching membername
-		/// </summary>
-		/// <returns>GuildMemberEntry</returns>
 		public GamePlayer GetOnlineMemberByID(string memberID)
 		{
 			lock (m_memberListLock)
@@ -554,22 +512,11 @@ public class Guild
 			return null;
 		}
 
-		/// <summary>
-		/// Add a player to a guild at rank 9
-		/// </summary>
-		/// <param name="addPlayer"></param>
-		/// <returns></returns>
 		public bool AddPlayer(GamePlayer addPlayer)
 		{
 			return AddPlayer(addPlayer, GetRankByID(9));
 		}
 
-		/// <summary>
-		/// Add a player to a guild with the specified rank
-		/// </summary>
-		/// <param name="addPlayer"></param>
-		/// <param name="rank"></param>
-		/// <returns></returns>
 		public bool AddPlayer(GamePlayer addPlayer, DBRank rank)
 		{
 			if (addPlayer == null || addPlayer.Guild != null)
@@ -587,9 +534,9 @@ public class Guild
 				addPlayer.Guild = this;
 				addPlayer.SaveIntoDatabase();
 				GuildMgr.AddPlayerToAllGuildPlayersList(addPlayer);
-				addPlayer.Out.SendMessage("You have agreed to join " + this.Name + "!", eChatType.CT_Group, eChatLoc.CL_SystemWindow);
-				addPlayer.Out.SendMessage("Your current rank is " + addPlayer.GuildRank.Title + "!", eChatType.CT_Group, eChatLoc.CL_SystemWindow);
-				SendMessageToGuildMembers(addPlayer.Name + " has joined the guild!", eChatType.CT_Group, eChatLoc.CL_SystemWindow);
+				addPlayer.Out.SendMessage("You have agreed to join " + this.Name + "!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+				addPlayer.Out.SendMessage("Your current rank is " + addPlayer.GuildRank.Title + "!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+				SendMessageToGuildMembers(addPlayer.Name + " has joined the guild!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
 			}
 			catch (Exception e)
 			{
@@ -601,12 +548,6 @@ public class Guild
 			return true;
 		}
 
-		/// <summary>
-		/// Delete's a member from this Guild
-		/// </summary>
-		/// <param name="removername">the player (client) removing</param>
-		/// <param name="member">the player named beeing remove</param>
-		/// <returns>true or false</returns>
 		public bool RemovePlayer(string removername, GamePlayer member)
 		{
 			try

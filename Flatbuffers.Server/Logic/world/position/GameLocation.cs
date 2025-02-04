@@ -68,25 +68,25 @@ public class GameLocation : IGameLocation
 
 		public static int ConvertLocalXToGlobalX(int localX, ushort zoneId)
 		{
-			Zone z = WorldMgr.GetZone(zoneId);
+			Zone z = WorldManager.GetZone(zoneId);
 			return z.Offset.X + localX;
 		}
 
 		public static int ConvertLocalYToGlobalY(int localY, ushort zoneId)
 		{
-			Zone z = WorldMgr.GetZone(zoneId);
+			Zone z = WorldManager.GetZone(zoneId);
 			return z.Offset.Y + localY;
 		}
 
 		public static int ConvertGlobalXToLocalX(int globalX, ushort zoneId)
 		{
-			Zone z = WorldMgr.GetZone(zoneId);
+			Zone z = WorldManager.GetZone(zoneId);
 			return globalX - z.Offset.X;
 		}
 
 		public static int ConvertGlobalYToLocalY(int globalY, ushort zoneId)
 		{
-			Zone z = WorldMgr.GetZone(zoneId);
+			Zone z = WorldManager.GetZone(zoneId);
 			return globalY - z.Offset.Y;
 		}
 

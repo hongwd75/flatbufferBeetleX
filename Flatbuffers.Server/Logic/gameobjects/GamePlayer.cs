@@ -907,6 +907,99 @@ namespace Game.Logic
 
 		#endregion Abilities
 
+		#region Send/Say/Yell/Whisper/Messages
+		public virtual void MessageFromArea(GameObject source, string message, eChatType chatType, eChatLoc chatLocation)
+		{
+			Out.SendMessage(message, chatType, chatLocation);
+		}
+		public override void MessageFromControlled(string message, eChatType chatType)
+		{
+			MessageToSelf(message, chatType);
+		}
+		public override void MessageToSelf(string message, eChatType chatType)
+		{
+			Out.SendMessage(message, chatType, eChatLoc.CL_SystemWindow);
+		}	
+		public override bool Whisper(GameObject target, string str)
+		{
+			if (target == null)
+			{
+				Out.SendMessage(LanguageMgr.GetTranslation(Network?.Account.Language, "GamePlayer.Whisper.SelectTarget"), eChatType.CT_System,
+					eChatLoc.CL_ChatWindow);
+				return false;
+			}
+			if (!base.Whisper(target, str))
+				return false;
+			if (target is GamePlayer)
+				Out.SendMessage("You whisper, \"" + str + "\" to " + target.GetName(0, false), eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+			return true;
+		}	
+		public override bool WhisperReceive(GameLiving source, string str)
+		{
+			if (!base.WhisperReceive(source, str))
+				return false;
+			if (GameServer.ServerRules.IsAllowedToUnderstand(source, this))
+			{
+				Out.SendMessage(source.GetName(0, false) + " whispers to you, \"" + str + "\"", eChatType.CT_Say,
+					eChatLoc.CL_ChatWindow);
+			}
+			else
+			{
+				Out.SendMessage(source.GetName(0, false) + " whispers something in a language you don't understand.",
+					eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+			}
+			return true;
+		}
+		public override bool Yell(string str)
+		{
+			if (!base.Yell(str))
+				return false;
+			Out.SendMessage("You yell, \"" + str + "\"", eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+			return true;
+		}
+		public override bool YellReceive(GameLiving source, string str)
+		{
+			if (!base.YellReceive(source, str))
+				return false;
+			if (GameServer.ServerRules.IsAllowedToUnderstand(source, this))
+			{
+				Out.SendMessage(source.GetName(0, false) + " yells, \"" + str + "\"", eChatType.CT_Say,
+					eChatLoc.CL_ChatWindow);
+			}
+			else
+			{
+				Out.SendMessage(source.GetName(0, false) + " yells something in a language you don't understand.",
+					eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+			}
+
+			return true;
+		}	
+		public override bool Say(string str)
+		{
+			if (!base.Say(str))
+				return false;
+			Out.SendMessage(LanguageMgr.GetTranslation(Network.Account.Language, "GamePlayer.Say.YouSay", str), eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+			return true;
+		}
+		public override bool SayReceive(GameLiving source, string str)
+		{
+			if (!base.SayReceive(source, str))
+				return false;
+
+			if (GameServer.ServerRules.IsAllowedToUnderstand(source, this))
+			{
+				Out.SendMessage(LanguageMgr.GetTranslation(Network.Account.Language, "GamePlayer.SayReceive.Says", source.GetName(0, false), str),
+					eChatType.CT_Say, eChatLoc.CL_ChatWindow);				
+			}
+			else
+			{
+				Out.SendMessage(LanguageMgr.GetTranslation(Network.Account.Language, "GamePlayer.SayReceive.FalseLanguage", source.GetName(0, false)), eChatType.CT_Say, eChatLoc.CL_ChatWindow);	
+			}
+			
+			return true;
+		}		
+		#endregion
+		
 		public virtual void RemoveAllAbilities()
 		{
 			lock (m_lockAbilities)
@@ -1178,15 +1271,15 @@ namespace Game.Logic
 			{
 				if (!m_specialization.TryGetValue(keyName, out spec))
 				{
-					if (keyName == GlobalSpellsLines.Combat_Styles_Effect)
-					{
-						if (CharacterClass.ID == (int)eCharacterClass.Reaver || CharacterClass.ID == (int)eCharacterClass.Heretic)
-							level = GetModifiedSpecLevel(Specs.Flexible);
-						if (CharacterClass.ID == (int)eCharacterClass.Valewalker)
-							level = GetModifiedSpecLevel(Specs.Scythe);
-						if (CharacterClass.ID == (int)eCharacterClass.Savage)
-							level = GetModifiedSpecLevel(Specs.Savagery);
-					}
+					// if (keyName == GlobalSpellsLines.Combat_Styles_Effect)
+					// {
+					// 	if (CharacterClass.ID == (int)eCharacterClass.Reaver || CharacterClass.ID == (int)eCharacterClass.Heretic)
+					// 		level = GetModifiedSpecLevel(Specs.Flexible);
+					// 	if (CharacterClass.ID == (int)eCharacterClass.Valewalker)
+					// 		level = GetModifiedSpecLevel(Specs.Scythe);
+					// 	if (CharacterClass.ID == (int)eCharacterClass.Savage)
+					// 		level = GetModifiedSpecLevel(Specs.Savagery);
+					// }
 	
 					level = 0;
 				}
@@ -1233,13 +1326,13 @@ namespace Game.Logic
 				}
 				
 				if (notify)
-					Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GamePlayer.AddSpellLine.YouLearn", line.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+					Out.SendMessage(LanguageMgr.GetTranslation(Network.Account.Language, "GamePlayer.AddSpellLine.YouLearn", line.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 			}
 			else
 			{
 				// message to player
 				if (notify && oldline.Level < line.Level)
-					Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GamePlayer.UpdateSpellLine.GainPower", line.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+					Out.SendMessage(LanguageMgr.GetTranslation(Network.Account.Language, "GamePlayer.UpdateSpellLine.GainPower", line.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 				oldline.Level = line.Level;
 			}
 		}
@@ -1578,31 +1671,18 @@ namespace Game.Logic
 				}
 			}
 		}
-
-		/// <summary>
-		/// Called by trainer when specialization points were added to a skill
-		/// </summary>
-		/// <param name="skill"></param>
+		
 		public void OnSkillTrained(Specialization skill)
 		{
-			Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GamePlayer.OnSkillTrained.YouSpend", skill.Level, skill.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-			Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GamePlayer.OnSkillTrained.YouHave", SkillSpecialtyPoints), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-			Message.SystemToOthers(this, LanguageMgr.GetTranslation(Client.Account.Language, "GamePlayer.OnSkillTrained.TrainsInVarious", GetName(0, true)), eChatType.CT_System);
+			Out.SendMessage(LanguageMgr.GetTranslation(Network.Account.Language, "GamePlayer.OnSkillTrained.YouSpend", skill.Level, skill.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+			Message.SystemToOthers(this, LanguageMgr.GetTranslation(Network.Account.Language, "GamePlayer.OnSkillTrained.TrainsInVarious", GetName(0, true)), eChatType.CT_System);
 			RefreshSpecDependantSkills(true);
 
-			Out.SendUpdatePlayerSkills();
+			//Out.SendUpdatePlayerSkills();
 		}
-
-		/// <summary>
-		/// effectiveness of the player (resurrection illness)
-		/// Effectiveness is used in physical/magic damage (exept dot), in weapon skill and max concentration formula
-		/// </summary>
+		
 		protected double m_playereffectiveness = 1.0;
 
-		/// <summary>
-		/// get / set the player's effectiveness.
-		/// Effectiveness is used in physical/magic damage (exept dot), in weapon skill and max concentration
-		/// </summary>
 		public override double Effectiveness
 		{
 			get { return m_playereffectiveness; }
@@ -2081,9 +2161,9 @@ namespace Game.Logic
 	        set
 	        {
 		        m_guildRank = value;
-		        if (value != null && DBCharacter != null)
+		        if (value != null && Network?.Account != null)
 		        {
-			        DBCharacter.GuildRank = value.RankLevel;
+			        Network.Account.GuildRank = value.RankLevel;
 		        }
 	        }
         }
@@ -2095,6 +2175,10 @@ namespace Game.Logic
         public string GuildID
         {
 	        get { return Network.Account.GuildID; }
+	        set
+	        {
+		        Network.Account.GuildID = value;
+	        }
         }
         #endregion
 

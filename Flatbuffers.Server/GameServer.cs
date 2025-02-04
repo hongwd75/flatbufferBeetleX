@@ -24,6 +24,10 @@ namespace Game.Logic
         protected const int MINUTE_CONV = 60000;
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
+        #region Properties
+        public NpcManager NpcManager { get; protected set; }
+
+        #endregion
         #region ========= DB ===========================================================================================
         protected IObjectDatabase m_database;
         public IObjectDatabase IDatabase => m_database;
@@ -147,6 +151,11 @@ namespace Game.Logic
 
             //--------------------------------------------------------------------------------------
             GameEventManager.Notify(ScriptEvent.Loaded);
+            
+            //---------------------------------------------------------------
+            //Try to initialize the NpcManager
+            if (!InitComponent(() => NpcManager = new NpcManager(this), "NPC Manager Initialization"))
+                return false;
             
             //--------------------------------------------------------------------------------------
             if (InitComponent(() =>

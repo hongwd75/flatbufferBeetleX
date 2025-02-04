@@ -118,6 +118,33 @@ namespace Game.Logic.ServerProperties
 		[ServerProperty("npc", "gamenpc_followcheck_time", "How often, in milliseconds, to check follow distance. Lower numbers make NPC follow closer but increase load on server.", 500)]
 		public static int GAMENPC_FOLLOWCHECK_TIME;		
 		
+		[ServerProperty("npc", "pet_scale_spell_max_level", "Disabled if 0 or less.  If greater than 0, this value is the level at which pets cast their spells at 100% effectivness, so choose spells for pets assuming they're at the level set here.  Live is max pet level, 44 or 50 depending on patch.", 0)]
+		public static int PET_SCALE_SPELL_MAX_LEVEL;
+		[ServerProperty("npc", "pet_levels_with_owner", "Do pets level up with their owner? ", false)]
+		public static bool PET_LEVELS_WITH_OWNER;
+		[ServerProperty("npc", "pet_autoset_str_base", "Base Value to use when auto-setting Pet STR stat. ", (short)30)]
+		public static short PET_AUTOSET_STR_BASE;
+		[ServerProperty("npc", "pet_autoset_str_multiplier", "Multiplier to use when auto-setting Pet STR stat. Multiplied by 10 when applied. ", 1.0)]
+		public static double PET_AUTOSET_STR_MULTIPLIER;
+		[ServerProperty("npc", "pet_autoset_con_base", "Base Value to use when auto-setting Pet CON stat. ", (short)30)]
+		public static short PET_AUTOSET_CON_BASE;
+		[ServerProperty("npc", "pet_autoset_con_multiplier", "Multiplier to use when auto-setting Pet CON stat. ", 1.0)]
+		public static double PET_AUTOSET_CON_MULTIPLIER;
+		[ServerProperty("npc", "pet_autoset_dex_base", "Base Value to use when auto-setting Pet DEX stat. ", (short)30)]
+		public static short PET_AUTOSET_DEX_BASE;
+		[ServerProperty("npc", "pet_autoset_dex_multiplier", "Multiplier to use when auto-setting Pet DEX stat. ", 1.0)]
+		public static double PET_AUTOSET_DEX_MULTIPLIER;
+		[ServerProperty("npc", "pet_autoset_qui_base", "Base Value to use when auto-setting Pet QUI stat. ", (short)30)]
+		public static short PET_AUTOSET_QUI_BASE;
+		[ServerProperty("npc", "pet_autoset_qui_multiplier", "Multiplier to use when auto-setting Pet QUI stat. ", 1.0)]
+		public static double PET_AUTOSET_QUI_MULTIPLIER;
+		[ServerProperty("npc", "pet_autoset_int_base", "Multiplier to use when auto-setting Pet INT stat. ", (short)30)]
+		public static short PET_AUTOSET_INT_BASE;
+		[ServerProperty("npc", "pet_autoset_int_multiplier", "Multiplier to use when auto-setting Pet INT stat. ", 1.0)]
+		public static double PET_AUTOSET_INT_MULTIPLIER;
+		[ServerProperty("npc", "pet_2h_bonus_damage", "If true, pets that use a 2H weapon and have a block chance get bonus damage equal to their block chance to compensate for not being able to block. ", true)]
+		public static bool PET_2H_BONUS_DAMAGE;		
+		
 		[ServerProperty("rates", "item_sell_ratio", "상인한테 팔 때 아이템 가격할인 비율 %", 50)]
 		public static int ITEM_SELL_RATIO;		
 		[ServerProperty("rates", "cs_opening_effectiveness", "스텔스 스타일 고정 스타일 성장율", 1.0)]

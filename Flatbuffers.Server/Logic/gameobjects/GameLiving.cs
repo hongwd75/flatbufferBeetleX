@@ -2695,6 +2695,20 @@ public partial class GameLiving : GameObject
 	}	
 	#endregion
 
+	public virtual void BroadcastLivingEquipmentUpdate()
+	{
+		if (ObjectState != eObjectState.Active)
+			return;
+			
+		foreach (GamePlayer player in GetPlayersInRadius(WorldManager.VISIBILITY_DISTANCE))
+		{
+			if (player == null)
+				continue;
+				
+			player.Out.SendLivingEquipmentUpdate(this);
+		}
+	}
+	
 	public override void Notify(GameEvent e, object sender, EventArgs args)
 	{
 		if (e == GameLivingEvent.Interrupted && args != null)

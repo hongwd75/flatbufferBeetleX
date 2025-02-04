@@ -786,6 +786,148 @@ static public class SC_PlayerUpdateVerify
       && verifier.VerifyTableEnd(tablePos);
   }
 }
+public struct SC_UpdateIcons : IFlatbufferObject
+{
+  private Table __p;
+  public ByteBuffer ByteBuffer { get { return __p.bb; } }
+  public static void ValidateVersion() { FlatBufferConstants.FLATBUFFERS_24_3_25(); }
+  public static SC_UpdateIcons GetRootAsSC_UpdateIcons(ByteBuffer _bb) { return GetRootAsSC_UpdateIcons(_bb, new SC_UpdateIcons()); }
+  public static SC_UpdateIcons GetRootAsSC_UpdateIcons(ByteBuffer _bb, SC_UpdateIcons obj) { return (obj.__assign(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
+  public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
+  public SC_UpdateIcons __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
+
+  public NetworkMessage.ActiveIconInfo? Icons(int j) { int o = __p.__offset(4); return o != 0 ? (NetworkMessage.ActiveIconInfo?)(new NetworkMessage.ActiveIconInfo()).__assign(__p.__indirect(__p.__vector(o) + j * 4), __p.bb) : null; }
+  public int IconsLength { get { int o = __p.__offset(4); return o != 0 ? __p.__vector_len(o) : 0; } }
+
+  public static Offset<NetworkMessage.SC_UpdateIcons> CreateSC_UpdateIcons(FlatBufferBuilder builder,
+      VectorOffset iconsOffset = default(VectorOffset)) {
+    builder.StartTable(1);
+    SC_UpdateIcons.AddIcons(builder, iconsOffset);
+    return SC_UpdateIcons.EndSC_UpdateIcons(builder);
+  }
+
+  public static void StartSC_UpdateIcons(FlatBufferBuilder builder) { builder.StartTable(1); }
+  public static void AddIcons(FlatBufferBuilder builder, VectorOffset iconsOffset) { builder.AddOffset(0, iconsOffset.Value, 0); }
+  public static VectorOffset CreateIconsVector(FlatBufferBuilder builder, Offset<NetworkMessage.ActiveIconInfo>[] data) { builder.StartVector(4, data.Length, 4); for (int i = data.Length - 1; i >= 0; i--) builder.AddOffset(data[i].Value); return builder.EndVector(); }
+  public static VectorOffset CreateIconsVectorBlock(FlatBufferBuilder builder, Offset<NetworkMessage.ActiveIconInfo>[] data) { builder.StartVector(4, data.Length, 4); builder.Add(data); return builder.EndVector(); }
+  public static VectorOffset CreateIconsVectorBlock(FlatBufferBuilder builder, ArraySegment<Offset<NetworkMessage.ActiveIconInfo>> data) { builder.StartVector(4, data.Count, 4); builder.Add(data); return builder.EndVector(); }
+  public static VectorOffset CreateIconsVectorBlock(FlatBufferBuilder builder, IntPtr dataPtr, int sizeInBytes) { builder.StartVector(1, sizeInBytes, 1); builder.Add<Offset<NetworkMessage.ActiveIconInfo>>(dataPtr, sizeInBytes); return builder.EndVector(); }
+  public static void StartIconsVector(FlatBufferBuilder builder, int numElems) { builder.StartVector(4, numElems, 4); }
+  public static Offset<NetworkMessage.SC_UpdateIcons> EndSC_UpdateIcons(FlatBufferBuilder builder) {
+    int o = builder.EndTable();
+    return new Offset<NetworkMessage.SC_UpdateIcons>(o);
+  }
+  public SC_UpdateIcons_FBS UnPack() {
+    var _o = new SC_UpdateIcons_FBS();
+    this.UnPackTo(_o);
+    return _o;
+  }
+  public void UnPackTo(SC_UpdateIcons_FBS _o) {
+    _o.Icons = new List<NetworkMessage.ActiveIconInfo_FBS>();
+    for (var _j = 0; _j < this.IconsLength; ++_j) {_o.Icons.Add(this.Icons(_j).HasValue ? this.Icons(_j).Value.UnPack() : null);}
+  }
+  public static Offset<NetworkMessage.SC_UpdateIcons> Pack(FlatBufferBuilder builder, SC_UpdateIcons_FBS _o) {
+    if (_o == null) return default(Offset<NetworkMessage.SC_UpdateIcons>);
+    var _icons = default(VectorOffset);
+    if (_o.Icons != null) {
+      var __icons = new Offset<NetworkMessage.ActiveIconInfo>[_o.Icons.Count];
+      for (var _j = 0; _j < __icons.Length; ++_j) { __icons[_j] = NetworkMessage.ActiveIconInfo.Pack(builder, _o.Icons[_j]); }
+      _icons = CreateIconsVector(builder, __icons);
+    }
+    return CreateSC_UpdateIcons(
+      builder,
+      _icons);
+  }
+}
+
+public class SC_UpdateIcons_FBS
+{
+  public List<NetworkMessage.ActiveIconInfo_FBS> Icons { get; set; }
+
+  public SC_UpdateIcons_FBS() {
+    this.Icons = null;
+  }
+}
+
+
+static public class SC_UpdateIconsVerify
+{
+  static public bool Verify(Google.FlatBuffers.Verifier verifier, uint tablePos)
+  {
+    return verifier.VerifyTableStart(tablePos)
+      && verifier.VerifyVectorOfTables(tablePos, 4 /*Icons*/, NetworkMessage.ActiveIconInfoVerify.Verify, false)
+      && verifier.VerifyTableEnd(tablePos);
+  }
+}
+public struct SC_ObjectGuildID : IFlatbufferObject
+{
+  private Table __p;
+  public ByteBuffer ByteBuffer { get { return __p.bb; } }
+  public static void ValidateVersion() { FlatBufferConstants.FLATBUFFERS_24_3_25(); }
+  public static SC_ObjectGuildID GetRootAsSC_ObjectGuildID(ByteBuffer _bb) { return GetRootAsSC_ObjectGuildID(_bb, new SC_ObjectGuildID()); }
+  public static SC_ObjectGuildID GetRootAsSC_ObjectGuildID(ByteBuffer _bb, SC_ObjectGuildID obj) { return (obj.__assign(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
+  public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
+  public SC_ObjectGuildID __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
+
+  public ushort Objectid { get { int o = __p.__offset(4); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public ushort Guildid { get { int o = __p.__offset(6); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+
+  public static Offset<NetworkMessage.SC_ObjectGuildID> CreateSC_ObjectGuildID(FlatBufferBuilder builder,
+      ushort objectid = 0,
+      ushort guildid = 0) {
+    builder.StartTable(2);
+    SC_ObjectGuildID.AddGuildid(builder, guildid);
+    SC_ObjectGuildID.AddObjectid(builder, objectid);
+    return SC_ObjectGuildID.EndSC_ObjectGuildID(builder);
+  }
+
+  public static void StartSC_ObjectGuildID(FlatBufferBuilder builder) { builder.StartTable(2); }
+  public static void AddObjectid(FlatBufferBuilder builder, ushort objectid) { builder.AddUshort(0, objectid, 0); }
+  public static void AddGuildid(FlatBufferBuilder builder, ushort guildid) { builder.AddUshort(1, guildid, 0); }
+  public static Offset<NetworkMessage.SC_ObjectGuildID> EndSC_ObjectGuildID(FlatBufferBuilder builder) {
+    int o = builder.EndTable();
+    return new Offset<NetworkMessage.SC_ObjectGuildID>(o);
+  }
+  public SC_ObjectGuildID_FBS UnPack() {
+    var _o = new SC_ObjectGuildID_FBS();
+    this.UnPackTo(_o);
+    return _o;
+  }
+  public void UnPackTo(SC_ObjectGuildID_FBS _o) {
+    _o.Objectid = this.Objectid;
+    _o.Guildid = this.Guildid;
+  }
+  public static Offset<NetworkMessage.SC_ObjectGuildID> Pack(FlatBufferBuilder builder, SC_ObjectGuildID_FBS _o) {
+    if (_o == null) return default(Offset<NetworkMessage.SC_ObjectGuildID>);
+    return CreateSC_ObjectGuildID(
+      builder,
+      _o.Objectid,
+      _o.Guildid);
+  }
+}
+
+public class SC_ObjectGuildID_FBS
+{
+  public ushort Objectid { get; set; }
+  public ushort Guildid { get; set; }
+
+  public SC_ObjectGuildID_FBS() {
+    this.Objectid = 0;
+    this.Guildid = 0;
+  }
+}
+
+
+static public class SC_ObjectGuildIDVerify
+{
+  static public bool Verify(Google.FlatBuffers.Verifier verifier, uint tablePos)
+  {
+    return verifier.VerifyTableStart(tablePos)
+      && verifier.VerifyField(tablePos, 4 /*Objectid*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 6 /*Guildid*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyTableEnd(tablePos);
+  }
+}
 public struct SC_VariousUpdate : IFlatbufferObject
 {
   private Table __p;

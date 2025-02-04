@@ -215,26 +215,28 @@ enum ServerPackets : uint16_t {
   ServerPackets_SC_UpdatePosition = 9,
   ServerPackets_SC_ObjectUpdate = 10,
   ServerPackets_SC_CharacterStatusUpdate = 11,
-  ServerPackets_SC_PlayerCreate = 12,
-  ServerPackets_SC_MovingObjectCreate = 13,
-  ServerPackets_SC_NPCCreate = 14,
-  ServerPackets_SC_ObjectCreate = 15,
-  ServerPackets_SC_ModelChange = 16,
-  ServerPackets_SC_RemoveObject = 17,
-  ServerPackets_SC_ConcentrationList = 18,
-  ServerPackets_SC_CombatAnimation = 19,
-  ServerPackets_SC_SpellCastAnimation = 20,
-  ServerPackets_SC_SpellEffectAnimation = 21,
-  ServerPackets_SC_EmoteAnimation = 22,
-  ServerPackets_SC_StringMessage = 23,
-  ServerPackets_SC_DialogBoxMessage = 24,
-  ServerPackets_SC_MaxSpeed = 25,
-  ServerPackets_SC_Quit = 26,
+  ServerPackets_SC_UpdateIcons = 12,
+  ServerPackets_SC_PlayerCreate = 13,
+  ServerPackets_SC_MovingObjectCreate = 14,
+  ServerPackets_SC_ObjectGuildID = 15,
+  ServerPackets_SC_NPCCreate = 16,
+  ServerPackets_SC_ObjectCreate = 17,
+  ServerPackets_SC_ModelChange = 18,
+  ServerPackets_SC_RemoveObject = 19,
+  ServerPackets_SC_ConcentrationList = 20,
+  ServerPackets_SC_CombatAnimation = 21,
+  ServerPackets_SC_SpellCastAnimation = 22,
+  ServerPackets_SC_SpellEffectAnimation = 23,
+  ServerPackets_SC_EmoteAnimation = 24,
+  ServerPackets_SC_StringMessage = 25,
+  ServerPackets_SC_DialogBoxMessage = 26,
+  ServerPackets_SC_MaxSpeed = 27,
+  ServerPackets_SC_Quit = 28,
   ServerPackets_MIN = ServerPackets_SC_LoginAns,
   ServerPackets_MAX = ServerPackets_SC_Quit
 };
 
-inline const ServerPackets (&EnumValuesServerPackets())[26] {
+inline const ServerPackets (&EnumValuesServerPackets())[28] {
   static const ServerPackets values[] = {
     ServerPackets_SC_LoginAns,
     ServerPackets_SC_AccountInfo,
@@ -247,8 +249,10 @@ inline const ServerPackets (&EnumValuesServerPackets())[26] {
     ServerPackets_SC_UpdatePosition,
     ServerPackets_SC_ObjectUpdate,
     ServerPackets_SC_CharacterStatusUpdate,
+    ServerPackets_SC_UpdateIcons,
     ServerPackets_SC_PlayerCreate,
     ServerPackets_SC_MovingObjectCreate,
+    ServerPackets_SC_ObjectGuildID,
     ServerPackets_SC_NPCCreate,
     ServerPackets_SC_ObjectCreate,
     ServerPackets_SC_ModelChange,
@@ -267,7 +271,7 @@ inline const ServerPackets (&EnumValuesServerPackets())[26] {
 }
 
 inline const char * const *EnumNamesServerPackets() {
-  static const char * const names[27] = {
+  static const char * const names[29] = {
     "SC_LoginAns",
     "SC_AccountInfo",
     "SC_WorldEnterNotify",
@@ -279,8 +283,10 @@ inline const char * const *EnumNamesServerPackets() {
     "SC_UpdatePosition",
     "SC_ObjectUpdate",
     "SC_CharacterStatusUpdate",
+    "SC_UpdateIcons",
     "SC_PlayerCreate",
     "SC_MovingObjectCreate",
+    "SC_ObjectGuildID",
     "SC_NPCCreate",
     "SC_ObjectCreate",
     "SC_ModelChange",

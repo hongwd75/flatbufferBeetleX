@@ -62,6 +62,14 @@ struct SC_PlayerUpdate;
 struct SC_PlayerUpdateBuilder;
 struct SC_PlayerUpdate_FBS;
 
+struct SC_UpdateIcons;
+struct SC_UpdateIconsBuilder;
+struct SC_UpdateIcons_FBS;
+
+struct SC_ObjectGuildID;
+struct SC_ObjectGuildIDBuilder;
+struct SC_ObjectGuildID_FBS;
+
 struct SC_VariousUpdate;
 struct SC_VariousUpdateBuilder;
 struct SC_VariousUpdate_FBS;
@@ -156,6 +164,10 @@ bool operator==(const SC_UpdatePosition_FBS &lhs, const SC_UpdatePosition_FBS &r
 bool operator!=(const SC_UpdatePosition_FBS &lhs, const SC_UpdatePosition_FBS &rhs);
 bool operator==(const SC_PlayerUpdate_FBS &lhs, const SC_PlayerUpdate_FBS &rhs);
 bool operator!=(const SC_PlayerUpdate_FBS &lhs, const SC_PlayerUpdate_FBS &rhs);
+bool operator==(const SC_UpdateIcons_FBS &lhs, const SC_UpdateIcons_FBS &rhs);
+bool operator!=(const SC_UpdateIcons_FBS &lhs, const SC_UpdateIcons_FBS &rhs);
+bool operator==(const SC_ObjectGuildID_FBS &lhs, const SC_ObjectGuildID_FBS &rhs);
+bool operator!=(const SC_ObjectGuildID_FBS &lhs, const SC_ObjectGuildID_FBS &rhs);
 bool operator==(const SC_VariousUpdate_FBS &lhs, const SC_VariousUpdate_FBS &rhs);
 bool operator!=(const SC_VariousUpdate_FBS &lhs, const SC_VariousUpdate_FBS &rhs);
 bool operator==(const SC_RemoveObject_FBS &lhs, const SC_RemoveObject_FBS &rhs);
@@ -986,6 +998,148 @@ inline ::flatbuffers::Offset<SC_PlayerUpdate> CreateSC_PlayerUpdate(
 }
 
 ::flatbuffers::Offset<SC_PlayerUpdate> CreateSC_PlayerUpdate(::flatbuffers::FlatBufferBuilder &_fbb, const SC_PlayerUpdate_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct SC_UpdateIcons_FBS : public ::flatbuffers::NativeTable {
+  typedef SC_UpdateIcons TableType;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_UpdateIcons_FBS";
+  }
+  std::vector<std::shared_ptr<NetworkMessage::ActiveIconInfo_FBS>> icons{};
+  SC_UpdateIcons_FBS() = default;
+  SC_UpdateIcons_FBS(const SC_UpdateIcons_FBS &o);
+  SC_UpdateIcons_FBS(SC_UpdateIcons_FBS&&) FLATBUFFERS_NOEXCEPT = default;
+  SC_UpdateIcons_FBS &operator=(SC_UpdateIcons_FBS o) FLATBUFFERS_NOEXCEPT;
+};
+
+struct SC_UpdateIcons FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SC_UpdateIcons_FBS NativeTableType;
+  typedef SC_UpdateIconsBuilder Builder;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_UpdateIcons";
+  }
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_ICONS = 4
+  };
+  const ::flatbuffers::Vector<::flatbuffers::Offset<NetworkMessage::ActiveIconInfo>> *icons() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<NetworkMessage::ActiveIconInfo>> *>(VT_ICONS);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_ICONS) &&
+           verifier.VerifyVector(icons()) &&
+           verifier.VerifyVectorOfTables(icons()) &&
+           verifier.EndTable();
+  }
+  SC_UpdateIcons_FBS *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(SC_UpdateIcons_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<SC_UpdateIcons> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_UpdateIcons_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct SC_UpdateIconsBuilder {
+  typedef SC_UpdateIcons Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_icons(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<NetworkMessage::ActiveIconInfo>>> icons) {
+    fbb_.AddOffset(SC_UpdateIcons::VT_ICONS, icons);
+  }
+  explicit SC_UpdateIconsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<SC_UpdateIcons> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<SC_UpdateIcons>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<SC_UpdateIcons> CreateSC_UpdateIcons(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<NetworkMessage::ActiveIconInfo>>> icons = 0) {
+  SC_UpdateIconsBuilder builder_(_fbb);
+  builder_.add_icons(icons);
+  return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<SC_UpdateIcons> CreateSC_UpdateIconsDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<::flatbuffers::Offset<NetworkMessage::ActiveIconInfo>> *icons = nullptr) {
+  auto icons__ = icons ? _fbb.CreateVector<::flatbuffers::Offset<NetworkMessage::ActiveIconInfo>>(*icons) : 0;
+  return NetworkMessage::CreateSC_UpdateIcons(
+      _fbb,
+      icons__);
+}
+
+::flatbuffers::Offset<SC_UpdateIcons> CreateSC_UpdateIcons(::flatbuffers::FlatBufferBuilder &_fbb, const SC_UpdateIcons_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct SC_ObjectGuildID_FBS : public ::flatbuffers::NativeTable {
+  typedef SC_ObjectGuildID TableType;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_ObjectGuildID_FBS";
+  }
+  uint16_t objectid = 0;
+  uint16_t guildid = 0;
+};
+
+struct SC_ObjectGuildID FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SC_ObjectGuildID_FBS NativeTableType;
+  typedef SC_ObjectGuildIDBuilder Builder;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_ObjectGuildID";
+  }
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_OBJECTID = 4,
+    VT_GUILDID = 6
+  };
+  uint16_t objectid() const {
+    return GetField<uint16_t>(VT_OBJECTID, 0);
+  }
+  uint16_t guildid() const {
+    return GetField<uint16_t>(VT_GUILDID, 0);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint16_t>(verifier, VT_OBJECTID, 2) &&
+           VerifyField<uint16_t>(verifier, VT_GUILDID, 2) &&
+           verifier.EndTable();
+  }
+  SC_ObjectGuildID_FBS *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(SC_ObjectGuildID_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<SC_ObjectGuildID> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_ObjectGuildID_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct SC_ObjectGuildIDBuilder {
+  typedef SC_ObjectGuildID Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_objectid(uint16_t objectid) {
+    fbb_.AddElement<uint16_t>(SC_ObjectGuildID::VT_OBJECTID, objectid, 0);
+  }
+  void add_guildid(uint16_t guildid) {
+    fbb_.AddElement<uint16_t>(SC_ObjectGuildID::VT_GUILDID, guildid, 0);
+  }
+  explicit SC_ObjectGuildIDBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<SC_ObjectGuildID> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<SC_ObjectGuildID>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<SC_ObjectGuildID> CreateSC_ObjectGuildID(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint16_t objectid = 0,
+    uint16_t guildid = 0) {
+  SC_ObjectGuildIDBuilder builder_(_fbb);
+  builder_.add_guildid(guildid);
+  builder_.add_objectid(objectid);
+  return builder_.Finish();
+}
+
+::flatbuffers::Offset<SC_ObjectGuildID> CreateSC_ObjectGuildID(::flatbuffers::FlatBufferBuilder &_fbb, const SC_ObjectGuildID_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 struct SC_VariousUpdate_FBS : public ::flatbuffers::NativeTable {
   typedef SC_VariousUpdate TableType;
@@ -3739,6 +3893,94 @@ inline ::flatbuffers::Offset<SC_PlayerUpdate> CreateSC_PlayerUpdate(::flatbuffer
       _head,
       _health,
       _state);
+}
+
+
+inline bool operator==(const SC_UpdateIcons_FBS &lhs, const SC_UpdateIcons_FBS &rhs) {
+  return
+      (lhs.icons.size() == rhs.icons.size() && std::equal(lhs.icons.cbegin(), lhs.icons.cend(), rhs.icons.cbegin(), [](std::shared_ptr<NetworkMessage::ActiveIconInfo_FBS> const &a, std::shared_ptr<NetworkMessage::ActiveIconInfo_FBS> const &b) { return (a == b) || (a && b && *a == *b); }));
+}
+
+inline bool operator!=(const SC_UpdateIcons_FBS &lhs, const SC_UpdateIcons_FBS &rhs) {
+    return !(lhs == rhs);
+}
+
+
+inline SC_UpdateIcons_FBS::SC_UpdateIcons_FBS(const SC_UpdateIcons_FBS &o) {
+  icons.reserve(o.icons.size());
+  for (const auto &icons_ : o.icons) { icons.emplace_back((icons_) ? new NetworkMessage::ActiveIconInfo_FBS(*icons_) : nullptr); }
+}
+
+inline SC_UpdateIcons_FBS &SC_UpdateIcons_FBS::operator=(SC_UpdateIcons_FBS o) FLATBUFFERS_NOEXCEPT {
+  std::swap(icons, o.icons);
+  return *this;
+}
+
+inline SC_UpdateIcons_FBS *SC_UpdateIcons::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<SC_UpdateIcons_FBS>(new SC_UpdateIcons_FBS());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void SC_UpdateIcons::UnPackTo(SC_UpdateIcons_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = icons(); if (_e) { _o->icons.resize(_e->size()); for (::flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { if(_o->icons[_i]) { _e->Get(_i)->UnPackTo(_o->icons[_i].get(), _resolver); } else { _o->icons[_i] = std::shared_ptr<NetworkMessage::ActiveIconInfo_FBS>(_e->Get(_i)->UnPack(_resolver)); }; } } else { _o->icons.resize(0); } }
+}
+
+inline ::flatbuffers::Offset<SC_UpdateIcons> SC_UpdateIcons::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_UpdateIcons_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateSC_UpdateIcons(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<SC_UpdateIcons> CreateSC_UpdateIcons(::flatbuffers::FlatBufferBuilder &_fbb, const SC_UpdateIcons_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const SC_UpdateIcons_FBS* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _icons = _fbb.CreateVector<::flatbuffers::Offset<NetworkMessage::ActiveIconInfo>> (_o->icons.size(), [](size_t i, _VectorArgs *__va) { return CreateActiveIconInfo(*__va->__fbb, __va->__o->icons[i].get(), __va->__rehasher); }, &_va );
+  return NetworkMessage::CreateSC_UpdateIcons(
+      _fbb,
+      _icons);
+}
+
+
+inline bool operator==(const SC_ObjectGuildID_FBS &lhs, const SC_ObjectGuildID_FBS &rhs) {
+  return
+      (lhs.objectid == rhs.objectid) &&
+      (lhs.guildid == rhs.guildid);
+}
+
+inline bool operator!=(const SC_ObjectGuildID_FBS &lhs, const SC_ObjectGuildID_FBS &rhs) {
+    return !(lhs == rhs);
+}
+
+
+inline SC_ObjectGuildID_FBS *SC_ObjectGuildID::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<SC_ObjectGuildID_FBS>(new SC_ObjectGuildID_FBS());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void SC_ObjectGuildID::UnPackTo(SC_ObjectGuildID_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = objectid(); _o->objectid = _e; }
+  { auto _e = guildid(); _o->guildid = _e; }
+}
+
+inline ::flatbuffers::Offset<SC_ObjectGuildID> SC_ObjectGuildID::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_ObjectGuildID_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateSC_ObjectGuildID(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<SC_ObjectGuildID> CreateSC_ObjectGuildID(::flatbuffers::FlatBufferBuilder &_fbb, const SC_ObjectGuildID_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const SC_ObjectGuildID_FBS* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _objectid = _o->objectid;
+  auto _guildid = _o->guildid;
+  return NetworkMessage::CreateSC_ObjectGuildID(
+      _fbb,
+      _objectid,
+      _guildid);
 }
 
 

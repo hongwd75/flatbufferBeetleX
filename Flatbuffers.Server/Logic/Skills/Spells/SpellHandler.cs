@@ -1461,7 +1461,7 @@ public class SpellHandler : ISpellHandler
 
 			if (IsCasting)
 			{
-				foreach (GamePlayer player in m_caster.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+				foreach (GamePlayer player in m_caster.GetPlayersInRadius(WorldManager.VISIBILITY_DISTANCE))
 				{
 					player.Out.SendInterruptAnimation(m_caster);
 				}
@@ -1699,7 +1699,7 @@ public class SpellHandler : ISpellHandler
 		/// <param name="castTime">The cast time</param>
 		public virtual void SendCastAnimation(ushort castTime)
 		{
-			foreach (GamePlayer player in m_caster.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+			foreach (GamePlayer player in m_caster.GetPlayersInRadius(WorldManager.VISIBILITY_DISTANCE))
 			{
 				if (player == null)
 					continue;
@@ -1719,7 +1719,7 @@ public class SpellHandler : ISpellHandler
 			if (target == null)
 				target = m_caster;
 
-			foreach (GamePlayer player in target.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+			foreach (GamePlayer player in target.GetPlayersInRadius(WorldManager.VISIBILITY_DISTANCE))
 			{
 				player.Out.SendSpellEffectAnimation(m_caster, target, m_spell.ClientEffect, boltDuration, noSound, success);
 			}
@@ -1730,7 +1730,7 @@ public class SpellHandler : ISpellHandler
 		/// </summary>
 		public virtual void SendInterruptCastAnimation()
 		{
-			foreach (GamePlayer player in m_caster.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+			foreach (GamePlayer player in m_caster.GetPlayersInRadius(WorldManager.VISIBILITY_DISTANCE))
 			{
 				player.Out.SendInterruptAnimation(m_caster);
 			}
@@ -1740,7 +1740,7 @@ public class SpellHandler : ISpellHandler
 			if (target == null)
 				target = m_caster;
 
-			foreach (GamePlayer player in target.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+			foreach (GamePlayer player in target.GetPlayersInRadius(WorldManager.VISIBILITY_DISTANCE))
 			{
 				player.Out.SendSpellEffectAnimation(m_caster, target, clientEffect, boltDuration, noSound, success);
 			}
@@ -1752,10 +1752,6 @@ public class SpellHandler : ISpellHandler
 		/// </summary>
 		public virtual void FinishSpellCast(GameLiving target)
 		{
-			if (Caster is GamePlayer && ((GamePlayer)Caster).IsOnHorse && !HasPositiveEffect)
-				((GamePlayer)Caster).IsOnHorse = false;
-
-			//[Stryve]: Do not break stealth if spell never breaks stealth.
 			if (UnstealthCasterOnFinish)
 				Caster.Stealth(false);
 
@@ -1771,7 +1767,7 @@ public class SpellHandler : ISpellHandler
 			if (Spell.InstrumentRequirement == 0 && Spell.ClientEffect != 0 && Spell.CastTime > 0)
 			{
 				MessageToCaster("You cast a " + m_spell.Name + " spell!", eChatType.CT_Spell);
-				foreach (GamePlayer player in m_caster.GetPlayersInRadius(WorldMgr.INFO_DISTANCE))
+				foreach (GamePlayer player in m_caster.GetPlayersInRadius(WorldManager.INFO_DISTANCE))
 				{
 					if (player != m_caster)
 						player.MessageFromArea(m_caster, m_caster.GetName(0, true) + " casts a spell!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
@@ -1849,7 +1845,7 @@ public class SpellHandler : ISpellHandler
 					m_caster.DisableSkill(m_spell, m_spell.RecastDelay);
 			}
 
-			GameEventMgr.Notify(GameLivingEvent.CastFinished, m_caster, new CastingEventArgs(this, target, m_lastAttackData));
+			GameEventManager.Notify(GameLivingEvent.CastFinished, m_caster, new CastingEventArgs(this, target, m_lastAttackData));
 		}
 
 		/// <summary>
@@ -1943,29 +1939,16 @@ public class SpellHandler : ISpellHandler
 					else
 						if (modifiedRadius > 0)
 					{
-						foreach (GamePlayer player in WorldMgr.GetPlayersCloseToSpot(Caster.GroundTargetPosition, modifiedRadius))
+						foreach (GamePlayer player in WorldManager.GetPlayersCloseToSpot(Caster.GroundTargetPosition, modifiedRadius))
 						{
 							if (GameServer.ServerRules.IsAllowedToAttack(Caster, player, true))
 							{
-								// Apply Mentalist RA5L
-								SelectiveBlindnessEffect SelectiveBlindness = Caster.EffectList.GetOfType<SelectiveBlindnessEffect>();
-								if (SelectiveBlindness != null)
-								{
-									GameLiving EffectOwner = SelectiveBlindness.EffectSource;
-									if (EffectOwner == player)
-									{
-										if (Caster is GamePlayer) ((GamePlayer)Caster).Out.SendMessage(string.Format("{0} is invisible to you!", player.GetName(0, true)), eChatType.CT_Missed, eChatLoc.CL_SystemWindow);
-									}
-									else list.Add(player);
-								}
-								else list.Add(player);
+								list.Add(player);
 							}
 						}
-						foreach (GameNPC npc in WorldMgr.GetNPCsCloseToSpot(Caster.GroundTargetPosition, modifiedRadius))
+						foreach (GameNPC npc in WorldManager.GetNPCsCloseToSpot(Caster.GroundTargetPosition, modifiedRadius))
 						{
-							if (npc is GameStorm)
-								list.Add(npc);
-							else if (GameServer.ServerRules.IsAllowedToAttack(Caster, npc, true))
+							if (GameServer.ServerRules.IsAllowedToAttack(Caster, npc, true))
 							{
 								if (!npc.HasAbility("DamageImmunity")) list.Add(npc);
 							}
@@ -2052,17 +2035,7 @@ public class SpellHandler : ISpellHandler
 						{
 							if (GameServer.ServerRules.IsAllowedToAttack(Caster, player, true))
 							{
-								SelectiveBlindnessEffect SelectiveBlindness = Caster.EffectList.GetOfType<SelectiveBlindnessEffect>();
-								if (SelectiveBlindness != null)
-								{
-									GameLiving EffectOwner = SelectiveBlindness.EffectSource;
-									if (EffectOwner == player)
-									{
-										if (Caster is GamePlayer) ((GamePlayer)Caster).Out.SendMessage(string.Format("{0} is invisible to you!", player.GetName(0, true)), eChatType.CT_Missed, eChatLoc.CL_SystemWindow);
-									}
-									else list.Add(player);
-								}
-								else list.Add(player);
+								list.Add(player);
 							}
 						}
 						foreach (GameNPC npc in target.GetNPCsInRadius(modifiedRadius))
@@ -2080,17 +2053,7 @@ public class SpellHandler : ISpellHandler
 							// Apply Mentalist RA5L
 							if (Spell.Range > 0)
 							{
-								SelectiveBlindnessEffect SelectiveBlindness = Caster.EffectList.GetOfType<SelectiveBlindnessEffect>();
-								if (SelectiveBlindness != null)
-								{
-									GameLiving EffectOwner = SelectiveBlindness.EffectSource;
-									if (EffectOwner == target)
-									{
-										if (Caster is GamePlayer) ((GamePlayer)Caster).Out.SendMessage(string.Format("{0} is invisible to you!", target.GetName(0, true)), eChatType.CT_Missed, eChatLoc.CL_SystemWindow);
-									}
-									else if (!target.HasAbility("DamageImmunity")) list.Add(target);
-								}
-								else if (!target.HasAbility("DamageImmunity")) list.Add(target);
+								if (!target.HasAbility("DamageImmunity")) list.Add(target);
 							}
 							else if (!target.HasAbility("DamageImmunity")) list.Add(target);
 						}
@@ -2152,102 +2115,6 @@ public class SpellHandler : ISpellHandler
 						{
 							list.Add(Caster);
 						}
-						break;
-					}
-				#endregion
-				#region Group
-				case "group":
-					{
-						Group group = m_caster.Group;
-
-						int spellRange;
-						if (Spell.Range == 0)
-							spellRange = modifiedRadius;
-						else
-							spellRange = CalculateSpellRange();
-
-						if (group == null)
-						{
-							if (m_caster is GamePlayer)
-							{
-								list.Add(m_caster);
-
-								IControlledBrain npc = m_caster.ControlledBrain;
-								if (npc != null)
-								{
-									//Add our first pet
-									GameNPC petBody2 = npc.Body;
-									if (m_caster.IsWithinRadius(petBody2, spellRange))
-										list.Add(petBody2);
-
-									//Now lets add any subpets!
-									if (petBody2 != null && petBody2.ControlledNpcList != null)
-									{
-										foreach (IControlledBrain icb in petBody2.ControlledNpcList)
-										{
-											if (icb != null && m_caster.IsWithinRadius(icb.Body, spellRange))
-												list.Add(icb.Body);
-										}
-									}
-								}
-							}// if (m_caster is GamePlayer)
-							else if (m_caster is GameNPC && (m_caster as GameNPC).Brain is ControlledNpcBrain)
-							{
-								IControlledBrain casterbrain = (m_caster as GameNPC).Brain as IControlledBrain;
-
-								GamePlayer player = casterbrain.GetPlayerOwner();
-
-								if (player != null)
-								{
-									if (player.Group == null)
-									{
-										// No group, add both the pet and owner to the list
-										list.Add(player);
-										list.Add(m_caster);
-									}
-									else
-										// Assign the owner's group so they are added to the list
-										group = player.Group;
-								}
-								else
-									list.Add(m_caster);
-							}// else if (m_caster is GameNPC...
-							else
-								list.Add(m_caster);
-						}// if (group == null)
-
-						//We need to add the entire group
-						if (group != null)
-						{
-							foreach (GameLiving living in group.GetMembersInTheGroup())
-							{
-								// only players in range
-								if (m_caster.IsWithinRadius(living, spellRange))
-								{
-									list.Add(living);
-
-									IControlledBrain npc = living.ControlledBrain;
-									if (npc != null)
-									{
-										//Add our first pet
-										GameNPC petBody2 = npc.Body;
-										if (m_caster.IsWithinRadius(petBody2, spellRange))
-											list.Add(petBody2);
-
-										//Now lets add any subpets!
-										if (petBody2 != null && petBody2.ControlledNpcList != null)
-										{
-											foreach (IControlledBrain icb in petBody2.ControlledNpcList)
-											{
-												if (icb != null && m_caster.IsWithinRadius(icb.Body, spellRange))
-													list.Add(icb.Body);
-											}
-										}
-									}
-								}
-							}
-						}
-
 						break;
 					}
 				#endregion
@@ -3845,7 +3712,7 @@ public class SpellHandler : ISpellHandler
 			}
 
 			if (ad.Damage > 0)
-				foreach (GamePlayer player in ad.Target.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+				foreach (GamePlayer player in ad.Target.GetPlayersInRadius(WorldManager.VISIBILITY_DISTANCE))
 					player.Out.SendCombatAnimation(ad.Attacker, ad.Target, 0, 0, 0, 0, (byte)attackResult, ad.Target.HealthPercent);
 
 			// send animation before dealing damage else dead livings show no animation

@@ -101,7 +101,6 @@ public class DOLCharacters : DataObject
 	private string m_playerTitleType = string.Empty;
 
 	private bool m_flagClassName = true;
-	private ushort m_guildRank;
 
 	private long m_playedTime;  // character /played in seconds.
 	private long m_deathTime; // character /played death time
@@ -136,10 +135,8 @@ public class DOLCharacters : DataObject
 	private DateTime m_lastfreeleveled;
 	private bool m_showXFireInfo;
 	private bool m_noHelp;
-	private bool m_showGuildLogins;
-
-	private string m_guildNote = string.Empty;
 	
+
 	//CLs
 	private bool m_cl;
 	private long m_clExperience;
@@ -189,7 +186,6 @@ public class DOLCharacters : DataObject
 		m_autoloot = true;
 		m_showXFireInfo = false;
 		m_noHelp = false;
-		m_showGuildLogins = false;
 		m_roleplay = false;
 		m_ignoreStatistics = false;
 	}
@@ -1350,23 +1346,7 @@ public class DOLCharacters : DataObject
 		get { return m_advisor; }
 		set { Dirty = true; m_advisor = value; }
 	}
-
-	/// <summary>
-	/// Gets/sets guild rank in the guild
-	/// </summary>
-	[DataElement(AllowDbNull = false)]
-	public ushort GuildRank
-	{
-		get
-		{
-			return m_guildRank;
-		}
-		set
-		{
-			m_guildRank = value;
-			Dirty = true;
-		}
-	}
+	
 	/// <summary>
 	/// Gets/sets the characters /played time
 	/// </summary>
@@ -1970,19 +1950,7 @@ public class DOLCharacters : DataObject
 		}
 	}
 
-	[DataElement(AllowDbNull = true)]
-	public string GuildNote
-	{
-		get
-		{
-			return m_guildNote;
-		}
-		set
-		{
-			Dirty = true;
-			m_guildNote = value;
-		}
-	}
+
 
 	[DataElement(AllowDbNull = false)]
 	public bool ShowXFireInfo
@@ -2005,13 +1973,6 @@ public class DOLCharacters : DataObject
 		set { Dirty = true; m_noHelp = value; }
 	}
 
-	[DataElement(AllowDbNull = false)]
-	public bool ShowGuildLogins
-	{
-		get { return m_showGuildLogins; }
-		set { Dirty = true; m_showGuildLogins = value; }
-	}
-	
 	/// <summary>
 	/// Is Champion level activated
 	/// </summary>

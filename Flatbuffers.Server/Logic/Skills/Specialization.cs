@@ -1,4 +1,6 @@
-﻿namespace Game.Logic.Skills
+﻿using Game.Logic.Styles;
+
+namespace Game.Logic.Skills
 {
 	public interface ISpecActionHandler
 	{

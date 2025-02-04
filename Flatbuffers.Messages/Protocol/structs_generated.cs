@@ -324,5 +324,135 @@ static public class CreatePlayerInfoVerify
       && verifier.VerifyTableEnd(tablePos);
   }
 }
+public struct ActiveIconInfo : IFlatbufferObject
+{
+  private Table __p;
+  public ByteBuffer ByteBuffer { get { return __p.bb; } }
+  public static void ValidateVersion() { FlatBufferConstants.FLATBUFFERS_24_3_25(); }
+  public static ActiveIconInfo GetRootAsActiveIconInfo(ByteBuffer _bb) { return GetRootAsActiveIconInfo(_bb, new ActiveIconInfo()); }
+  public static ActiveIconInfo GetRootAsActiveIconInfo(ByteBuffer _bb, ActiveIconInfo obj) { return (obj.__assign(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
+  public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
+  public ActiveIconInfo __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
+
+  public byte Index { get { int o = __p.__offset(4); return o != 0 ? __p.bb.Get(o + __p.bb_pos) : (byte)0; } }
+  public byte Spelleffectype { get { int o = __p.__offset(6); return o != 0 ? __p.bb.Get(o + __p.bb_pos) : (byte)0; } }
+  public bool Immunity { get { int o = __p.__offset(8); return o != 0 ? 0!=__p.bb.Get(o + __p.bb_pos) : (bool)false; } }
+  public bool Flagnegative { get { int o = __p.__offset(10); return o != 0 ? 0!=__p.bb.Get(o + __p.bb_pos) : (bool)false; } }
+  public ushort Icon { get { int o = __p.__offset(12); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public ushort Remainsec { get { int o = __p.__offset(14); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public ushort Internalid { get { int o = __p.__offset(16); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public string Name { get { int o = __p.__offset(18); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
+#if ENABLE_SPAN_T
+  public Span<byte> GetNameBytes() { return __p.__vector_as_span<byte>(18, 1); }
+#else
+  public ArraySegment<byte>? GetNameBytes() { return __p.__vector_as_arraysegment(18); }
+#endif
+  public byte[] GetNameArray() { return __p.__vector_as_array<byte>(18); }
+
+  public static Offset<NetworkMessage.ActiveIconInfo> CreateActiveIconInfo(FlatBufferBuilder builder,
+      byte index = 0,
+      byte spelleffectype = 0,
+      bool immunity = false,
+      bool flagnegative = false,
+      ushort icon = 0,
+      ushort remainsec = 0,
+      ushort internalid = 0,
+      StringOffset nameOffset = default(StringOffset)) {
+    builder.StartTable(8);
+    ActiveIconInfo.AddName(builder, nameOffset);
+    ActiveIconInfo.AddInternalid(builder, internalid);
+    ActiveIconInfo.AddRemainsec(builder, remainsec);
+    ActiveIconInfo.AddIcon(builder, icon);
+    ActiveIconInfo.AddFlagnegative(builder, flagnegative);
+    ActiveIconInfo.AddImmunity(builder, immunity);
+    ActiveIconInfo.AddSpelleffectype(builder, spelleffectype);
+    ActiveIconInfo.AddIndex(builder, index);
+    return ActiveIconInfo.EndActiveIconInfo(builder);
+  }
+
+  public static void StartActiveIconInfo(FlatBufferBuilder builder) { builder.StartTable(8); }
+  public static void AddIndex(FlatBufferBuilder builder, byte index) { builder.AddByte(0, index, 0); }
+  public static void AddSpelleffectype(FlatBufferBuilder builder, byte spelleffectype) { builder.AddByte(1, spelleffectype, 0); }
+  public static void AddImmunity(FlatBufferBuilder builder, bool immunity) { builder.AddBool(2, immunity, false); }
+  public static void AddFlagnegative(FlatBufferBuilder builder, bool flagnegative) { builder.AddBool(3, flagnegative, false); }
+  public static void AddIcon(FlatBufferBuilder builder, ushort icon) { builder.AddUshort(4, icon, 0); }
+  public static void AddRemainsec(FlatBufferBuilder builder, ushort remainsec) { builder.AddUshort(5, remainsec, 0); }
+  public static void AddInternalid(FlatBufferBuilder builder, ushort internalid) { builder.AddUshort(6, internalid, 0); }
+  public static void AddName(FlatBufferBuilder builder, StringOffset nameOffset) { builder.AddOffset(7, nameOffset.Value, 0); }
+  public static Offset<NetworkMessage.ActiveIconInfo> EndActiveIconInfo(FlatBufferBuilder builder) {
+    int o = builder.EndTable();
+    return new Offset<NetworkMessage.ActiveIconInfo>(o);
+  }
+  public ActiveIconInfo_FBS UnPack() {
+    var _o = new ActiveIconInfo_FBS();
+    this.UnPackTo(_o);
+    return _o;
+  }
+  public void UnPackTo(ActiveIconInfo_FBS _o) {
+    _o.Index = this.Index;
+    _o.Spelleffectype = this.Spelleffectype;
+    _o.Immunity = this.Immunity;
+    _o.Flagnegative = this.Flagnegative;
+    _o.Icon = this.Icon;
+    _o.Remainsec = this.Remainsec;
+    _o.Internalid = this.Internalid;
+    _o.Name = this.Name;
+  }
+  public static Offset<NetworkMessage.ActiveIconInfo> Pack(FlatBufferBuilder builder, ActiveIconInfo_FBS _o) {
+    if (_o == null) return default(Offset<NetworkMessage.ActiveIconInfo>);
+    var _name = _o.Name == null ? default(StringOffset) : builder.CreateString(_o.Name);
+    return CreateActiveIconInfo(
+      builder,
+      _o.Index,
+      _o.Spelleffectype,
+      _o.Immunity,
+      _o.Flagnegative,
+      _o.Icon,
+      _o.Remainsec,
+      _o.Internalid,
+      _name);
+  }
+}
+
+public class ActiveIconInfo_FBS
+{
+  public byte Index { get; set; }
+  public byte Spelleffectype { get; set; }
+  public bool Immunity { get; set; }
+  public bool Flagnegative { get; set; }
+  public ushort Icon { get; set; }
+  public ushort Remainsec { get; set; }
+  public ushort Internalid { get; set; }
+  public string Name { get; set; }
+
+  public ActiveIconInfo_FBS() {
+    this.Index = 0;
+    this.Spelleffectype = 0;
+    this.Immunity = false;
+    this.Flagnegative = false;
+    this.Icon = 0;
+    this.Remainsec = 0;
+    this.Internalid = 0;
+    this.Name = null;
+  }
+}
+
+
+static public class ActiveIconInfoVerify
+{
+  static public bool Verify(Google.FlatBuffers.Verifier verifier, uint tablePos)
+  {
+    return verifier.VerifyTableStart(tablePos)
+      && verifier.VerifyField(tablePos, 4 /*Index*/, 1 /*byte*/, 1, false)
+      && verifier.VerifyField(tablePos, 6 /*Spelleffectype*/, 1 /*byte*/, 1, false)
+      && verifier.VerifyField(tablePos, 8 /*Immunity*/, 1 /*bool*/, 1, false)
+      && verifier.VerifyField(tablePos, 10 /*Flagnegative*/, 1 /*bool*/, 1, false)
+      && verifier.VerifyField(tablePos, 12 /*Icon*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 14 /*Remainsec*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 16 /*Internalid*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyString(tablePos, 18 /*Name*/, false)
+      && verifier.VerifyTableEnd(tablePos);
+  }
+}
 
 }

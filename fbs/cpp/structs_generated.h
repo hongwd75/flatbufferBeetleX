@@ -27,6 +27,10 @@ struct CreatePlayerInfo;
 struct CreatePlayerInfoBuilder;
 struct CreatePlayerInfo_FBS;
 
+struct ActiveIconInfo;
+struct ActiveIconInfoBuilder;
+struct ActiveIconInfo_FBS;
+
 bool operator==(const ConEffectData_FBS &lhs, const ConEffectData_FBS &rhs);
 bool operator!=(const ConEffectData_FBS &lhs, const ConEffectData_FBS &rhs);
 bool operator==(const Vector3 &lhs, const Vector3 &rhs);
@@ -35,6 +39,8 @@ bool operator==(const Vector3Int &lhs, const Vector3Int &rhs);
 bool operator!=(const Vector3Int &lhs, const Vector3Int &rhs);
 bool operator==(const CreatePlayerInfo_FBS &lhs, const CreatePlayerInfo_FBS &rhs);
 bool operator!=(const CreatePlayerInfo_FBS &lhs, const CreatePlayerInfo_FBS &rhs);
+bool operator==(const ActiveIconInfo_FBS &lhs, const ActiveIconInfo_FBS &rhs);
+bool operator!=(const ActiveIconInfo_FBS &lhs, const ActiveIconInfo_FBS &rhs);
 
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Vector3 FLATBUFFERS_FINAL_CLASS {
  private:
@@ -370,6 +376,165 @@ inline ::flatbuffers::Offset<CreatePlayerInfo> CreateCreatePlayerInfoDirect(
 
 ::flatbuffers::Offset<CreatePlayerInfo> CreateCreatePlayerInfo(::flatbuffers::FlatBufferBuilder &_fbb, const CreatePlayerInfo_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct ActiveIconInfo_FBS : public ::flatbuffers::NativeTable {
+  typedef ActiveIconInfo TableType;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.ActiveIconInfo_FBS";
+  }
+  uint8_t index = 0;
+  uint8_t spelleffectype = 0;
+  bool immunity = false;
+  bool flagnegative = false;
+  uint16_t icon = 0;
+  uint16_t remainsec = 0;
+  uint16_t internalid = 0;
+  std::string name{};
+};
+
+struct ActiveIconInfo FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef ActiveIconInfo_FBS NativeTableType;
+  typedef ActiveIconInfoBuilder Builder;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.ActiveIconInfo";
+  }
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_INDEX = 4,
+    VT_SPELLEFFECTYPE = 6,
+    VT_IMMUNITY = 8,
+    VT_FLAGNEGATIVE = 10,
+    VT_ICON = 12,
+    VT_REMAINSEC = 14,
+    VT_INTERNALID = 16,
+    VT_NAME = 18
+  };
+  uint8_t index() const {
+    return GetField<uint8_t>(VT_INDEX, 0);
+  }
+  uint8_t spelleffectype() const {
+    return GetField<uint8_t>(VT_SPELLEFFECTYPE, 0);
+  }
+  bool immunity() const {
+    return GetField<uint8_t>(VT_IMMUNITY, 0) != 0;
+  }
+  bool flagnegative() const {
+    return GetField<uint8_t>(VT_FLAGNEGATIVE, 0) != 0;
+  }
+  uint16_t icon() const {
+    return GetField<uint16_t>(VT_ICON, 0);
+  }
+  uint16_t remainsec() const {
+    return GetField<uint16_t>(VT_REMAINSEC, 0);
+  }
+  uint16_t internalid() const {
+    return GetField<uint16_t>(VT_INTERNALID, 0);
+  }
+  const ::flatbuffers::String *name() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_NAME);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint8_t>(verifier, VT_INDEX, 1) &&
+           VerifyField<uint8_t>(verifier, VT_SPELLEFFECTYPE, 1) &&
+           VerifyField<uint8_t>(verifier, VT_IMMUNITY, 1) &&
+           VerifyField<uint8_t>(verifier, VT_FLAGNEGATIVE, 1) &&
+           VerifyField<uint16_t>(verifier, VT_ICON, 2) &&
+           VerifyField<uint16_t>(verifier, VT_REMAINSEC, 2) &&
+           VerifyField<uint16_t>(verifier, VT_INTERNALID, 2) &&
+           VerifyOffset(verifier, VT_NAME) &&
+           verifier.VerifyString(name()) &&
+           verifier.EndTable();
+  }
+  ActiveIconInfo_FBS *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(ActiveIconInfo_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<ActiveIconInfo> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const ActiveIconInfo_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct ActiveIconInfoBuilder {
+  typedef ActiveIconInfo Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_index(uint8_t index) {
+    fbb_.AddElement<uint8_t>(ActiveIconInfo::VT_INDEX, index, 0);
+  }
+  void add_spelleffectype(uint8_t spelleffectype) {
+    fbb_.AddElement<uint8_t>(ActiveIconInfo::VT_SPELLEFFECTYPE, spelleffectype, 0);
+  }
+  void add_immunity(bool immunity) {
+    fbb_.AddElement<uint8_t>(ActiveIconInfo::VT_IMMUNITY, static_cast<uint8_t>(immunity), 0);
+  }
+  void add_flagnegative(bool flagnegative) {
+    fbb_.AddElement<uint8_t>(ActiveIconInfo::VT_FLAGNEGATIVE, static_cast<uint8_t>(flagnegative), 0);
+  }
+  void add_icon(uint16_t icon) {
+    fbb_.AddElement<uint16_t>(ActiveIconInfo::VT_ICON, icon, 0);
+  }
+  void add_remainsec(uint16_t remainsec) {
+    fbb_.AddElement<uint16_t>(ActiveIconInfo::VT_REMAINSEC, remainsec, 0);
+  }
+  void add_internalid(uint16_t internalid) {
+    fbb_.AddElement<uint16_t>(ActiveIconInfo::VT_INTERNALID, internalid, 0);
+  }
+  void add_name(::flatbuffers::Offset<::flatbuffers::String> name) {
+    fbb_.AddOffset(ActiveIconInfo::VT_NAME, name);
+  }
+  explicit ActiveIconInfoBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<ActiveIconInfo> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<ActiveIconInfo>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<ActiveIconInfo> CreateActiveIconInfo(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint8_t index = 0,
+    uint8_t spelleffectype = 0,
+    bool immunity = false,
+    bool flagnegative = false,
+    uint16_t icon = 0,
+    uint16_t remainsec = 0,
+    uint16_t internalid = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> name = 0) {
+  ActiveIconInfoBuilder builder_(_fbb);
+  builder_.add_name(name);
+  builder_.add_internalid(internalid);
+  builder_.add_remainsec(remainsec);
+  builder_.add_icon(icon);
+  builder_.add_flagnegative(flagnegative);
+  builder_.add_immunity(immunity);
+  builder_.add_spelleffectype(spelleffectype);
+  builder_.add_index(index);
+  return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<ActiveIconInfo> CreateActiveIconInfoDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint8_t index = 0,
+    uint8_t spelleffectype = 0,
+    bool immunity = false,
+    bool flagnegative = false,
+    uint16_t icon = 0,
+    uint16_t remainsec = 0,
+    uint16_t internalid = 0,
+    const char *name = nullptr) {
+  auto name__ = name ? _fbb.CreateString(name) : 0;
+  return NetworkMessage::CreateActiveIconInfo(
+      _fbb,
+      index,
+      spelleffectype,
+      immunity,
+      flagnegative,
+      icon,
+      remainsec,
+      internalid,
+      name__);
+}
+
+::flatbuffers::Offset<ActiveIconInfo> CreateActiveIconInfo(::flatbuffers::FlatBufferBuilder &_fbb, const ActiveIconInfo_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 
 inline bool operator==(const ConEffectData_FBS &lhs, const ConEffectData_FBS &rhs) {
   return
@@ -491,6 +656,71 @@ inline ::flatbuffers::Offset<CreatePlayerInfo> CreateCreatePlayerInfo(::flatbuff
       _realm,
       _head,
       _position);
+}
+
+
+inline bool operator==(const ActiveIconInfo_FBS &lhs, const ActiveIconInfo_FBS &rhs) {
+  return
+      (lhs.index == rhs.index) &&
+      (lhs.spelleffectype == rhs.spelleffectype) &&
+      (lhs.immunity == rhs.immunity) &&
+      (lhs.flagnegative == rhs.flagnegative) &&
+      (lhs.icon == rhs.icon) &&
+      (lhs.remainsec == rhs.remainsec) &&
+      (lhs.internalid == rhs.internalid) &&
+      (lhs.name == rhs.name);
+}
+
+inline bool operator!=(const ActiveIconInfo_FBS &lhs, const ActiveIconInfo_FBS &rhs) {
+    return !(lhs == rhs);
+}
+
+
+inline ActiveIconInfo_FBS *ActiveIconInfo::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<ActiveIconInfo_FBS>(new ActiveIconInfo_FBS());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void ActiveIconInfo::UnPackTo(ActiveIconInfo_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = index(); _o->index = _e; }
+  { auto _e = spelleffectype(); _o->spelleffectype = _e; }
+  { auto _e = immunity(); _o->immunity = _e; }
+  { auto _e = flagnegative(); _o->flagnegative = _e; }
+  { auto _e = icon(); _o->icon = _e; }
+  { auto _e = remainsec(); _o->remainsec = _e; }
+  { auto _e = internalid(); _o->internalid = _e; }
+  { auto _e = name(); if (_e) _o->name = _e->str(); }
+}
+
+inline ::flatbuffers::Offset<ActiveIconInfo> ActiveIconInfo::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const ActiveIconInfo_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateActiveIconInfo(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<ActiveIconInfo> CreateActiveIconInfo(::flatbuffers::FlatBufferBuilder &_fbb, const ActiveIconInfo_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const ActiveIconInfo_FBS* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _index = _o->index;
+  auto _spelleffectype = _o->spelleffectype;
+  auto _immunity = _o->immunity;
+  auto _flagnegative = _o->flagnegative;
+  auto _icon = _o->icon;
+  auto _remainsec = _o->remainsec;
+  auto _internalid = _o->internalid;
+  auto _name = _o->name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->name);
+  return NetworkMessage::CreateActiveIconInfo(
+      _fbb,
+      _index,
+      _spelleffectype,
+      _immunity,
+      _flagnegative,
+      _icon,
+      _remainsec,
+      _internalid,
+      _name);
 }
 
 }  // namespace NetworkMessage

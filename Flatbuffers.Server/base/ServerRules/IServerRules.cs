@@ -16,6 +16,7 @@ public interface IServerRules
     void OnPlayerKilled(GamePlayer killedPlayer, GameObject killer);
     
     bool IsSameRealm(GameLiving source, GameLiving target, bool quiet);
+    bool IsAllowedToUnderstand(GameLiving source, GamePlayer target);
     string RulesDescription();
     
     byte GetLivingRealm(GamePlayer player, GameLiving target);

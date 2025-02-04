@@ -9,6 +9,10 @@ namespace Logic.database.table
         private string m_password;
         private string m_language;
         private string m_guildid;
+        private ushort m_guildRank;
+        private string m_guildNote;
+        private bool m_showGuildLogins;
+        
         private DateTime m_creationDate;
         private DateTime m_lastLogin;
         private int m_realm;
@@ -27,6 +31,10 @@ namespace Logic.database.table
             m_realm = 0;
             m_state = 1;
             m_isMuted = false;
+            m_guildid = string.Empty;
+            m_guildRank = 0;
+            m_guildNote = string.Empty;
+            m_showGuildLogins = false;
         }
         
         [PrimaryKey]
@@ -42,16 +50,35 @@ namespace Logic.database.table
             get => m_password;
             set => SetProperty(ref m_password, value);
         }
-        
-        /// <summary>
-        /// ID of the guild this character is in
-        /// </summary>
+
         [DataElement(AllowDbNull = true, Index = true)]
         public string GuildID
         {
             get => m_guildid;
-            set { Dirty = true; m_guildid = value.ToUpper(); }            
+            set => SetProperty(ref m_guildid, value);                
         }
+        
+        [DataElement(AllowDbNull = false)]
+        public ushort GuildRank
+        {
+            get => m_guildRank;
+            set => SetProperty(ref m_guildRank, value);            
+        }
+        
+        [DataElement(AllowDbNull = true)]
+        public string GuildNote
+        {
+            get => m_guildNote;
+            set => SetProperty(ref m_guildNote, value);
+        }
+        
+        [DataElement(AllowDbNull = false)]
+        public bool ShowGuildLogins
+        {
+            get => m_showGuildLogins;
+            set => SetProperty(ref m_showGuildLogins, value);               
+        }
+
         
         [DataElement(AllowDbNull = false)]
         public string Nickname

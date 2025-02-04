@@ -63,6 +63,15 @@ table SC_PlayerUpdate {
 	state  : int;
 }
 
+table SC_UpdateIcons {
+	icons : [ActiveIconInfo];
+}
+
+table SC_ObjectGuildID {
+	objectid	: ushort;
+	guildid		: ushort;
+}
+
 // SendUpdatePlayer
 table SC_VariousUpdate  
 {

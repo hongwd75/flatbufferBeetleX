@@ -28,3 +28,14 @@ table CreatePlayerInfo {
 	head : int;
 	position : Vector3;
 }
+
+table ActiveIconInfo {
+	index 			: ubyte;
+	spelleffectype 	: ubyte;
+	immunity		: bool;
+	flagnegative	: bool;
+	icon			: ushort;
+	remainsec		: ushort;
+	internalid		: ushort;
+	name			: string;
+}

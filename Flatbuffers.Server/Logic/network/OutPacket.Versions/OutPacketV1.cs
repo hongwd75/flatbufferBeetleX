@@ -3,6 +3,7 @@ using BeetleX;
 using Flatbuffers.Messages.Enums;
 using Game.Logic.AI.Brain;
 using Game.Logic.datatable;
+using Game.Logic.Effects;
 using Game.Logic.Geometry;
 using Game.Logic.Language;
 using Game.Logic.PropertyCalc;
@@ -491,6 +492,68 @@ namespace Game.Logic.network
             
         }
 
+        public override void SendUpdateIcons(System.Collections.IList changedEffects, ref int lastUpdateEffectsCount)
+        {
+            int fxcount = 0;
+            SC_UpdateIcons_FBS req = new SC_UpdateIcons_FBS();
+            
+            foreach (IGameEffect effect in Client.Player.EffectList)
+            {
+                if (effect.Icon != 0)
+                {
+                    fxcount++;
+                    if (changedEffects != null && !changedEffects.Contains(effect))
+                    {
+                        continue;
+                    }
+
+                    bool immuni = false;
+                    bool flagnegative = false;
+                    byte setype = 0xff;
+                    ushort internalid = 0;
+                    
+                    if (effect is GameSpellEffect op)
+                    {
+                        internalid = (ushort)op.Spell.InternalID;
+                        if (op.IsDisabled == true)
+                        {
+                            immuni = true;
+                        }
+                        if (op.SpellHandler.HasPositiveEffect == false)
+                        {
+                            flagnegative = false;
+                        }
+                        setype = (byte)(fxcount - 1);
+                    } else
+                    if (effect is StaticEffect se)
+                    {
+                        if (se.HasNegativeEffect == true)
+                        {
+                            flagnegative = true;
+                        }
+                    }
+                    if (effect.Icon > 5000)
+                    {
+                        setype = (byte)(fxcount - 1);
+                    }
+                    
+                    req.Icons.Add(new ActiveIconInfo_FBS()
+                    {
+                        Index = (byte)(fxcount-1),
+                        Spelleffectype = setype,
+                        Immunity = immuni,
+                        Icon = effect.Icon,
+                        Flagnegative = flagnegative,
+                        Internalid = internalid,
+                        Remainsec = (ushort)(effect.RemainingTime / 1000),
+                        Name = effect.Name
+                    });
+                }
+            }
+            
+            SendFlatBufferPacket(ServerPackets.SC_UpdateIcons, req);
+        }
+        
         public override void SendConcentrationList()
         {
             SC_ConcentrationList_FBS req = new SC_ConcentrationList_FBS();
@@ -523,6 +586,16 @@ namespace Game.Logic.network
                     (Client.Player.GetModified(eProperty.WaterSpeed)*0.01f))
             };
             SendFlatBufferPacket(ServerPackets.SC_MaxSpeed, req);
+        }
+
+        public override void SendObjectGuildID(GameObject obj, Guild.Guild guild)
+        {
+            SC_ObjectGuildID_FBS req = new SC_ObjectGuildID_FBS()
+            {
+                Guildid = guild == null ? (ushort)0 : guild.ID,
+                Objectid = (ushort)obj.ObjectID
+            };
+            SendFlatBufferPacket(ServerPackets.SC_ObjectGuildID, req);
         }
     }
 }
