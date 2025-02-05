@@ -11,7 +11,8 @@ namespace Game.Logic.network
     {
         private ISession Session = null;
         private GameClient mGameClient = null;
-
+        public delegate void CheckLOSMgrResponse(GamePlayer player, ushort response, ushort sourceOID, ushort targetOID);
+        
         // 에니메이션 인덱스
         public virtual int OneDualWeaponHit => 0x1f5;
         public virtual int BothDualWeaponHit => 0x1f6;
@@ -140,5 +141,6 @@ namespace Game.Logic.network
         public abstract void SendConcentrationList();
         public abstract void SendUpdateMaxSpeed();
         public abstract void SendObjectGuildID(GameObject obj, Guild.Guild guild);
+        public abstract void SendCheckLOS(GameObject source, GameObject target, CheckLOSMgrResponse callback);
     }
 }

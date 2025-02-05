@@ -39,6 +39,12 @@ namespace Game.Logic.ServerProperties
 		[ServerProperty("account", "time_between_account_creation_sameip", "동일 IP에서 계정을 생성한 후, 2개의 계정 생성 이후 계정 생성 간에 필요한 시간(분 단위)을 설정합니다.", 15)]
 		public static int TIME_BETWEEN_ACCOUNT_CREATION_SAMEIP;
 		
+		[ServerProperty("world", "check_los_during_cast", "Perform a LOS check during a spell cast.", true)]
+		public static bool CHECK_LOS_DURING_CAST;
+		[ServerProperty("world", "always_check_los", "Perform a LoS check before aggroing. This can involve a huge lag, handle with care!", false)]
+		public static bool ALWAYS_CHECK_LOS;
+		[ServerProperty("world", "always_check_pet_los", "Should we perform LOS checks between controlled NPC's and players?", false)]
+		public static bool ALWAYS_CHECK_PET_LOS;		
 		[ServerProperty("world", "disabled_regions", "비활성화된 지역 ID의 직렬화된 목록, 세미콜론으로 구분되거나 대시로 범위 표시 (예: 1-5;7;9)", "")]
 		public static string DISABLED_REGIONS = "";
 		[ServerProperty("world", "world_day_increment", "일 증가 (0에서 512까지, 기본값은 24). 증가값이 클수록 하루의 길이가 짧아집니다.", (uint)24)]

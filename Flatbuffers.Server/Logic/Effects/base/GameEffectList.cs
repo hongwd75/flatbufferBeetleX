@@ -13,52 +13,25 @@ namespace Game.Logic.Effects;
 
 public class GameEffectList : IEnumerable<IGameEffect>
 {
-	/// <summary>
-	/// Defines a logger for this class.
-	/// </summary>
 	private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-	/// <summary>
-	/// Default Lock Object
-	/// </summary>
 	private readonly object m_lockObject = new object();
-	
-	/// <summary>
-	/// Stores all effects
-	/// </summary>
+
 	protected List<IGameEffect> m_effects;
 
-	/// <summary>
-	/// The owner of this list
-	/// </summary>
 	protected readonly GameLiving m_owner;
 
-	/// <summary>
-	/// The current unique effect ID
-	/// </summary>
 	protected ushort m_runningID = 1;
-
-	/// <summary>
-	/// The count of started changes to the list
-	/// </summary>
+	
 	protected volatile sbyte m_changesCount;
-
-	/// <summary>
-	/// constructor
-	/// </summary>
-	/// <param name="owner"></param>
+	
 	public GameEffectList(GameLiving owner)
 	{
 		if (owner == null)
 			throw new ArgumentNullException("owner");
 		m_owner = owner;
 	}
-
-	/// <summary>
-	/// add a new effect to the effectlist, it does not start the effect
-	/// </summary>
-	/// <param name="effect">The effect to add to the list</param>
-	/// <returns>true if the effect was added</returns>
+	
 	public virtual bool Add(IGameEffect effect)
 	{
 		// dead owners don't get effects
@@ -82,12 +55,7 @@ public class GameEffectList : IEnumerable<IGameEffect>
 
 		return true;
 	}
-
-	/// <summary>
-	/// remove effect
-	/// </summary>
-	/// <param name="effect">The effect to remove from the list</param>
-	/// <returns>true if the effect was removed</returns>
+	
 	public virtual bool Remove(IGameEffect effect)
 	{
 		if (m_effects == null)
@@ -114,9 +82,6 @@ public class GameEffectList : IEnumerable<IGameEffect>
 		return true;
 	}
 
-	/// <summary>
-	/// Cancels all effects
-	/// </summary>
 	public virtual void CancelAll()
 	{
 		IGameEffect[] fx;
@@ -139,9 +104,6 @@ public class GameEffectList : IEnumerable<IGameEffect>
 		CommitChanges();
 	}
 
-	/// <summary>
-	/// Restore All Effect From PlayerXEffect Data Table
-	/// </summary>
 	public virtual void RestoreAllEffects()
 	{
 		GamePlayer player = m_owner as GamePlayer;
@@ -195,9 +157,6 @@ public class GameEffectList : IEnumerable<IGameEffect>
 		}
 	}
 
-	/// <summary>
-	/// Save All Effect to PlayerXEffect Data Table
-	/// </summary>
 	public virtual void SaveAllEffects()
 	{
 		GamePlayer player = m_owner as GamePlayer;
@@ -243,9 +202,6 @@ public class GameEffectList : IEnumerable<IGameEffect>
 		}
 	}
 
-	/// <summary>
-	/// Called when an effect changed
-	/// </summary>
 	public virtual void OnEffectsChanged(IGameEffect changedEffect)
 	{
 		if (m_changesCount > 0)
@@ -254,17 +210,11 @@ public class GameEffectList : IEnumerable<IGameEffect>
 		UpdateChangedEffects();
 	}
 
-	/// <summary>
-	/// Begins multiple changes to the list that should not send updates
-	/// </summary>
 	public void BeginChanges()
 	{
 		m_changesCount++;
 	}
 
-	/// <summary>
-	/// Updates all list changes to the owner since BeginChanges was called
-	/// </summary>
 	public virtual void CommitChanges()
 	{
 		if (--m_changesCount < 0)
@@ -279,9 +229,6 @@ public class GameEffectList : IEnumerable<IGameEffect>
 			UpdateChangedEffects();
 	}
 
-	/// <summary>
-	/// Updates the changed effects.
-	/// </summary>
 	protected virtual void UpdateChangedEffects()
 	{
 		if (m_owner is GameNPC)
@@ -292,11 +239,6 @@ public class GameEffectList : IEnumerable<IGameEffect>
 		}
 	}
 
-	/// <summary>
-	/// Find the first occurence of an effect with given type
-	/// </summary>
-	/// <param name="effectType"></param>
-	/// <returns>effect or null</returns>
 	public virtual T GetOfType<T>() where T : IGameEffect
 	{
 		if (m_effects == null)
@@ -308,11 +250,6 @@ public class GameEffectList : IEnumerable<IGameEffect>
 		}
 	}
 
-	/// <summary>
-	/// Find effects of specific type
-	/// </summary>
-	/// <param name="effectType"></param>
-	/// <returns>resulting effectlist</returns>
 	public virtual ICollection<T> GetAllOfType<T>() where T : IGameEffect
 	{
 		if (m_effects == null)
@@ -324,11 +261,6 @@ public class GameEffectList : IEnumerable<IGameEffect>
 		}
 	}
 
-	/// <summary>
-	/// Count effects of a specific type
-	/// </summary>
-	/// <param name="effectType"></param>
-	/// <returns></returns>
 	public int CountOfType<T>() where T : IGameEffect
 	{
 		if (m_effects == null)
@@ -340,11 +272,6 @@ public class GameEffectList : IEnumerable<IGameEffect>
 		}
 	}
 
-	/// <summary>
-	/// Count effects of a specific type
-	/// </summary>
-	/// <param name="effectType"></param>
-	/// <returns></returns>
 	public int CountOfType(params Type[] types)
 	{
 		if (m_effects == null)

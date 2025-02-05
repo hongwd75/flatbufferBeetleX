@@ -82,8 +82,9 @@ public enum ServerPackets : ushort
   SC_EmoteAnimation = 24,
   SC_StringMessage = 25,
   SC_DialogBoxMessage = 26,
-  SC_MaxSpeed = 27,
-  SC_Quit = 28,
+  SC_CheckLOSRequest = 27,
+  SC_MaxSpeed = 28,
+  SC_Quit = 29,
 };
 
 public enum ClientPackets : ushort

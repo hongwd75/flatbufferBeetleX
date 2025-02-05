@@ -230,13 +230,14 @@ enum ServerPackets : uint16_t {
   ServerPackets_SC_EmoteAnimation = 24,
   ServerPackets_SC_StringMessage = 25,
   ServerPackets_SC_DialogBoxMessage = 26,
-  ServerPackets_SC_MaxSpeed = 27,
-  ServerPackets_SC_Quit = 28,
+  ServerPackets_SC_CheckLOSRequest = 27,
+  ServerPackets_SC_MaxSpeed = 28,
+  ServerPackets_SC_Quit = 29,
   ServerPackets_MIN = ServerPackets_SC_LoginAns,
   ServerPackets_MAX = ServerPackets_SC_Quit
 };
 
-inline const ServerPackets (&EnumValuesServerPackets())[28] {
+inline const ServerPackets (&EnumValuesServerPackets())[29] {
   static const ServerPackets values[] = {
     ServerPackets_SC_LoginAns,
     ServerPackets_SC_AccountInfo,
@@ -264,6 +265,7 @@ inline const ServerPackets (&EnumValuesServerPackets())[28] {
     ServerPackets_SC_EmoteAnimation,
     ServerPackets_SC_StringMessage,
     ServerPackets_SC_DialogBoxMessage,
+    ServerPackets_SC_CheckLOSRequest,
     ServerPackets_SC_MaxSpeed,
     ServerPackets_SC_Quit
   };
@@ -271,7 +273,7 @@ inline const ServerPackets (&EnumValuesServerPackets())[28] {
 }
 
 inline const char * const *EnumNamesServerPackets() {
-  static const char * const names[29] = {
+  static const char * const names[30] = {
     "SC_LoginAns",
     "SC_AccountInfo",
     "SC_WorldEnterNotify",
@@ -298,6 +300,7 @@ inline const char * const *EnumNamesServerPackets() {
     "SC_EmoteAnimation",
     "SC_StringMessage",
     "SC_DialogBoxMessage",
+    "SC_CheckLOSRequest",
     "SC_MaxSpeed",
     "SC_Quit",
     nullptr

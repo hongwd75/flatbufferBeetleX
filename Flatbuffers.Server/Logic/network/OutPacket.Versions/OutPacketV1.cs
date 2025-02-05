@@ -597,5 +597,37 @@ namespace Game.Logic.network
             };
             SendFlatBufferPacket(ServerPackets.SC_ObjectGuildID, req);
         }
+
+        public override void SendCheckLOS(GameObject source, GameObject target, CheckLOSMgrResponse callback)
+        {
+            if (Client.Player == null)
+            {
+                return;
+            }
+
+            int targetoid = (target != null ? target.ObjectID : 0);
+            int sourceoid = (source != null ? source.ObjectID : 0);
+
+            string key = $"LOSMGR C:0x{sourceoid} T:0x{targetoid}";
+            
+            CheckLOSMgrResponse old_callback = null;
+            lock (Client.Player.TempProperties)
+            {
+                old_callback = (CheckLOSMgrResponse) Client.Player.TempProperties.getProperty<object>(key, null);
+                Client.Player.TempProperties.setProperty(key, callback);
+            }
+
+            if (old_callback != null)
+            {
+                old_callback(Client.Player, 0, 0, 0);
+            }
+
+            SC_CheckLOSRequest_FBS req = new SC_CheckLOSRequest_FBS()
+            {
+                Sourceid = (ushort)sourceoid,
+                Targetid = (ushort)targetoid
+            };
+            SendFlatBufferPacket(ServerPackets.SC_CheckLOSRequest, req);
+        }
     }
 }

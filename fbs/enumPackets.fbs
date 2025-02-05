@@ -70,6 +70,7 @@ enum ServerPackets : ushort {
 	SC_EmoteAnimation,
 	SC_StringMessage,
 	SC_DialogBoxMessage,
+	SC_CheckLOSRequest,
 	SC_MaxSpeed,
 	SC_Quit
 }

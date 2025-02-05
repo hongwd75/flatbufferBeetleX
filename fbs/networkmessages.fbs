@@ -243,6 +243,12 @@ table SC_DialogBoxMessage
 	message		: string;
 }
 
+table SC_CheckLOSRequest
+{
+	sourceid	: ushort;
+	targetid	: ushort;
+}
+
 table SC_MaxSpeed
 {
 	speed			: ushort;

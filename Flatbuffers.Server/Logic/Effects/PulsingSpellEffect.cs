@@ -1,7 +1,8 @@
 ﻿using System.Text;
 using Game.Logic.Effects;
+using Game.Logic.Spells;
 
-namespace Game.Logic.Spells;
+namespace Game.Logic.Effects;
 
 public sealed class PulsingSpellEffect : IConcentrationEffect
 {

@@ -134,6 +134,10 @@ struct SC_DialogBoxMessage;
 struct SC_DialogBoxMessageBuilder;
 struct SC_DialogBoxMessage_FBS;
 
+struct SC_CheckLOSRequest;
+struct SC_CheckLOSRequestBuilder;
+struct SC_CheckLOSRequest_FBS;
+
 struct SC_MaxSpeed;
 struct SC_MaxSpeedBuilder;
 struct SC_MaxSpeed_FBS;
@@ -200,6 +204,8 @@ bool operator==(const SC_StringMessage_FBS &lhs, const SC_StringMessage_FBS &rhs
 bool operator!=(const SC_StringMessage_FBS &lhs, const SC_StringMessage_FBS &rhs);
 bool operator==(const SC_DialogBoxMessage_FBS &lhs, const SC_DialogBoxMessage_FBS &rhs);
 bool operator!=(const SC_DialogBoxMessage_FBS &lhs, const SC_DialogBoxMessage_FBS &rhs);
+bool operator==(const SC_CheckLOSRequest_FBS &lhs, const SC_CheckLOSRequest_FBS &rhs);
+bool operator!=(const SC_CheckLOSRequest_FBS &lhs, const SC_CheckLOSRequest_FBS &rhs);
 bool operator==(const SC_MaxSpeed_FBS &lhs, const SC_MaxSpeed_FBS &rhs);
 bool operator!=(const SC_MaxSpeed_FBS &lhs, const SC_MaxSpeed_FBS &rhs);
 bool operator==(const SC_Quit_FBS &lhs, const SC_Quit_FBS &rhs);
@@ -3258,6 +3264,75 @@ inline ::flatbuffers::Offset<SC_DialogBoxMessage> CreateSC_DialogBoxMessageDirec
 
 ::flatbuffers::Offset<SC_DialogBoxMessage> CreateSC_DialogBoxMessage(::flatbuffers::FlatBufferBuilder &_fbb, const SC_DialogBoxMessage_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct SC_CheckLOSRequest_FBS : public ::flatbuffers::NativeTable {
+  typedef SC_CheckLOSRequest TableType;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_CheckLOSRequest_FBS";
+  }
+  uint16_t sourceid = 0;
+  uint16_t targetid = 0;
+};
+
+struct SC_CheckLOSRequest FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SC_CheckLOSRequest_FBS NativeTableType;
+  typedef SC_CheckLOSRequestBuilder Builder;
+  static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
+    return "NetworkMessage.SC_CheckLOSRequest";
+  }
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_SOURCEID = 4,
+    VT_TARGETID = 6
+  };
+  uint16_t sourceid() const {
+    return GetField<uint16_t>(VT_SOURCEID, 0);
+  }
+  uint16_t targetid() const {
+    return GetField<uint16_t>(VT_TARGETID, 0);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint16_t>(verifier, VT_SOURCEID, 2) &&
+           VerifyField<uint16_t>(verifier, VT_TARGETID, 2) &&
+           verifier.EndTable();
+  }
+  SC_CheckLOSRequest_FBS *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(SC_CheckLOSRequest_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<SC_CheckLOSRequest> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_CheckLOSRequest_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct SC_CheckLOSRequestBuilder {
+  typedef SC_CheckLOSRequest Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_sourceid(uint16_t sourceid) {
+    fbb_.AddElement<uint16_t>(SC_CheckLOSRequest::VT_SOURCEID, sourceid, 0);
+  }
+  void add_targetid(uint16_t targetid) {
+    fbb_.AddElement<uint16_t>(SC_CheckLOSRequest::VT_TARGETID, targetid, 0);
+  }
+  explicit SC_CheckLOSRequestBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<SC_CheckLOSRequest> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<SC_CheckLOSRequest>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<SC_CheckLOSRequest> CreateSC_CheckLOSRequest(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint16_t sourceid = 0,
+    uint16_t targetid = 0) {
+  SC_CheckLOSRequestBuilder builder_(_fbb);
+  builder_.add_targetid(targetid);
+  builder_.add_sourceid(sourceid);
+  return builder_.Finish();
+}
+
+::flatbuffers::Offset<SC_CheckLOSRequest> CreateSC_CheckLOSRequest(::flatbuffers::FlatBufferBuilder &_fbb, const SC_CheckLOSRequest_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 struct SC_MaxSpeed_FBS : public ::flatbuffers::NativeTable {
   typedef SC_MaxSpeed TableType;
   static FLATBUFFERS_CONSTEXPR_CPP11 const char *GetFullyQualifiedName() {
@@ -5062,6 +5137,47 @@ inline ::flatbuffers::Offset<SC_DialogBoxMessage> CreateSC_DialogBoxMessage(::fl
       _data3,
       _data4,
       _message);
+}
+
+
+inline bool operator==(const SC_CheckLOSRequest_FBS &lhs, const SC_CheckLOSRequest_FBS &rhs) {
+  return
+      (lhs.sourceid == rhs.sourceid) &&
+      (lhs.targetid == rhs.targetid);
+}
+
+inline bool operator!=(const SC_CheckLOSRequest_FBS &lhs, const SC_CheckLOSRequest_FBS &rhs) {
+    return !(lhs == rhs);
+}
+
+
+inline SC_CheckLOSRequest_FBS *SC_CheckLOSRequest::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<SC_CheckLOSRequest_FBS>(new SC_CheckLOSRequest_FBS());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void SC_CheckLOSRequest::UnPackTo(SC_CheckLOSRequest_FBS *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = sourceid(); _o->sourceid = _e; }
+  { auto _e = targetid(); _o->targetid = _e; }
+}
+
+inline ::flatbuffers::Offset<SC_CheckLOSRequest> SC_CheckLOSRequest::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SC_CheckLOSRequest_FBS* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateSC_CheckLOSRequest(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<SC_CheckLOSRequest> CreateSC_CheckLOSRequest(::flatbuffers::FlatBufferBuilder &_fbb, const SC_CheckLOSRequest_FBS *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const SC_CheckLOSRequest_FBS* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _sourceid = _o->sourceid;
+  auto _targetid = _o->targetid;
+  return NetworkMessage::CreateSC_CheckLOSRequest(
+      _fbb,
+      _sourceid,
+      _targetid);
 }
 
 

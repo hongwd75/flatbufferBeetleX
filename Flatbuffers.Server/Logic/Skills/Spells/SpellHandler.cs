@@ -6,6 +6,7 @@ using Game.Logic.Effects;
 using Game.Logic.Events;
 using Game.Logic.Inventory;
 using Game.Logic.Language;
+using Game.Logic.network;
 using Game.Logic.PropertyCalc;
 using Game.Logic.ServerProperties;
 using Game.Logic.Skills;
@@ -820,7 +821,7 @@ public class SpellHandler : ISpellHandler
 		/// <param name="player">The player</param>
 		/// <param name="response">The result</param>
 		/// <param name="targetOID">The target OID</param>
-		public virtual void CheckLOSPlayerToTarget(GamePlayer player, ushort response, ushort targetOID)
+		public virtual void CheckLOSPlayerToTarget(GamePlayer player, ushort response, ushort sourceOID, ushort targetOID)
 		{
 			if (player == null) // Hmm
 				return;
@@ -846,7 +847,7 @@ public class SpellHandler : ISpellHandler
 		/// <param name="player">The player</param>
 		/// <param name="response">The result</param>
 		/// <param name="targetOID">The target OID</param>
-		public virtual void CheckLOSNPCToTarget(GamePlayer player, ushort response, ushort targetOID)
+		public virtual void CheckLOSNPCToTarget(GamePlayer player, ushort response, ushort sourceOID, ushort targetOID)
 		{
 			if (player == null) // Hmm
 				return;
@@ -1116,11 +1117,11 @@ public class SpellHandler : ISpellHandler
 
 								if (Caster is GamePlayer)
 								{
-									playerChecker.Out.SendCheckLOS(Caster, target, new CheckLOSResponse(CheckLOSPlayerToTarget));
+									playerChecker.Out.SendCheckLOS(Caster, target, new OutPacket.CheckLOSMgrResponse(CheckLOSPlayerToTarget));
 								}
 								else if (target is GamePlayer || MustCheckLOS(Caster))
 								{
-									playerChecker.Out.SendCheckLOS(Caster, target, new CheckLOSResponse(CheckLOSNPCToTarget));
+									playerChecker.Out.SendCheckLOS(Caster, target, new OutPacket.CheckLOSMgrResponse(CheckLOSNPCToTarget));
 								}
 							}
 						}
@@ -1585,7 +1586,7 @@ public class SpellHandler : ISpellHandler
 						m_handler.OnAfterSpellCastSequence();
 					}
 
-					if (m_caster is GamePlayer && ServerProperties.Properties.ENABLE_DEBUG && m_stage < 3)
+					if (m_caster is GamePlayer &&  m_stage < 3)
 					{
 						(m_caster as GamePlayer).Out.SendMessage("[DEBUG] step = " + (m_handler.Stage + 1), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 					}
@@ -2197,12 +2198,6 @@ public class SpellHandler : ISpellHandler
 			return StartSpell(target);
 		}
 
-
-		/// <summary>
-		/// Called when spell effect has to be started and applied to targets
-		/// This is typically called after calling CheckBeginCast
-		/// </summary>
-		/// <param name="target">The current target object</param>
 		public virtual bool StartSpell(GameLiving target)
 		{
 			// For PBAOE spells always set the target to the caster
@@ -2219,41 +2214,7 @@ public class SpellHandler : ISpellHandler
 			var targets = SelectTargets(m_spellTarget);
 
 			double effectiveness = Caster.Effectiveness;
-
-			if (Caster.EffectList.GetOfType<MasteryofConcentrationEffect>() != null)
-			{
-				MasteryofConcentrationAbility ra = Caster.GetAbility<MasteryofConcentrationAbility>();
-				if (ra != null && ra.Level > 0)
-				{
-					effectiveness *= System.Math.Round((double)ra.GetAmountForLevel(ra.Level) / 100, 2);
-				}
-			}
-
-			//[StephenxPimentel] Reduce Damage if necro is using MoC
-			if (Caster is NecromancerPet)
-			{
-				if ((Caster as NecromancerPet).Owner.EffectList.GetOfType<MasteryofConcentrationEffect>() != null)
-				{
-					MasteryofConcentrationAbility necroRA = (Caster as NecromancerPet).Owner.GetAbility<MasteryofConcentrationAbility>();
-					if (necroRA != null && necroRA.Level > 0)
-					{
-						effectiveness *= System.Math.Round((double)necroRA.GetAmountForLevel(necroRA.Level) / 100, 2);
-					}
-				}
-			}
-
-			if (Caster is GamePlayer && (Caster as GamePlayer).CharacterClass.ID == (int)eCharacterClass.Warlock && m_spell.IsSecondary)
-			{
-				Spell uninterruptibleSpell = Caster.TempProperties.getProperty<Spell>(UninterruptableSpellHandler.WARLOCK_UNINTERRUPTABLE_SPELL);
-
-				if (uninterruptibleSpell != null && uninterruptibleSpell.Value > 0)
-				{
-					double nerf = uninterruptibleSpell.Value;
-					effectiveness *= (1 - (nerf * 0.01));
-					Caster.TempProperties.removeProperty(UninterruptableSpellHandler.WARLOCK_UNINTERRUPTABLE_SPELL);
-				}
-			}
-
+			
 			foreach (GameLiving t in targets)
 			{
 				// Aggressive NPCs will aggro on every target they hit
@@ -2263,7 +2224,7 @@ public class SpellHandler : ISpellHandler
 					&& Caster is GameNPC && (Caster as GameNPC).Brain is IOldAggressiveBrain)
 					((Caster as GameNPC).Brain as IOldAggressiveBrain).AddToAggroList(t, 1);
 
-				if (Util.Chance(CalculateSpellResistChance(t)))
+				if (RandomUtil.Chance(CalculateSpellResistChance(t)))
 				{
 					OnSpellResisted(t);
 					continue;
@@ -2305,23 +2266,12 @@ public class SpellHandler : ISpellHandler
 			CastSubSpells(target);
 			return true;
 		}
-		/// <summary>
-		/// Calculate the variance due to the radius of the spell
-		/// </summary>
-		/// <param name="distance">The distance away from center of the spell</param>
-		/// <param name="radius">The radius of the spell</param>
-		/// <returns></returns>
+
 		protected virtual double CalculateAreaVariance(GameLiving target, int distance, int radius)
 		{
 			return ((double)distance / (double)radius);
 		}
 
-		/// <summary>
-		/// Calculates the effect duration in milliseconds
-		/// </summary>
-		/// <param name="target">The effect target</param>
-		/// <param name="effectiveness">The effect effectiveness</param>
-		/// <returns>The effect duration in milliseconds</returns>
 		protected virtual int CalculateEffectDuration(GameLiving target, double effectiveness)
 		{
 			double duration = Spell.Duration;
@@ -2344,23 +2294,12 @@ public class SpellHandler : ISpellHandler
 			return (int)duration;
 		}
 
-		/// <summary>
-		/// Creates the corresponding spell effect for the spell
-		/// </summary>
-		/// <param name="target"></param>
-		/// <param name="effectiveness"></param>
-		/// <returns></returns>
 		protected virtual GameSpellEffect CreateSpellEffect(GameLiving target, double effectiveness)
 		{
 			int freq = Spell != null ? Spell.Frequency : 0;
 			return new GameSpellEffect(this, CalculateEffectDuration(target, effectiveness), freq, effectiveness);
 		}
 
-		/// <summary>
-		/// Apply effect on target or do spell action if non duration spell
-		/// </summary>
-		/// <param name="target">target that gets the effect</param>
-		/// <param name="effectiveness">factor from 0..1 (0%-100%)</param>
 		public virtual void ApplyEffectOnTarget(GameLiving target, double effectiveness)
 		{
 			if (target is GamePlayer)
@@ -2373,49 +2312,7 @@ public class SpellHandler : ISpellHandler
 					return;
 				}
 			}
-
-			if ((target is Keeps.GameKeepDoor || target is Keeps.GameKeepComponent))
-			{
-				bool isAllowed = false;
-				bool isSilent = false;
-
-				if (Spell.Radius == 0)
-				{
-					switch (Spell.SpellType.ToLower())
-					{
-						case "archery":
-						case "bolt":
-						case "bomber":
-						case "damagespeeddecrease":
-						case "directdamage":
-						case "magicalstrike":
-						case "siegearrow":
-						case "summontheurgistpet":
-						case "directdamagewithdebuff":
-							isAllowed = true;
-							break;
-					}
-				}
-
-				if (Spell.Radius > 0)
-				{
-					// pbaoe is allowed, otherwise door is in range of a AOE so don't spam caster with a message
-					if (Spell.Range == 0)
-						isAllowed = true;
-					else
-						isSilent = true;
-				}
-
-				if (!isAllowed)
-				{
-					if (!isSilent)
-					{
-						MessageToCaster(String.Format("Your spell has no effect on the {0}!", target.Name), eChatType.CT_SpellResisted);
-					}
-
-					return;
-				}
-			}
+			
 			if (m_spellLine.KeyName == GlobalSpellsLines.Item_Effects || m_spellLine.KeyName == GlobalSpellsLines.Combat_Styles_Effect || m_spellLine.KeyName == GlobalSpellsLines.Potions_Effects || m_spellLine.KeyName == Specs.Savagery || m_spellLine.KeyName == GlobalSpellsLines.Character_Abilities || m_spellLine.KeyName == "OffensiveProc")
 				effectiveness = 1.0; // TODO player.PlayerEffectiveness
 			if (effectiveness <= 0)
@@ -2553,7 +2450,7 @@ public class SpellHandler : ISpellHandler
 			if (!target.IsAlive || target.EffectList == null)
 				return;
 
-			eChatType noOverwrite = (Spell.Pulse == 0) ? eChatType.CT_SpellResisted : eChatType.CT_SpellPulse;
+			eChatType noOverwrite = (Spell.Pulse == 0) ? eChatType.CT_SpellResisted : eChatType.CT_Spell;
 			GameSpellEffect neweffect = CreateSpellEffect(target, effectiveness);
 
 			// Iterate through Overwritable Effect
@@ -2711,19 +2608,19 @@ public class SpellHandler : ISpellHandler
 				SendEffectAnimation(effect.Owner, 0, false, 1);
 			if (Spell.IsFocus) // Add Event handlers for focus spell
 			{
-				GameEventMgr.RemoveHandler(Caster, GameLivingEvent.AttackFinished, new DOLEventHandler(FocusSpellAction));
-				GameEventMgr.RemoveHandler(Caster, GameLivingEvent.CastStarting, new DOLEventHandler(FocusSpellAction));
-				GameEventMgr.RemoveHandler(Caster, GameLivingEvent.Moving, new DOLEventHandler(FocusSpellAction));
-				GameEventMgr.RemoveHandler(Caster, GameLivingEvent.Dying, new DOLEventHandler(FocusSpellAction));
-				GameEventMgr.RemoveHandler(Caster, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(FocusSpellAction));
-				GameEventMgr.RemoveHandler(effect.Owner, GameLivingEvent.Dying, new DOLEventHandler(FocusSpellAction));
+				GameEventManager.RemoveHandler(Caster, GameLivingEvent.AttackFinished, new GameEventHandler(FocusSpellAction));
+				GameEventManager.RemoveHandler(Caster, GameLivingEvent.CastStarting, new GameEventHandler(FocusSpellAction));
+				GameEventManager.RemoveHandler(Caster, GameLivingEvent.Moving, new GameEventHandler(FocusSpellAction));
+				GameEventManager.RemoveHandler(Caster, GameLivingEvent.Dying, new GameEventHandler(FocusSpellAction));
+				GameEventManager.RemoveHandler(Caster, GameLivingEvent.AttackedByEnemy, new GameEventHandler(FocusSpellAction));
+				GameEventManager.RemoveHandler(effect.Owner, GameLivingEvent.Dying, new GameEventHandler(FocusSpellAction));
 				Caster.TempProperties.setProperty(FOCUS_SPELL, effect);
-				GameEventMgr.AddHandler(Caster, GameLivingEvent.AttackFinished, new DOLEventHandler(FocusSpellAction));
-				GameEventMgr.AddHandler(Caster, GameLivingEvent.CastStarting, new DOLEventHandler(FocusSpellAction));
-				GameEventMgr.AddHandler(Caster, GameLivingEvent.Moving, new DOLEventHandler(FocusSpellAction));
-				GameEventMgr.AddHandler(Caster, GameLivingEvent.Dying, new DOLEventHandler(FocusSpellAction));
-				GameEventMgr.AddHandler(Caster, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(FocusSpellAction));
-				GameEventMgr.AddHandler(effect.Owner, GameLivingEvent.Dying, new DOLEventHandler(FocusSpellAction));
+				GameEventManager.AddHandler(Caster, GameLivingEvent.AttackFinished, new GameEventHandler(FocusSpellAction));
+				GameEventManager.AddHandler(Caster, GameLivingEvent.CastStarting, new GameEventHandler(FocusSpellAction));
+				GameEventManager.AddHandler(Caster, GameLivingEvent.Moving, new GameEventHandler(FocusSpellAction));
+				GameEventManager.AddHandler(Caster, GameLivingEvent.Dying, new GameEventHandler(FocusSpellAction));
+				GameEventManager.AddHandler(Caster, GameLivingEvent.AttackedByEnemy, new GameEventHandler(FocusSpellAction));
+				GameEventManager.AddHandler(effect.Owner, GameLivingEvent.Dying, new GameEventHandler(FocusSpellAction));
 			}
 		}
 
@@ -2776,11 +2673,7 @@ public class SpellHandler : ISpellHandler
 
 			return 100 - CalculateToHitChance(target);
 		}
-
-		/// <summary>
-		/// When spell was resisted
-		/// </summary>
-		/// <param name="target">the target that resisted the spell</param>
+		
 		protected virtual void OnSpellResisted(GameLiving target)
 		{
 			SendSpellResistAnimation(target);
@@ -2789,21 +2682,13 @@ public class SpellHandler : ISpellHandler
 			StartSpellResistInterruptTimer(target);
 			StartSpellResistLastAttackTimer(target);
 		}
-
-		/// <summary>
-		/// Send Spell Resisted Animation
-		/// </summary>
-		/// <param name="target"></param>
+		
 		public virtual void SendSpellResistAnimation(GameLiving target)
 		{
 			if (Spell.Pulse == 0 || !HasPositiveEffect)
 				SendEffectAnimation(target, 0, false, 0);
 		}
-
-		/// <summary>
-		/// Send Spell Resist Messages to Caster and Target
-		/// </summary>
-		/// <param name="target"></param>
+		
 		public virtual void SendSpellResistMessages(GameLiving target)
 		{
 			// Deliver message to the target, if the target is a pet, to its
@@ -2828,16 +2713,9 @@ public class SpellHandler : ISpellHandler
 			// Deliver message to the caster as well.
 			this.MessageToCaster(eChatType.CT_SpellResisted, "{0} resists the effect!", target.GetName(0, true));
 		}
-
-		/// <summary>
-		/// Send Spell Attack Data Notification to Target when Spell is Resisted
-		/// </summary>
-		/// <param name="target"></param>
+		
 		public virtual void SendSpellResistNotification(GameLiving target)
 		{
-			// Report resisted spell attack data to any type of living object, no need
-			// to decide here what to do. For example, NPCs will use their brain.
-			// "Just the facts, ma'am, just the facts."
 			AttackData ad = new AttackData();
 			ad.Attacker = Caster;
 			ad.Target = target;
@@ -2849,45 +2727,19 @@ public class SpellHandler : ISpellHandler
 
 		}
 
-		/// <summary>
-		/// Start Spell Interrupt Timer when Spell is Resisted
-		/// </summary>
-		/// <param name="target"></param>
 		public virtual void StartSpellResistInterruptTimer(GameLiving target)
 		{
-			// Spells that would have caused damage or are not instant will still
-			// interrupt a casting player.
 			if (!(Spell.SpellType.IndexOf("debuff", StringComparison.OrdinalIgnoreCase) >= 0 && Spell.CastTime == 0))
 				target.StartInterruptTimer(target.SpellInterruptDuration, AttackData.eAttackType.Spell, Caster);
 		}
 
-		/// <summary>
-		/// Start Last Attack Timer when Spell is Resisted
-		/// </summary>
-		/// <param name="target"></param>
 		public virtual void StartSpellResistLastAttackTimer(GameLiving target)
 		{
-			if (target.Realm == 0 || Caster.Realm == 0)
-			{
-				target.LastAttackedByEnemyTickPvE = target.CurrentRegion.Time;
-				Caster.LastAttackTickPvE = Caster.CurrentRegion.Time;
-			}
-			else
-			{
-				target.LastAttackedByEnemyTickPvP = target.CurrentRegion.Time;
-				Caster.LastAttackTickPvP = Caster.CurrentRegion.Time;
-			}
+			target.LastAttackedByEnemyTick = target.CurrentRegion.Time;
+			Caster.LastAttackedTick = Caster.CurrentRegion.Time;
 		}
 
 		#region messages
-
-		/// <summary>
-		/// Sends a message to the caster, if the caster is a controlled
-		/// creature, to the player instead (only spell hit and resisted
-		/// messages).
-		/// </summary>
-		/// <param name="message"></param>
-		/// <param name="type"></param>
 		public void MessageToCaster(string message, eChatType type)
 		{
 			if (Caster is GamePlayer)
@@ -2905,12 +2757,6 @@ public class SpellHandler : ISpellHandler
 			}
 		}
 
-		/// <summary>
-		/// sends a message to a living
-		/// </summary>
-		/// <param name="living"></param>
-		/// <param name="message"></param>
-		/// <param name="type"></param>
 		public void MessageToLiving(GameLiving living, string message, eChatType type)
 		{
 			if (message != null && message.Length > 0)
@@ -2919,12 +2765,6 @@ public class SpellHandler : ISpellHandler
 			}
 		}
 
-		/// <summary>
-		/// Hold events for focus spells
-		/// </summary>
-		/// <param name="e"></param>
-		/// <param name="sender"></param>
-		/// <param name="args"></param>
 		protected virtual void FocusSpellAction(GameEvent e, object sender, EventArgs args)
 		{
 			GameLiving living = sender as GameLiving;
@@ -3037,7 +2877,7 @@ public class SpellHandler : ISpellHandler
 				player = caster is GamePlayer ? (caster as GamePlayer) : ((caster as GameNPC).Brain as IControlledBrain).GetPlayerOwner();
 			}
 
-			if (player != null) return LanguageMgr.GetTranslation(player.Client, translationId, args);
+			if (player != null) return LanguageMgr.GetTranslation(player.Network, translationId, args);
 			else return LanguageMgr.GetTranslation(Properties.SERV_LANGUAGE, translationId, args);
 		}
 

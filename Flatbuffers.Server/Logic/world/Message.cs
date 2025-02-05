@@ -1,4 +1,5 @@
 ﻿using Game.Logic.Language;
+using Game.Logic.Spells;
 using NetworkMessage;
 
 namespace Game.Logic.World;
@@ -61,5 +62,21 @@ public static class Message
 				player.MessageFromArea(centerObject, message, chatType, chatLoc);
 			}
 		}
+	}
+}
+
+//======================================================================================================================
+//
+public static class SpellMessagesHelper
+{
+	public static void MessageToCaster(this SpellHandler handler, eChatType type, string format, params object[] args)
+	{
+		handler.MessageToCaster(string.Format(format, args), type);
+	}
+
+	public static void MessageToLiving(this SpellHandler handler, GameLiving living, eChatType type, string format,
+		params object[] args)
+	{
+		handler.MessageToLiving(living, string.Format(format, args), type);
 	}
 }

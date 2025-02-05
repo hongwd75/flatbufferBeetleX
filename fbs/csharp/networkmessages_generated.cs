@@ -2798,6 +2798,75 @@ static public class SC_DialogBoxMessageVerify
       && verifier.VerifyTableEnd(tablePos);
   }
 }
+public struct SC_CheckLOSRequest : IFlatbufferObject
+{
+  private Table __p;
+  public ByteBuffer ByteBuffer { get { return __p.bb; } }
+  public static void ValidateVersion() { FlatBufferConstants.FLATBUFFERS_24_3_25(); }
+  public static SC_CheckLOSRequest GetRootAsSC_CheckLOSRequest(ByteBuffer _bb) { return GetRootAsSC_CheckLOSRequest(_bb, new SC_CheckLOSRequest()); }
+  public static SC_CheckLOSRequest GetRootAsSC_CheckLOSRequest(ByteBuffer _bb, SC_CheckLOSRequest obj) { return (obj.__assign(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
+  public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
+  public SC_CheckLOSRequest __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
+
+  public ushort Sourceid { get { int o = __p.__offset(4); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+  public ushort Targetid { get { int o = __p.__offset(6); return o != 0 ? __p.bb.GetUshort(o + __p.bb_pos) : (ushort)0; } }
+
+  public static Offset<NetworkMessage.SC_CheckLOSRequest> CreateSC_CheckLOSRequest(FlatBufferBuilder builder,
+      ushort sourceid = 0,
+      ushort targetid = 0) {
+    builder.StartTable(2);
+    SC_CheckLOSRequest.AddTargetid(builder, targetid);
+    SC_CheckLOSRequest.AddSourceid(builder, sourceid);
+    return SC_CheckLOSRequest.EndSC_CheckLOSRequest(builder);
+  }
+
+  public static void StartSC_CheckLOSRequest(FlatBufferBuilder builder) { builder.StartTable(2); }
+  public static void AddSourceid(FlatBufferBuilder builder, ushort sourceid) { builder.AddUshort(0, sourceid, 0); }
+  public static void AddTargetid(FlatBufferBuilder builder, ushort targetid) { builder.AddUshort(1, targetid, 0); }
+  public static Offset<NetworkMessage.SC_CheckLOSRequest> EndSC_CheckLOSRequest(FlatBufferBuilder builder) {
+    int o = builder.EndTable();
+    return new Offset<NetworkMessage.SC_CheckLOSRequest>(o);
+  }
+  public SC_CheckLOSRequest_FBS UnPack() {
+    var _o = new SC_CheckLOSRequest_FBS();
+    this.UnPackTo(_o);
+    return _o;
+  }
+  public void UnPackTo(SC_CheckLOSRequest_FBS _o) {
+    _o.Sourceid = this.Sourceid;
+    _o.Targetid = this.Targetid;
+  }
+  public static Offset<NetworkMessage.SC_CheckLOSRequest> Pack(FlatBufferBuilder builder, SC_CheckLOSRequest_FBS _o) {
+    if (_o == null) return default(Offset<NetworkMessage.SC_CheckLOSRequest>);
+    return CreateSC_CheckLOSRequest(
+      builder,
+      _o.Sourceid,
+      _o.Targetid);
+  }
+}
+
+public class SC_CheckLOSRequest_FBS
+{
+  public ushort Sourceid { get; set; }
+  public ushort Targetid { get; set; }
+
+  public SC_CheckLOSRequest_FBS() {
+    this.Sourceid = 0;
+    this.Targetid = 0;
+  }
+}
+
+
+static public class SC_CheckLOSRequestVerify
+{
+  static public bool Verify(Google.FlatBuffers.Verifier verifier, uint tablePos)
+  {
+    return verifier.VerifyTableStart(tablePos)
+      && verifier.VerifyField(tablePos, 4 /*Sourceid*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyField(tablePos, 6 /*Targetid*/, 2 /*ushort*/, 2, false)
+      && verifier.VerifyTableEnd(tablePos);
+  }
+}
 public struct SC_MaxSpeed : IFlatbufferObject
 {
   private Table __p;

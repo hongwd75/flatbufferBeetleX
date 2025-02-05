@@ -69,9 +69,6 @@ public class SpeedEnhancementSpellHandler : SpellHandler
 		if (target.TempProperties.getProperty("Charging", false))
 			return;
 
-		if (target.EffectList.GetOfType<ArmsLengthEffect>() != null)
-			return;
-
 		if (target.EffectList.GetOfType<SpeedOfSoundEffect>() != null)
 			return;
 
